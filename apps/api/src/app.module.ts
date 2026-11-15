@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AdminModule } from './admin/admin.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -23,6 +24,7 @@ import { TenantGuard } from './tenancy/tenant.guard';
     AuthModule,
     HealthModule,
     OrganizationsModule,
+    AdminModule,
   ],
   // Global guards run in this order: rate limit → authentication → organization → permissions.
   providers: [

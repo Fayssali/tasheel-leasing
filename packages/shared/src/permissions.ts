@@ -53,6 +53,11 @@ export const PERMISSIONS = [
     description: 'Open a time-boxed support session on a tenant',
     allowedOrgTypes: ['PLATFORM'],
   },
+  {
+    code: 'admin.audit.read',
+    description: 'Read the audit log of every organization',
+    allowedOrgTypes: ['PLATFORM'],
+  },
   { code: 'admin.kpi.read', description: 'View platform KPIs', allowedOrgTypes: ['PLATFORM'] },
 ] as const satisfies readonly PermissionDef[];
 
@@ -89,6 +94,7 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.organization.verify',
       'admin.settings.manage',
       'admin.support_session',
+      'admin.audit.read',
       'admin.kpi.read',
     ],
   },

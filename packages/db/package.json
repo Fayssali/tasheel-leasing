@@ -13,7 +13,9 @@
     "seed": "dotenv -e ../../.env -- tsx prisma/seed.ts",
     "studio": "dotenv -e ../../.env -- prisma studio",
     "test": "dotenv -e ../../.env -- tsx --test test/*.test.ts",
-    "test:rls": "dotenv -e ../../.env -- bash test/rls/run.sh"
+    "test:rls": "dotenv -e ../../.env -- bash test/rls/run.sh",
+    "create-admin": "dotenv -e ../../.env -- tsx scripts/create-platform-admin.ts",
+    "seed:catalogue": "dotenv -e ../../.env -- tsx prisma/seed.ts --catalogue-only"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

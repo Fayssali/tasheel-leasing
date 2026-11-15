@@ -130,6 +130,15 @@ async function seedDemoOrganizations(): Promise<void> {
 
 async function main(): Promise<void> {
   await seedCatalogue();
+  if (process.argv.includes('--catalogue-only')) {
+    console.log(
+      `Seeded ${PERMISSIONS.length} permissions and ${SYSTEM_ROLES.length} system roles (no demo data).`,
+    );
+    return;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Refusing to create demo organizations in production. Use --catalogue-only.');
+  }
   await seedDemoOrganizations();
   console.log(
     `Seeded ${PERMISSIONS.length} permissions, ${SYSTEM_ROLES.length} system roles, ${DEMO_ORGS.length} demo organizations.`,

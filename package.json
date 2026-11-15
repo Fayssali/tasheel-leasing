@@ -1,7 +1,7 @@
 {
   "name": "tasheel",
   "private": true,
-  "description": "Tasheel Leasing — B2B digital leasing marketplace and financing intermediation SaaS",
+  "description": "Tasheel Leasing \u2014 B2B digital leasing marketplace and financing intermediation SaaS",
   "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=22"
@@ -18,7 +18,9 @@
     "db:migrate": "pnpm --filter @tasheel/db migrate:dev",
     "db:deploy": "pnpm --filter @tasheel/db migrate:deploy",
     "db:seed": "pnpm --filter @tasheel/db seed",
-    "db:studio": "pnpm --filter @tasheel/db studio"
+    "db:studio": "pnpm --filter @tasheel/db studio",
+    "db:create-admin": "pnpm --filter @tasheel/db create-admin",
+    "db:seed:catalogue": "pnpm --filter @tasheel/db seed:catalogue"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

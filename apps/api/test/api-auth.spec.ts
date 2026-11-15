@@ -326,6 +326,30 @@ describe('Auth and access control (HTTP)', () => {
         .expect(200);
     });
 
+    it('keeps the admin console closed to non-platform organizations', async () => {
+      prisma.forTenant.mockResolvedValueOnce(
+        memberWith(['organization.read', 'member.manage', 'member.invite']),
+      );
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/admin/organizations')
+        .set('Authorization', await bearer())
+        .set('X-Organization-Id', ORG)
+        .expect(403);
+      expect(res.body.code).toBe('PERMISSION_DENIED');
+    });
+
+    it('requires a reason payload shape on admin actions', async () => {
+      prisma.forTenant.mockResolvedValueOnce(
+        memberWith(['admin.organization.verify'], 'VERIFIED', 'PLATFORM', true),
+      );
+      await request(app.getHttpServer())
+        .post(`/api/v1/admin/organizations/${ORG}/reject`)
+        .set('Authorization', await bearer())
+        .set('X-Organization-Id', ORG)
+        .send({ reason: 'x' })
+        .expect(400);
+    });
+
     it('refuses a member without the required permission', async () => {
       prisma.forTenant.mockResolvedValueOnce(memberWith(['organization.read']));
       const res = await request(app.getHttpServer())

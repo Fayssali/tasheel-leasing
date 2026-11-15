@@ -56,9 +56,18 @@
 - Mandatory for platform and institution members: organization routes return `MFA_SETUP_REQUIRED` until enabled, and disabling is refused.
 - Tests: 66 unit and HTTP tests passing; the integration test now covers the bank-user MFA journey on PostgreSQL (runs in CI).
 
+### Done — 2026-11-15, team management and admin console API
+
+- Invitations by email with a role (7 days, latest only); preview; accept with a new account (email verified by the link) or an existing one (email must match); revoke.
+- Members: change role, enable/disable. No privilege escalation, last-admin protection, no self-modification.
+- Organization profile editing; legal identity locked once verified.
+- Admin console API: KPIs, organization search and verification queue, verify / reject / suspend / reactivate (reason required where relevant, concurrent-safe, emailed to the organization's admins), cross-organization audit log.
+- Server bootstrap: `db:seed:catalogue` (no demo data) and `db:create-admin`; the full seed refuses demo data in production.
+- Design change: invitation acceptance uses a token carrying the organization id (the tenant context is set before lookup) instead of the SECURITY DEFINER function planned earlier. Same protection, less SQL.
+- Tests: 85 unit and HTTP tests passing; integration tests for members and admin run in CI.
+- Docs: `docs/modules/m0-organizations-and-admin.md`.
+
 ### Next
 
-1. Members and invitations (with the SECURITY DEFINER accept function).
-2. Admin console API: verification queue, verify/reject/suspend, audit log viewer.
-3. Web: login, registration, email verification, password reset, MFA setup and organization switcher screens; admin console screens.
-4. Phase 1 demo.
+1. Web: login, registration, email verification, password reset, MFA setup and organization switcher screens; team screens; admin console screens.
+2. Phase 1 demo.
