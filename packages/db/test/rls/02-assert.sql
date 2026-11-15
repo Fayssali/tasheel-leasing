@@ -199,3 +199,37 @@ DO $$ BEGIN
   END;
 END $$;
 COMMIT;
+
+-- 19. Anonymous visitors see verified suppliers' public profiles, never businesses
+BEGIN;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM organizations WHERE type = 'BUSINESS') THEN
+    RAISE EXCEPTION 'FAIL 19: a business is publicly visible';
+  END IF;
+  IF EXISTS (SELECT 1 FROM organizations WHERE status <> 'VERIFIED') THEN
+    RAISE EXCEPTION 'FAIL 19: an unverified organization is publicly visible';
+  END IF;
+  RAISE NOTICE 'ok 19 - only verified suppliers and institutions are public';
+END $$;
+COMMIT;
+
+-- 20. A business that asked for a quotation keeps seeing the listing once it is archived;
+--     other organizations do not
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true),
+       set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM equipment_listings WHERE reference = 'RLS-ARCH') THEN
+    RAISE EXCEPTION 'FAIL 20: requesting business lost sight of an archived listing';
+  END IF;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000c', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM equipment_listings WHERE reference = 'RLS-ARCH') THEN
+    RAISE EXCEPTION 'FAIL 20: an archived listing is visible to an unrelated organization';
+  END IF;
+  RAISE NOTICE 'ok 20 - archived listings stay visible to businesses that requested quotations only';
+END $$;
+COMMIT;

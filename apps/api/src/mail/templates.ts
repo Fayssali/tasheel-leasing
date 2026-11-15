@@ -42,7 +42,11 @@ interface TemplateInput {
     | 'email.invite'
     | 'email.orgVerified'
     | 'email.orgRejected'
-    | 'email.orgSuspended';
+    | 'email.orgSuspended'
+    | 'email.quoteRequested'
+    | 'email.quoteIssued'
+    | 'email.quoteAccepted'
+    | 'email.quoteDeclined';
   vars?: Record<string, string | number>;
   /** Call-to-action link; omitted for notification-only emails. */
   actionUrl?: string;

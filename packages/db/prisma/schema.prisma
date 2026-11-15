@@ -423,6 +423,9 @@ model QuotationRequest {
   reference       String                 @unique // QR-YYYY-NNNNNN
   listingId       String                 @map("listing_id") @db.Uuid
   requestedById   String                 @map("requested_by_id") @db.Uuid
+  // Snapshot shown to the supplier (business profiles are private): who is asking.
+  businessName    String                 @default("") @map("business_name")
+  requesterName   String                 @default("") @map("requester_name")
   quantity        Int                    @default(1)
   message         String?
   deliveryWilaya  String?                @map("delivery_wilaya") @db.VarChar(2)

@@ -92,6 +92,26 @@
     "orgSuspended": {
       "subject": "تم تعليق مؤسستكم — تسهيل ليزينغ",
       "body": "تم تعليق وصول {{organization}} إلى تسهيل ليزينغ. السبب: {{reason}}. يُرجى الاتصال بالدعم لمزيد من المعلومات."
+    },
+    "quoteRequested": {
+      "subject": "طلب عرض سعر جديد {{reference}} — تسهيل ليزينغ",
+      "body": "تطلب {{business}} عرض سعر لـ «{{listing}}» (الكمية: {{quantity}}). أجيبوا من فضاء المورّد.",
+      "cta": "عرض الطلب"
+    },
+    "quoteIssued": {
+      "subject": "تم استلام عرض السعر {{reference}} — تسهيل ليزينغ",
+      "body": "أرسل لكم {{supplier}} عرض سعر لـ «{{listing}}»: {{total}}، صالح إلى غاية {{validUntil}}.",
+      "cta": "عرض عرض السعر"
+    },
+    "quoteAccepted": {
+      "subject": "تم قبول عرض السعر {{reference}} — تسهيل ليزينغ",
+      "body": "قبلت {{business}} عرض سعركم لـ «{{listing}}».",
+      "cta": "عرض عرض السعر"
+    },
+    "quoteDeclined": {
+      "subject": "تم رفض عرض السعر {{reference}} — تسهيل ليزينغ",
+      "body": "رفضت {{business}} عرض سعركم لـ «{{listing}}».",
+      "cta": "عرض عرض السعر"
     }
   },
   "auth": {

@@ -92,6 +92,26 @@
     "orgSuspended": {
       "subject": "Votre organisation est suspendue — Tasheel Leasing",
       "body": "L'accès de {{organization}} à Tasheel Leasing est suspendu. Motif : {{reason}}. Contactez le support pour plus d'informations."
+    },
+    "quoteRequested": {
+      "subject": "Nouvelle demande de devis {{reference}} — Tasheel Leasing",
+      "body": "{{business}} demande un devis pour « {{listing}} » (quantité : {{quantity}}). Répondez depuis votre espace fournisseur.",
+      "cta": "Voir la demande"
+    },
+    "quoteIssued": {
+      "subject": "Devis {{reference}} reçu — Tasheel Leasing",
+      "body": "{{supplier}} vous a envoyé un devis pour « {{listing}} » : {{total}}, valable jusqu'au {{validUntil}}.",
+      "cta": "Voir le devis"
+    },
+    "quoteAccepted": {
+      "subject": "Devis {{reference}} accepté — Tasheel Leasing",
+      "body": "{{business}} a accepté votre devis pour « {{listing}} ».",
+      "cta": "Voir le devis"
+    },
+    "quoteDeclined": {
+      "subject": "Devis {{reference}} refusé — Tasheel Leasing",
+      "body": "{{business}} a refusé votre devis pour « {{listing}} ».",
+      "cta": "Voir le devis"
     }
   },
   "auth": {

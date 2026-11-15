@@ -8,9 +8,12 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { validateEnv } from './config/env';
 import { HealthModule } from './health/health.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { StorageModule } from './storage/storage.module';
 import { MailModule } from './mail/mail.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { QuotationsModule } from './quotations/quotations.module';
 import { PermissionsGuard } from './tenancy/permissions.guard';
 import { TenantGuard } from './tenancy/tenant.guard';
 
@@ -21,10 +24,13 @@ import { TenantGuard } from './tenancy/tenant.guard';
     PrismaModule,
     AuditModule,
     MailModule,
+    StorageModule,
     AuthModule,
     HealthModule,
     OrganizationsModule,
     AdminModule,
+    MarketplaceModule,
+    QuotationsModule,
   ],
   // Global guards run in this order: rate limit → authentication → organization → permissions.
   providers: [

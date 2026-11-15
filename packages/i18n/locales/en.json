@@ -92,6 +92,26 @@
     "orgSuspended": {
       "subject": "Your organization is suspended — Tasheel Leasing",
       "body": "Access for {{organization}} to Tasheel Leasing is suspended. Reason: {{reason}}. Contact support for more information."
+    },
+    "quoteRequested": {
+      "subject": "New quotation request {{reference}} — Tasheel Leasing",
+      "body": "{{business}} requests a quotation for \"{{listing}}\" (quantity: {{quantity}}). Reply from your supplier area.",
+      "cta": "View the request"
+    },
+    "quoteIssued": {
+      "subject": "Quotation {{reference}} received — Tasheel Leasing",
+      "body": "{{supplier}} sent you a quotation for \"{{listing}}\": {{total}}, valid until {{validUntil}}.",
+      "cta": "View the quotation"
+    },
+    "quoteAccepted": {
+      "subject": "Quotation {{reference}} accepted — Tasheel Leasing",
+      "body": "{{business}} accepted your quotation for \"{{listing}}\".",
+      "cta": "View the quotation"
+    },
+    "quoteDeclined": {
+      "subject": "Quotation {{reference}} declined — Tasheel Leasing",
+      "body": "{{business}} declined your quotation for \"{{listing}}\".",
+      "cta": "View the quotation"
     }
   },
   "auth": {

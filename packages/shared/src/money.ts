@@ -40,3 +40,49 @@ export function formatMoney(value: string, locale: string, currency = DEFAULT_CU
     maximumFractionDigits: 2,
   }).format(value as unknown as number);
 }
+
+export interface QuotationLineInput {
+  label: string;
+  quantity: number;
+  unitPrice: string;
+}
+
+export interface QuotationTotals {
+  lines: Array<QuotationLineInput & { lineTotal: string }>;
+  subtotal: string;
+  vatAmount: string;
+  total: string;
+}
+
+const RATE_RE = /^\d{1,2}(\.\d{1,4})?$/;
+
+/**
+ * Quotation totals in integer centimes. VAT = subtotal × rate / 100, rounded half up to the
+ * centime. The rate is whatever the supplier enters (no tax rate is hardcoded).
+ */
+export function computeQuotationTotals(
+  lines: QuotationLineInput[],
+  vatRate: string,
+): QuotationTotals {
+  if (!RATE_RE.test(vatRate)) throw new Error(`Invalid VAT rate: ${vatRate}`);
+  const [ri = '0', rf = ''] = vatRate.split('.');
+  const rateTenThousandths = BigInt(ri) * 10_000n + BigInt(rf.padEnd(4, '0')); // 19.5 → 195000
+
+  let subtotal = 0n;
+  const out = lines.map((l) => {
+    if (!Number.isInteger(l.quantity) || l.quantity < 1)
+      throw new Error('Quantity must be a positive integer');
+    const lineTotal = toCentimes(l.unitPrice) * BigInt(l.quantity);
+    subtotal += lineTotal;
+    return { ...l, lineTotal: fromCentimes(lineTotal) };
+  });
+  // centimes × rate(1e-4 %) / (100 × 10 000), half up.
+  const denom = 1_000_000n;
+  const vat = (subtotal * rateTenThousandths + denom / 2n) / denom;
+  return {
+    lines: out,
+    subtotal: fromCentimes(subtotal),
+    vatAmount: fromCentimes(vat),
+    total: fromCentimes(subtotal + vat),
+  };
+}
