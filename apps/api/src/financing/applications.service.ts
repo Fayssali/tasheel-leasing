@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { TenantTx } from '@tasheel/db';
+import type { Prisma, SubmissionStatus, TenantTx } from '@tasheel/db';
 import {
   computeInstallment,
   formatMoney,
@@ -22,7 +22,12 @@ import { Notifier } from '../mail/notifier';
 import { PrismaService } from '../prisma/prisma.service';
 import type { ApplicationDto, ApplicationUpdateDto, CompanyProfileDto } from './financing.dto';
 
-const OPEN_SUBMISSION = ['SENT', 'UNDER_REVIEW', 'INFO_REQUESTED', 'OFFER_MADE'];
+const OPEN_SUBMISSION: SubmissionStatus[] = [
+  'SENT',
+  'UNDER_REVIEW',
+  'INFO_REQUESTED',
+  'OFFER_MADE',
+];
 const today = () => new Date(new Date().toISOString().slice(0, 10));
 /** An offer past its validity date is presented and treated as EXPIRED. */
 export const offerStatus = (o: { status: string; validUntil: Date }) =>

@@ -292,6 +292,7 @@ export class AdminService {
         by: ['type', 'status'],
         where: { deletedAt: null, type: { not: 'PLATFORM' } },
         _count: { _all: true },
+        orderBy: [{ type: 'asc' }, { status: 'asc' }],
       })) as Array<{
         type: OrganizationType;
         status: OrganizationStatus;

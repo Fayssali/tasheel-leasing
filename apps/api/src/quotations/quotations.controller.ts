@@ -101,7 +101,7 @@ export class IssueQuotationDto {
 export class RequestStatusQueryDto {
   @IsOptional()
   @IsIn(['OPEN', 'QUOTED', 'CLOSED', 'CANCELLED'])
-  status?: string;
+  status?: 'OPEN' | 'QUOTED' | 'CLOSED' | 'CANCELLED';
 }
 
 /** Business side. */

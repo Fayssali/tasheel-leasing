@@ -7,7 +7,7 @@ import {
   Optional,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import type { TenantTx } from '@tasheel/db';
+import type { ListingStatus, Prisma, TenantTx } from '@tasheel/db';
 import type { SpecField } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
@@ -52,7 +52,7 @@ const LISTING_INCLUDE = {
     orderBy: { createdAt: 'asc' },
     select: { id: true, kind: true, fileName: true, sizeBytes: true, createdAt: true },
   },
-} as const;
+} satisfies Prisma.EquipmentListingInclude;
 
 /** Supplier side of the catalogue (permission listing.manage) plus Tasheel moderation. */
 @Injectable()
@@ -65,7 +65,7 @@ export class ListingsService {
     @Optional() private readonly scanner?: Scanner,
   ) {}
 
-  list(tenant: TenantInfo, status?: string) {
+  list(tenant: TenantInfo, status?: ListingStatus) {
     return this.prisma.forTenant(tenant, (tx) =>
       tx.equipmentListing.findMany({
         where: {
@@ -144,7 +144,9 @@ export class ListingsService {
         where: { id },
         data: {
           ...data,
-          ...(listing.status === 'REJECTED' ? { status: 'DRAFT', statusReason: null } : {}),
+          ...(listing.status === 'REJECTED'
+            ? { status: 'DRAFT' as const, statusReason: null }
+            : {}),
         },
       });
       await this.audit.record(tx, {
@@ -408,7 +410,7 @@ export class ListingsService {
 
   // --- Moderation (Tasheel) ---------------------------------------------------
 
-  moderationQueue(tenant: TenantInfo, status = 'PENDING_REVIEW') {
+  moderationQueue(tenant: TenantInfo, status: ListingStatus = 'PENDING_REVIEW') {
     return this.prisma.forTenant(tenant, (tx) =>
       tx.equipmentListing.findMany({
         where: { status, deletedAt: null },
@@ -550,7 +552,7 @@ export class ListingsService {
         ...(input.title.fr ? { fr: input.title.fr } : {}),
         ...(input.title.ar ? { ar: input.title.ar } : {}),
       },
-      description: input.description ?? {},
+      description: (input.description ?? {}) as Prisma.InputJsonValue,
       brand: input.brand || null,
       model: input.model || null,
       year: input.year ?? null,
@@ -562,7 +564,7 @@ export class ListingsService {
       leadTimeDays: input.leadTimeDays ?? null,
       deliveryWilayas: [...new Set(input.deliveryWilayas)].sort(),
       warrantyMonths: input.warrantyMonths ?? null,
-      specs: validateSpecs(input.specs, category.specSchema),
+      specs: validateSpecs(input.specs, category.specSchema) as Prisma.InputJsonValue,
     };
   }
 }

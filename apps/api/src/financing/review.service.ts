@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { TenantTx } from '@tasheel/db';
+import type { SubmissionStatus, TenantTx } from '@tasheel/db';
 import {
   computeInstallment,
   computeTotalCost,
@@ -22,7 +22,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { offerStatus } from './applications.service';
 import type { OfferDto } from './financing.dto';
 
-const REVIEWABLE = ['SENT', 'UNDER_REVIEW', 'INFO_REQUESTED', 'OFFER_MADE'];
+const REVIEWABLE: SubmissionStatus[] = ['SENT', 'UNDER_REVIEW', 'INFO_REQUESTED', 'OFFER_MADE'];
 const NOT_FOUND = { code: 'NOT_FOUND', message: 'Application not found.' };
 
 interface SubmissionRow {
@@ -30,7 +30,7 @@ interface SubmissionRow {
   organizationId: string; // business
   applicationId: string;
   institutionOrgId: string;
-  status: string;
+  status: SubmissionStatus;
   application: { reference: string; status: string; financedAmount: unknown };
 }
 
@@ -48,7 +48,7 @@ export class ReviewService {
     private readonly notifier: Notifier,
   ) {}
 
-  inbox(tenant: TenantInfo, status?: string) {
+  inbox(tenant: TenantInfo, status?: SubmissionStatus) {
     return this.prisma.forTenant(tenant, async (tx) => {
       const rows = (await tx.applicationSubmission.findMany({
         where: { institutionOrgId: tenant.organizationId, ...(status ? { status } : {}) },
@@ -366,8 +366,8 @@ export class ReviewService {
   private async transition(
     tenant: TenantInfo,
     submissionId: string,
-    from: string[],
-    to: string,
+    from: SubmissionStatus[],
+    to: SubmissionStatus,
     kind: string,
     note: string,
     meta: RequestMeta,

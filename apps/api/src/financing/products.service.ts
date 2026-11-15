@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { toCentimes } from '@tasheel/shared';
+import type { Prisma } from '@tasheel/db';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
 import type { RequestMeta, TenantInfo } from '../common/request-context';
@@ -138,8 +139,8 @@ export class ProductsService {
 
   private data(dto: ProductDto) {
     return {
-      name: dto.name,
-      description: dto.description ?? {},
+      name: dto.name as unknown as Prisma.InputJsonValue,
+      description: (dto.description ?? {}) as unknown as Prisma.InputJsonValue,
       productType: dto.productType,
       minAmount: dto.minAmount,
       maxAmount: dto.maxAmount,

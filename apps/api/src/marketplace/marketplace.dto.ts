@@ -170,7 +170,7 @@ export class SearchQueryDto {
 export class ListingStatusQueryDto {
   @IsOptional()
   @IsIn(['DRAFT', 'PENDING_REVIEW', 'PUBLISHED', 'ARCHIVED', 'REJECTED'])
-  status?: string;
+  status?: 'DRAFT' | 'PENDING_REVIEW' | 'PUBLISHED' | 'ARCHIVED' | 'REJECTED';
 }
 
 export class ReorderDto {

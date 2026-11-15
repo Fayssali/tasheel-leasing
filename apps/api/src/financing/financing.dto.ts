@@ -133,5 +133,6 @@ export class OfferDto {
 export class SubmissionStatusQueryDto {
   @IsOptional()
   @IsIn(['SENT', 'UNDER_REVIEW', 'INFO_REQUESTED', 'OFFER_MADE', 'DECLINED', 'WITHDRAWN', 'CLOSED'])
-  status?: string;
+  status?:
+    'SENT' | 'UNDER_REVIEW' | 'INFO_REQUESTED' | 'OFFER_MADE' | 'DECLINED' | 'WITHDRAWN' | 'CLOSED';
 }

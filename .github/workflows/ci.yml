@@ -44,6 +44,19 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # The development sandbox cannot download Prisma engines, so it cannot generate the
+      # client; this artifact lets it typecheck against the real generated types.
+      - name: Upload generated Prisma client types
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prisma-client-types
+          path: |
+            node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/*.d.ts
+            node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/package.json
+            node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/schema.prisma
+          retention-days: 7
+
       - name: Unit and API tests
         run: pnpm --filter @tasheel/shared --filter @tasheel/api --filter @tasheel/i18n test
 

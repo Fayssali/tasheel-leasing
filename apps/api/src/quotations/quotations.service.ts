@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TenantContext, TenantTx } from '@tasheel/db';
+import type { QuotationRequestStatus, TenantContext, TenantTx } from '@tasheel/db';
 import {
   computeQuotationTotals,
   formatMoney,
@@ -183,7 +183,7 @@ export class QuotationsService {
         orderBy: { createdAt: 'desc' },
         take: 200,
       }),
-    )) as Array<{ quotations: Array<{ status: string; validUntil: Date }> }>;
+    )) as unknown as Array<{ quotations: Array<{ status: string; validUntil: Date }> }>;
     return rows.map((r) => ({
       ...r,
       quotations: r.quotations.map((q) => ({ ...q, status: effectiveStatus(q) })),
@@ -191,7 +191,7 @@ export class QuotationsService {
   }
 
   /** Supplier side: requests addressed to me, with the quotations I issued. */
-  async forSupplier(tenant: TenantInfo, status?: string) {
+  async forSupplier(tenant: TenantInfo, status?: QuotationRequestStatus) {
     const rows = (await this.prisma.forTenant(tenant, (tx) =>
       tx.quotationRequest.findMany({
         where: { supplierOrgId: tenant.organizationId, ...(status ? { status } : {}) },
@@ -207,7 +207,7 @@ export class QuotationsService {
         orderBy: { createdAt: 'desc' },
         take: 200,
       }),
-    )) as Array<{ quotations: Array<{ status: string; validUntil: Date }> }>;
+    )) as unknown as Array<{ quotations: Array<{ status: string; validUntil: Date }> }>;
     return rows.map((r) => ({
       ...r,
       quotations: r.quotations.map((q) => ({ ...q, status: effectiveStatus(q) })),
