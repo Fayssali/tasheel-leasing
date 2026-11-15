@@ -7,7 +7,17 @@
 - [x] D1 (multi-tenancy with RLS) accepted, 2026-11-15.
 - [ ] Decisions D2–D8 validated by the project owner.
 
-## Phase 1 — Foundation (complete, awaiting demo acceptance)
+## CI recovery — 2026-11-15
+
+CI had been failing since the first Phase 1 authentication commit: the sandbox cannot generate the Prisma client, so problems only visible against the real generated types, and the integration tests, had never run. Fixed before recording acceptance:
+
+- Type errors against the generated client (status enums, JSON columns, a `groupBy` inside a transaction, declaration emit in the API app). Status unions now live in `@tasheel/shared` and JSON columns go through `asJson`, so the sandbox typechecks and runs every test again.
+- A real bug: audit entries outside any organization (sign-in failures, password resets, MFA setup) were rejected by RLS, because `INSERT … RETURNING` is checked against the SELECT policy. Those requests failed with 500. The audit writer now uses a plain insert.
+- One integration assertion was stricter than intended (it rejected the 2FA flag shown on the team page).
+
+First fully green run: build, unit tests, SQL and Prisma isolation suites, seed, all three integration tests (auth, marketplace, financing), formatting — [https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069](https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069).
+
+## Phase 1 — Foundation (accepted 2026-11-15)
 
 ### Done — 2026-11-15, repository bootstrap
 
@@ -85,10 +95,10 @@
 - [x] Admin console (verification queue, decisions, audit, KPIs)
 - [x] Screens in French and Arabic (RTL), responsive
 - [x] Server bootstrap scripts (catalogue-only seed, platform admin)
-- [ ] CI green on GitHub (first run of Prisma generate, migrations and integration tests). To be confirmed
-- [ ] Demo accepted by the project owner (`docs/demo/phase-1.md`)
+- [x] CI green on GitHub, 2026-11-15 ([run](https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069))
+- [x] Demo accepted by the project owner, 2026-11-15 (`docs/demo/phase-1.md`)
 
-## Phase 2 — Marketplace (built, awaiting demo acceptance)
+## Phase 2 — Marketplace (accepted 2026-11-15)
 
 ### Done — 2026-11-15
 
@@ -122,10 +132,10 @@
 - [x] Isolation checks for every new table (SQL suite 20/20)
 - [x] Screens in French and Arabic, responsive
 - [x] Fictional demo data
-- [ ] CI green on GitHub. To be confirmed
-- [ ] Demo accepted by the project owner (`docs/demo/phase-2.md`)
+- [x] CI green on GitHub, 2026-11-15 ([run](https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069))
+- [x] Demo accepted by the project owner, 2026-11-15 (`docs/demo/phase-2.md`)
 
-## Phase 3 — Documents and financing applications (built, awaiting demo acceptance)
+## Phase 3 — Documents and financing applications (accepted 2026-11-15)
 
 ### Done — 2026-11-15
 
@@ -154,8 +164,8 @@
 - [x] Isolation checks for every new table (SQL 26/26, Prisma cases)
 - [x] Screens in French and Arabic, responsive
 - [x] Fictional demo data
-- [ ] CI green on GitHub. To be confirmed
-- [ ] Demo accepted by the project owner (`docs/demo/phase-3.md`)
+- [x] CI green on GitHub, 2026-11-15 ([run](https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069))
+- [x] Demo accepted by the project owner, 2026-11-15 (`docs/demo/phase-3.md`)
 
 ## Phase 4 — Next (proposed, to be confirmed against the Phase 0 roadmap)
 
