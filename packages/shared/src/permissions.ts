@@ -54,6 +54,33 @@ export const PERMISSIONS = [
     allowedOrgTypes: ['BUSINESS'],
   },
 
+  // Financing (Phase 3)
+  {
+    code: 'document.manage',
+    description: "Upload and manage the organization's documents",
+    allowedOrgTypes: ['BUSINESS', 'SUPPLIER', 'FINANCIAL_INSTITUTION'],
+  },
+  {
+    code: 'application.manage',
+    description: 'Create, submit and follow financing applications; decide on offers',
+    allowedOrgTypes: ['BUSINESS'],
+  },
+  {
+    code: 'product.manage',
+    description: 'Configure financing products and their criteria',
+    allowedOrgTypes: ['FINANCIAL_INSTITUTION'],
+  },
+  {
+    code: 'application.review',
+    description: 'Review received applications, request information, decline',
+    allowedOrgTypes: ['FINANCIAL_INSTITUTION'],
+  },
+  {
+    code: 'offer.issue',
+    description: 'Issue and withdraw financing offers',
+    allowedOrgTypes: ['FINANCIAL_INSTITUTION'],
+  },
+
   // Platform administration (Tasheel only)
   {
     code: 'admin.organization.read',
@@ -86,6 +113,11 @@ export const PERMISSIONS = [
     allowedOrgTypes: ['PLATFORM'],
   },
   { code: 'admin.kpi.read', description: 'View platform KPIs', allowedOrgTypes: ['PLATFORM'] },
+  {
+    code: 'admin.document.review',
+    description: 'Review organization verification documents',
+    allowedOrgTypes: ['PLATFORM'],
+  },
 ] as const satisfies readonly PermissionDef[];
 
 export type PermissionCode = (typeof PERMISSIONS)[number]['code'];
@@ -124,6 +156,7 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.audit.read',
       'admin.kpi.read',
       'admin.listing.moderate',
+      'admin.document.review',
     ],
   },
   {
@@ -136,42 +169,62 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.organization.verify',
       'admin.kpi.read',
       'admin.listing.moderate',
+      'admin.document.review',
     ],
   },
   {
     code: 'supplier_admin',
     organizationType: 'SUPPLIER',
     name: { fr: 'Administrateur fournisseur', ar: 'مسؤول المورد', en: 'Supplier admin' },
-    permissions: [...ORG_ADMIN_PERMS, 'listing.manage', 'quotation.respond'],
+    permissions: [...ORG_ADMIN_PERMS, 'listing.manage', 'quotation.respond', 'document.manage'],
   },
   {
     code: 'supplier_member',
     organizationType: 'SUPPLIER',
     name: { fr: 'Commercial', ar: 'مندوب مبيعات', en: 'Sales rep' },
-    permissions: [...ORG_MEMBER_PERMS, 'listing.manage', 'quotation.respond'],
+    permissions: [...ORG_MEMBER_PERMS, 'listing.manage', 'quotation.respond', 'document.manage'],
   },
   {
     code: 'institution_admin',
     organizationType: 'FINANCIAL_INSTITUTION',
     name: { fr: "Administrateur de l'établissement", ar: 'مسؤول المؤسسة', en: 'Institution admin' },
-    permissions: ORG_ADMIN_PERMS,
+    permissions: [
+      ...ORG_ADMIN_PERMS,
+      'product.manage',
+      'application.review',
+      'offer.issue',
+      'document.manage',
+    ],
   },
   {
     code: 'institution_analyst',
     organizationType: 'FINANCIAL_INSTITUTION',
     name: { fr: 'Analyste crédit', ar: 'محلل ائتمان', en: 'Credit analyst' },
-    permissions: ORG_MEMBER_PERMS,
+    // Analysts review and ask for information; offers are issued by the institution admin.
+    permissions: [...ORG_MEMBER_PERMS, 'application.review'],
   },
   {
     code: 'business_admin',
     organizationType: 'BUSINESS',
     name: { fr: "Administrateur de l'entreprise", ar: 'مسؤول المؤسسة', en: 'Business admin' },
-    permissions: [...ORG_ADMIN_PERMS, 'quotation.request', 'favourite.manage'],
+    permissions: [
+      ...ORG_ADMIN_PERMS,
+      'quotation.request',
+      'favourite.manage',
+      'document.manage',
+      'application.manage',
+    ],
   },
   {
     code: 'business_member',
     organizationType: 'BUSINESS',
     name: { fr: 'Collaborateur', ar: 'متعاون', en: 'Member' },
-    permissions: [...ORG_MEMBER_PERMS, 'quotation.request', 'favourite.manage'],
+    permissions: [
+      ...ORG_MEMBER_PERMS,
+      'quotation.request',
+      'favourite.manage',
+      'document.manage',
+      'application.manage',
+    ],
   },
 ];

@@ -2,12 +2,12 @@
 -- Mirrors packages/db/test/tenant-isolation.test.ts at the SQL level.
 \set ON_ERROR_STOP on
 
--- 1. Tenant A sees only its own organization
+-- 1. Tenant A sees only its own organization (verified banks are public profiles by design, see 19)
 BEGIN;
 SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true),
        set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
 DO $$ BEGIN
-  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %') <> 1 THEN
+  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %' AND legal_name NOT LIKE 'RLS Bank %') <> 1 THEN
     RAISE EXCEPTION 'FAIL 1: tenant A sees other organizations';
   END IF;
   RAISE NOTICE 'ok 1 - tenant sees only its own organization';
@@ -55,7 +55,7 @@ COMMIT;
 -- 6. No context → nothing visible
 BEGIN;
 DO $$ BEGIN
-  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %') <> 0 THEN
+  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %' AND legal_name NOT LIKE 'RLS Bank %') <> 0 THEN
     RAISE EXCEPTION 'FAIL 6: organizations visible without tenant context';
   END IF;
   RAISE NOTICE 'ok 6 - nothing visible without context';
@@ -66,7 +66,7 @@ COMMIT;
 BEGIN;
 SELECT set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
 DO $$ BEGIN
-  IF (SELECT array_agg(legal_name) FROM organizations WHERE legal_name LIKE 'RLS %') <> ARRAY['RLS Tenant B'] THEN
+  IF (SELECT array_agg(legal_name) FROM organizations WHERE legal_name LIKE 'RLS %' AND legal_name NOT LIKE 'RLS Bank %') <> ARRAY['RLS Tenant B'] THEN
     RAISE EXCEPTION 'FAIL 7: user sees organizations they do not belong to';
   END IF;
   RAISE NOTICE 'ok 7 - user sees only organizations they belong to';
@@ -78,7 +78,7 @@ BEGIN;
 SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000f', true),
        set_config('app.user_id', '00000000-0000-7000-8000-0000000000f1', true);
 DO $$ BEGIN
-  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %') <> 4 THEN
+  IF (SELECT count(*) FROM organizations WHERE legal_name LIKE 'RLS %') <> 6 THEN
     RAISE EXCEPTION 'FAIL 8: platform cannot see all organizations';
   END IF;
   RAISE NOTICE 'ok 8 - platform sees all organizations';
@@ -233,3 +233,103 @@ DO $$ BEGIN
   RAISE NOTICE 'ok 20 - archived listings stay visible to businesses that requested quotations only';
 END $$;
 COMMIT;
+
+-- ---------------------------------------------------------------- Phase 3
+-- 21. An institution sees an application submitted to it and only the attached documents
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000d', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d1', true);
+DO $$ BEGIN
+  IF (SELECT count(*) FROM financing_applications WHERE reference = 'RLS-FA') <> 1 THEN RAISE EXCEPTION 'FAIL 21: bank D cannot see the application submitted to it'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM documents WHERE title = 'RLS attached') THEN RAISE EXCEPTION 'FAIL 21: bank D cannot see the attached document'; END IF;
+  IF EXISTS (SELECT 1 FROM documents WHERE title = 'RLS private') THEN RAISE EXCEPTION 'FAIL 21: bank D sees a document that was not attached'; END IF;
+  RAISE NOTICE 'ok 21 - institutions see submitted applications and attached documents only';
+END $$;
+COMMIT;
+-- 22. Another institution and a supplier see nothing of it
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000e', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d2', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM financing_applications WHERE reference = 'RLS-FA') THEN RAISE EXCEPTION 'FAIL 22: bank E sees the application'; END IF;
+  IF EXISTS (SELECT 1 FROM documents WHERE title LIKE 'RLS %') THEN RAISE EXCEPTION 'FAIL 22: bank E sees vault documents'; END IF;
+  IF EXISTS (SELECT 1 FROM application_submissions WHERE id = '00000000-0000-7000-8000-0000000000fb') OR EXISTS (SELECT 1 FROM offers WHERE reference = 'RLS-OF') OR EXISTS (SELECT 1 FROM submission_events WHERE note = 'rls-test') THEN RAISE EXCEPTION 'FAIL 22: bank E sees submissions, offers or events'; END IF;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM financing_applications WHERE reference = 'RLS-FA') THEN RAISE EXCEPTION 'FAIL 22: supplier B sees the application'; END IF;
+  IF EXISTS (SELECT 1 FROM documents WHERE title LIKE 'RLS %') THEN RAISE EXCEPTION 'FAIL 22: supplier B sees vault documents'; END IF;
+  IF EXISTS (SELECT 1 FROM application_submissions WHERE id = '00000000-0000-7000-8000-0000000000fb') OR EXISTS (SELECT 1 FROM offers WHERE reference = 'RLS-OF') OR EXISTS (SELECT 1 FROM submission_events WHERE note = 'rls-test') THEN RAISE EXCEPTION 'FAIL 22: supplier B sees submissions, offers or events'; END IF;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF (SELECT count(*) FROM documents WHERE title LIKE 'RLS %') <> 2 THEN RAISE EXCEPTION 'FAIL 22: business A cannot see its own vault'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM offers WHERE reference = 'RLS-OF') THEN RAISE EXCEPTION 'FAIL 22: business A cannot see the offer made to it'; END IF;
+  RAISE NOTICE 'ok 22 - other institutions and suppliers see nothing; the business sees its vault and offers';
+END $$;
+COMMIT;
+-- 23. Active products of verified institutions are visible to signed-in organizations; inactive ones are not; anonymous sees none
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM financing_products WHERE name->>'fr' = 'RLS active') THEN RAISE EXCEPTION 'FAIL 23: business cannot see an active product'; END IF;
+  IF EXISTS (SELECT 1 FROM financing_products WHERE name->>'fr' = 'RLS inactive') THEN RAISE EXCEPTION 'FAIL 23: business sees an inactive product'; END IF;
+END $$;
+COMMIT;
+BEGIN;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM financing_products WHERE name->>'fr' LIKE 'RLS %') THEN RAISE EXCEPTION 'FAIL 23: anonymous visitors see products'; END IF;
+  RAISE NOTICE 'ok 23 - products: active ones to signed-in organizations only';
+END $$;
+COMMIT;
+-- 24. An institution cannot change an application, nor write events in the business's name
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000d', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d1', true);
+DO $$ BEGIN
+  UPDATE financing_applications SET financed_amount = 1 WHERE reference = 'RLS-FA';
+  IF FOUND THEN RAISE EXCEPTION 'FAIL 24: bank D changed the application'; END IF;
+  BEGIN
+    INSERT INTO submission_events (id, organization_id, submission_id, business_org_id, institution_org_id, kind, note, actor_user_id)
+    VALUES (gen_random_uuid(), '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-0000000000fb', '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-00000000000d', 'NOTE', 'forged', '00000000-0000-7000-8000-0000000000d1');
+    RAISE EXCEPTION 'FAIL 24: bank D wrote an event in the business''s name';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000e', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d2', true);
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO submission_events (id, organization_id, submission_id, business_org_id, institution_org_id, kind, note, actor_user_id)
+    VALUES (gen_random_uuid(), '00000000-0000-7000-8000-00000000000e', '00000000-0000-7000-8000-0000000000fb', '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-00000000000d', 'NOTE', 'intruder', '00000000-0000-7000-8000-0000000000d2');
+    RAISE EXCEPTION 'FAIL 24: bank E wrote into a timeline it is not part of';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+  RAISE NOTICE 'ok 24 - institutions cannot edit applications or forge timeline entries';
+END $$;
+COMMIT;
+-- 25. Financing records and documents are never deleted; the timeline is append-only
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  BEGIN DELETE FROM documents WHERE title = 'RLS private'; RAISE EXCEPTION 'FAIL 25: document deleted'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  BEGIN DELETE FROM financing_applications WHERE reference = 'RLS-FA'; RAISE EXCEPTION 'FAIL 25: application deleted'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  BEGIN DELETE FROM offers WHERE reference = 'RLS-OF'; RAISE EXCEPTION 'FAIL 25: offer deleted'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  BEGIN UPDATE submission_events SET note = 'changed' WHERE note = 'rls-test'; RAISE EXCEPTION 'FAIL 25: event changed'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  RAISE NOTICE 'ok 25 - documents and financing records cannot be deleted; events cannot be changed';
+END $$;
+COMMIT;
+-- 26. Once the business withdraws a submission, the institution loses access to its documents
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+UPDATE application_submissions SET status = 'WITHDRAWN' WHERE id = '00000000-0000-7000-8000-0000000000fb';
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000d', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d1', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM documents WHERE title = 'RLS attached') OR EXISTS (SELECT 1 FROM financing_applications WHERE reference = 'RLS-FA') THEN
+    RAISE EXCEPTION 'FAIL 26: bank D still sees the application or documents after withdrawal';
+  END IF;
+  RAISE NOTICE 'ok 26 - withdrawal removes the institution''s access to the application and documents';
+END $$;
+ROLLBACK;

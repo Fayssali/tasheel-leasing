@@ -8,7 +8,7 @@
  */
 import { hash } from '@node-rs/argon2';
 import { PrismaClient, type OrganizationType } from '@prisma/client';
-import { EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
+import { DOCUMENT_TYPES, EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
 import { seedDemoMarketplace } from './demo-marketplace';
 
 const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL_ADMIN });
@@ -137,6 +137,22 @@ async function seedCategories(): Promise<void> {
       where: { code: c.code },
       update: { name: c.name, specSchema: c.specSchema as object[], sortOrder: i },
       create: { code: c.code, name: c.name, specSchema: c.specSchema as object[], sortOrder: i },
+    });
+  }
+  // Document types: inserted once, then owned by the database (Tasheel may adjust them there).
+  for (const [i, d] of DOCUMENT_TYPES.entries()) {
+    await prisma.documentType.upsert({
+      where: { code: d.code },
+      update: {},
+      create: {
+        code: d.code,
+        name: d.name,
+        ownerTypes: d.ownerTypes,
+        requiredForVerification: d.requiredForVerification,
+        requiredForApplication: d.requiredForApplication,
+        hasExpiry: d.hasExpiry,
+        sortOrder: i,
+      },
     });
   }
 }
