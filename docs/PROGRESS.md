@@ -7,7 +7,7 @@
 - [x] D1 (multi-tenancy with RLS) accepted, 2026-11-15.
 - [ ] Decisions D2–D8 validated by the project owner.
 
-## Phase 1 — Foundation (in progress)
+## Phase 1 — Foundation (complete, awaiting demo acceptance)
 
 ### Done — 2026-11-15, repository bootstrap
 
@@ -67,7 +67,27 @@
 - Tests: 85 unit and HTTP tests passing; integration tests for members and admin run in CI.
 - Docs: `docs/modules/m0-organizations-and-admin.md`.
 
-### Next
+### Done — 2026-11-15, Phase 1 web screens
 
-1. Web: login, registration, email verification, password reset, MFA setup and organization switcher screens; team screens; admin console screens.
-2. Phase 1 demo.
+- Auth: login with 2FA step, registration, email verification, forgot/reset password, invitation acceptance.
+- Client area: dashboard with onboarding steps, organization profile, team management, security (2FA with QR code and recovery codes).
+- Admin area: KPIs, verification queue, organization detail with decisions, audit log.
+- Route guards mirror the API: MFA-mandatory users stay on Security until 2FA is on; the platform and client areas follow the active organization.
+- 294 interface strings complete in French, Arabic and English; a CI check fails if code uses a missing key.
+- Checked visually with headless Chrome against a mocked API, 14 screens in FR / AR, desktop and mobile.
+
+### Phase 1 exit checklist
+
+- [x] Authentication, sessions, lockout, email verification, password reset
+- [x] Two-factor authentication, mandatory for platform and bank users
+- [x] Multi-tenant isolation in three layers; 12 SQL checks plus Prisma and API integration tests
+- [x] Roles, permissions, invitations, member management
+- [x] Admin console (verification queue, decisions, audit, KPIs)
+- [x] Screens in French and Arabic (RTL), responsive
+- [x] Server bootstrap scripts (catalogue-only seed, platform admin)
+- [ ] CI green on GitHub (first run of Prisma generate, migrations and integration tests). To be confirmed
+- [ ] Demo accepted by the project owner (`docs/demo/phase-1.md`)
+
+## Phase 2 — Marketplace (next)
+
+Supplier onboarding documents, equipment categories, listings with images and specifications, search and filters, equipment pages, quotations.

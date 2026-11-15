@@ -4,7 +4,7 @@ B2B digital leasing marketplace and financing intermediation platform for the Al
 
 Tasheel is a **technology intermediary only**. It does not lend, hold funds or make credit decisions. Financing decisions rest solely with the financial institutions.
 
-> Status: **Phase 1, Foundation (in progress).** Development environment, fictional data only.
+> Status: **Phase 1, Foundation, complete** (awaiting demo acceptance). Development environment, fictional data only. Demo script: [docs/demo/phase-1.md](docs/demo/phase-1.md).
 > Specification: [Phase 0 Specification](https://claude.ai/artifact/7qyaTrP2Bk89HyTtAUosnd) (PRD, architecture, ERD, roadmap).
 
 ## Stack
@@ -50,7 +50,9 @@ proposes a new migration, report it before accepting it (see `docs/PROGRESS.md`)
 
 Local services: web http://localhost:5173 · API health http://localhost:3000/api/v1/health · Mailpit http://localhost:8025 · MinIO console http://localhost:9001.
 
-Demo logins (fictional): `admin@`, `fournisseur@`, `banque@`, `entreprise@demo.tasheel.local`. The password comes from `SEED_DEMO_PASSWORD` (default in `packages/db/prisma/seed.ts`). Login screens arrive later in Phase 1.
+Demo logins (fictional): `admin@`, `fournisseur@`, `banque@`, `entreprise@demo.tasheel.local`. The password comes from `SEED_DEMO_PASSWORD` (default in `packages/db/prisma/seed.ts`). The admin and bank users must set up 2FA at first sign-in.
+
+Module documentation: [auth and access](docs/modules/m0-auth-and-access.md) · [organizations and admin](docs/modules/m0-organizations-and-admin.md).
 
 ## Commands
 
