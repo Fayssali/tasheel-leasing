@@ -11,7 +11,15 @@ import {
   AdminOrganizationDetailPage,
   AdminOrganizationsPage,
 } from './pages/admin/AdminPages';
+import { AdminListingsPage } from './pages/admin/AdminListingsPage';
 import { DashboardPage } from './pages/app/DashboardPage';
+import { FavouritesPage } from './pages/app/FavouritesPage';
+import { QuotationsPage } from './pages/app/QuotationsPage';
+import { ListingPage } from './pages/marketplace/ListingPage';
+import { MarketplacePage } from './pages/marketplace/MarketplacePage';
+import { SupplierPage } from './pages/marketplace/SupplierPage';
+import { ListingEditorPage } from './pages/supplier/ListingEditorPage';
+import { SupplierListingsPage } from './pages/supplier/SupplierListingsPage';
 import { OrganizationPage } from './pages/app/OrganizationPage';
 import { SecurityPage } from './pages/app/SecurityPage';
 import { TeamPage } from './pages/app/TeamPage';
@@ -79,12 +87,27 @@ function GuestOnly({ children }: { children: ReactNode }) {
 
 function AppArea() {
   const { t } = useTranslation();
+  const { activeOrg } = useAuth();
+  const byType =
+    activeOrg?.type === 'SUPPLIER'
+      ? [
+          { to: '/app/catalogue', label: t('nav.catalogue') },
+          { to: '/app/quotations', label: t('nav.quotationRequests') },
+        ]
+      : activeOrg?.type === 'BUSINESS'
+        ? [
+            { to: '/marketplace', label: t('nav.marketplace') },
+            { to: '/app/quotations', label: t('nav.quotations') },
+            { to: '/app/favourites', label: t('nav.favourites') },
+          ]
+        : [];
   return (
     <RequireAuth area="app">
       <AppShell
         area="app"
         nav={[
           { to: '/app', label: t('nav.dashboard'), end: true },
+          ...byType,
           { to: '/app/organization', label: t('nav.organization') },
           { to: '/app/team', label: t('nav.team') },
           { to: '/app/security', label: t('nav.security') },
@@ -114,6 +137,7 @@ function AdminArea() {
             isActive: (path, q) =>
               path.startsWith('/admin/organizations') && q.get('status') !== 'PENDING_VERIFICATION',
           },
+          { to: '/admin/listings', label: t('nav.moderation') },
           { to: '/admin/audit', label: t('nav.audit') },
           { to: '/admin/team', label: t('nav.team') },
           { to: '/admin/security', label: t('nav.security') },
@@ -125,6 +149,9 @@ function AdminArea() {
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
+  { path: '/marketplace', element: <MarketplacePage /> },
+  { path: '/marketplace/suppliers/:id', element: <SupplierPage /> },
+  { path: '/marketplace/:reference', element: <ListingPage /> },
   {
     path: '/login',
     element: (
@@ -160,6 +187,11 @@ export const router = createBrowserRouter([
       { path: 'organization', element: <OrganizationPage /> },
       { path: 'team', element: <TeamPage /> },
       { path: 'security', element: <SecurityPage /> },
+      { path: 'catalogue', element: <SupplierListingsPage /> },
+      { path: 'catalogue/new', element: <ListingEditorPage /> },
+      { path: 'catalogue/:id', element: <ListingEditorPage /> },
+      { path: 'quotations', element: <QuotationsPage /> },
+      { path: 'favourites', element: <FavouritesPage /> },
     ],
   },
   {
@@ -169,6 +201,7 @@ export const router = createBrowserRouter([
       { index: true, element: <AdminDashboardPage /> },
       { path: 'organizations', element: <AdminOrganizationsPage /> },
       { path: 'organizations/:id', element: <AdminOrganizationDetailPage /> },
+      { path: 'listings', element: <AdminListingsPage /> },
       { path: 'audit', element: <AdminAuditPage /> },
       { path: 'team', element: <TeamPage /> },
       { path: 'security', element: <SecurityPage /> },

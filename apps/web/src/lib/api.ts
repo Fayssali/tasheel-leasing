@@ -67,7 +67,7 @@ export function refreshSession(): Promise<boolean> {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   body?: unknown;
   query?: Record<string, string | number | undefined | null>;
   /** Send X-Organization-Id (true = active organization, string = that organization). */
@@ -82,7 +82,8 @@ export async function api<T>(path: string, opts: RequestOptions = {}, retried = 
   const qs = params.toString();
 
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+  const isForm = typeof FormData !== 'undefined' && opts.body instanceof FormData;
+  if (opts.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
   const orgId = typeof opts.org === 'string' ? opts.org : opts.org ? getActiveOrg() : null;
   if (orgId) headers['X-Organization-Id'] = orgId;
@@ -91,7 +92,11 @@ export async function api<T>(path: string, opts: RequestOptions = {}, retried = 
     method: opts.method ?? 'GET',
     headers,
     credentials: 'include',
-    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    body: isForm
+      ? (opts.body as FormData)
+      : opts.body !== undefined
+        ? JSON.stringify(opts.body)
+        : undefined,
   });
 
   if (res.status === 401 && !retried && accessToken && !path.startsWith('/auth/refresh')) {
@@ -121,4 +126,9 @@ export async function api<T>(path: string, opts: RequestOptions = {}, retried = 
 
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
+}
+
+/** For fetches that cannot go through api() (e.g. authenticated images rendered from blobs). */
+export function getAccessToken(): string | null {
+  return accessToken;
 }

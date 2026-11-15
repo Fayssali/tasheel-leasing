@@ -5,7 +5,7 @@ import { LanguageSwitch } from '../components/LanguageSwitch';
 import { useAuth } from '../lib/auth';
 import { homePathFor } from '../routes';
 
-/** Public home. The marketplace (Phase 2) will replace the hero with equipment search. */
+/** Public home: positioning, entry to the marketplace and sign-up. */
 export function LandingPage() {
   const { t } = useTranslation();
   const { status, me } = useAuth();
@@ -47,6 +47,12 @@ export function LandingPage() {
         <h1 className="text-3xl font-semibold text-primary-900 text-start">{t('home.title')}</h1>
         <p className="mt-3 max-w-2xl text-gray-600 text-start">{t('home.subtitle')}</p>
         <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            to="/marketplace"
+            className="rounded-lg bg-primary-600 px-5 py-2.5 font-semibold text-white hover:bg-primary-900"
+          >
+            {t('home.browse')}
+          </Link>
           <Link
             to={signedIn ? homePathFor(me) : '/register'}
             className="rounded-lg bg-accent-500 px-5 py-2.5 font-semibold text-primary-900 hover:brightness-95"
