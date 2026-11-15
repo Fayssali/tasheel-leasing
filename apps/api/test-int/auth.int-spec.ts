@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { base32Decode, hotp, timeStep } from '../src/auth/mfa/totp';
 import { Mailer, type OutgoingMail } from '../src/mail/mailer';
 
 const outbox: OutgoingMail[] = [];
@@ -211,5 +212,86 @@ describe('Auth flow (PostgreSQL + RLS)', () => {
       .expect(400);
     await flush();
     expect(outbox.some((m) => m.to === email && /modifié/.test(m.subject))).toBe(true);
+  });
+
+  it('forces a bank user through MFA setup, then signs in with a second factor', async () => {
+    const email = `epsilon-${run}@int-test.local`;
+    const signup = await register('Epsilon', 'FINANCIAL_INSTITUTION').expect(201);
+    const auth = `Bearer ${signup.body.accessToken}`;
+
+    const me = await request(http).get('/api/v1/auth/me').set('Authorization', auth).expect(200);
+    expect(me.body.user.mfaSetupRequired).toBe(true);
+    const orgId = me.body.memberships[0].organizationId;
+
+    // Blocked from the organization until MFA is on.
+    const blocked = await request(http)
+      .get('/api/v1/organizations/current')
+      .set('Authorization', auth)
+      .set('X-Organization-Id', orgId)
+      .expect(403);
+    expect(blocked.body.code).toBe('MFA_SETUP_REQUIRED');
+
+    // Enrol.
+    const setupRes = await request(http)
+      .post('/api/v1/auth/mfa/setup')
+      .set('Authorization', auth)
+      .send({ password })
+      .expect(200);
+    const secret = setupRes.body.secret as string;
+    const code = hotp(base32Decode(secret), timeStep(new Date()));
+    const enabled = await request(http)
+      .post('/api/v1/auth/mfa/enable')
+      .set('Authorization', auth)
+      .send({ code })
+      .expect(200);
+    const recoveryCodes = enabled.body.recoveryCodes as string[];
+    expect(recoveryCodes).toHaveLength(10);
+
+    await request(http)
+      .get('/api/v1/organizations/current')
+      .set('Authorization', auth)
+      .set('X-Organization-Id', orgId)
+      .expect(200);
+
+    // Cannot be switched off: mandatory for institutions.
+    const disable = await request(http)
+      .post('/api/v1/auth/mfa/disable')
+      .set('Authorization', auth)
+      .send({ password, code: recoveryCodes[0] })
+      .expect(403);
+    expect(disable.body.code).toBe('MFA_REQUIRED_BY_POLICY');
+
+    // Login now needs a second step; no session cookie before it.
+    const step1 = await request(http)
+      .post('/api/v1/auth/login')
+      .send({ email, password })
+      .expect(200);
+    expect(step1.body.mfaRequired).toBe(true);
+    expect(step1.headers['set-cookie']).toBeUndefined();
+
+    // The enrolment code cannot be replayed; a wrong code fails; a recovery code works once.
+    await request(http)
+      .post('/api/v1/auth/mfa/verify')
+      .send({ mfaToken: step1.body.mfaToken, code })
+      .expect(401);
+    await request(http)
+      .post('/api/v1/auth/mfa/verify')
+      .send({ mfaToken: step1.body.mfaToken, code: '000000' })
+      .expect(401);
+    const step2 = await request(http)
+      .post('/api/v1/auth/mfa/verify')
+      .send({ mfaToken: step1.body.mfaToken, code: recoveryCodes[1] })
+      .expect(200);
+    expect(String(step2.headers['set-cookie'])).toMatch(/tasheel_rt=/);
+    await request(http)
+      .post('/api/v1/auth/mfa/verify')
+      .send({ mfaToken: step1.body.mfaToken, code: recoveryCodes[1] })
+      .expect(401);
+
+    // The challenge token is not an access token.
+    await request(http)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${step1.body.mfaToken}`)
+      .expect(401);
   });
 });

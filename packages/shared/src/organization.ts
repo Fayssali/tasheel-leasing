@@ -27,3 +27,13 @@ export const RTL_LOCALES: readonly Locale[] = ['ar'];
 export function isRtl(locale: Locale): boolean {
   return RTL_LOCALES.includes(locale);
 }
+
+/**
+ * Members of these organization types must enable two-factor authentication before they
+ * can act in the organization (Phase 0 specification, section 9.2). Security policy, not a
+ * business rule: changing it is a code change with review.
+ */
+export const MFA_REQUIRED_ORG_TYPES: readonly OrganizationType[] = [
+  'PLATFORM',
+  'FINANCIAL_INSTITUTION',
+];

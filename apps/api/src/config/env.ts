@@ -1,5 +1,7 @@
 /** Fails fast at startup when required configuration is missing or unsafe. */
 const REQUIRED = ['DATABASE_URL', 'JWT_ACCESS_SECRET'] as const;
+/** The development key shipped in .env.example; refused in production. */
+const DEV_MFA_KEY = 'ZGV2LW9ubHktbWZhLWtleS1jaGFuZ2UtbWUtMzJieXQ=';
 const PLACEHOLDER_SECRETS = new Set(['change-me-access', 'change-me-refresh']);
 
 export function validateEnv(env: Record<string, unknown>): Record<string, unknown> {
@@ -13,6 +15,13 @@ export function validateEnv(env: Record<string, unknown>): Record<string, unknow
     throw new Error(
       'JWT_ACCESS_SECRET must be a random value of at least 32 characters in production',
     );
+  }
+
+  if (env.NODE_ENV === 'production') {
+    const key = Buffer.from(String(env.MFA_ENCRYPTION_KEY ?? ''), 'base64');
+    if (key.length !== 32 || String(env.MFA_ENCRYPTION_KEY) === DEV_MFA_KEY) {
+      throw new Error('MFA_ENCRYPTION_KEY must be a production key of 32 random bytes (base64)');
+    }
   }
 
   return { ...env, API_PORT: Number(env.API_PORT ?? 3000) };

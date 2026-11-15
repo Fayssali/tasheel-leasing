@@ -42,6 +42,7 @@ describe('Auth and access control (HTTP)', () => {
   const authService = {
     register: jest.fn(),
     login: jest.fn(),
+    verifyMfaLogin: jest.fn(),
     refresh: jest.fn(),
     logout: jest.fn(),
     me: jest.fn(),
@@ -138,6 +139,61 @@ describe('Auth and access control (HTTP)', () => {
     });
   });
 
+  describe('two-factor login', () => {
+    it('returns an MFA challenge without setting any cookie', async () => {
+      authService.login.mockResolvedValueOnce({
+        mfaRequired: true,
+        mfaToken: 'challenge.jwt.token-value',
+        expiresIn: 300,
+      });
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: 'samia@bank.dz', password: 'whatever-password' })
+        .expect(200);
+      expect(res.body).toEqual({
+        mfaRequired: true,
+        mfaToken: 'challenge.jwt.token-value',
+        expiresIn: 300,
+      });
+      expect(res.headers['set-cookie']).toBeUndefined();
+    });
+
+    it('sets the session cookie only after the second step', async () => {
+      authService.verifyMfaLogin.mockResolvedValueOnce(tokens);
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/auth/mfa/verify')
+        .send({ mfaToken: 'challenge.jwt.token-value', code: '123 456' })
+        .expect(200);
+      expect(res.body.accessToken).toBe('access.jwt');
+      expect(String(res.headers['set-cookie'])).toMatch(/tasheel_rt=/);
+      expect(authService.verifyMfaLogin).toHaveBeenCalledWith(
+        'challenge.jwt.token-value',
+        '123 456',
+        expect.anything(),
+      );
+    });
+
+    it('rejects malformed second-step codes', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/mfa/verify')
+        .send({ mfaToken: 'challenge.jwt.token-value', code: '12' })
+        .expect(400);
+      expect(authService.verifyMfaLogin).not.toHaveBeenCalled();
+    });
+
+    it('never accepts an MFA challenge token as an access token', async () => {
+      const challenge = await jwt.signAsync(
+        { sub: USER, purpose: 'mfa' },
+        { audience: 'tasheel-mfa', expiresIn: 300 },
+      );
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${challenge}`)
+        .expect(401);
+      expect(res.body.code).toBe('TOKEN_INVALID');
+    });
+  });
+
   describe('email verification and password reset', () => {
     it('answers 202 to forgot-password without waiting for the lookup', async () => {
       accountService.forgotPassword.mockReturnValueOnce(new Promise(() => undefined)); // never resolves
@@ -206,8 +262,14 @@ describe('Auth and access control (HTTP)', () => {
   });
 
   describe('organization and permissions', () => {
-    const memberWith = (permissions: string[], status = 'VERIFIED') => ({
-      organization: { type: 'BUSINESS', status, deletedAt: null },
+    const memberWith = (
+      permissions: string[],
+      status = 'VERIFIED',
+      type = 'BUSINESS',
+      mfaEnabled = false,
+    ) => ({
+      user: { mfaEnabled },
+      organization: { type, status, deletedAt: null },
       roles: [{ role: { permissions: permissions.map((permissionCode) => ({ permissionCode })) } }],
     });
 
@@ -237,6 +299,31 @@ describe('Auth and access control (HTTP)', () => {
         .set('X-Organization-Id', ORG)
         .expect(403);
       expect(res.body.code).toBe('ORGANIZATION_BLOCKED');
+    });
+
+    it('makes bank users enable MFA before acting in their organization', async () => {
+      prisma.forTenant.mockResolvedValueOnce(
+        memberWith(['organization.read'], 'VERIFIED', 'FINANCIAL_INSTITUTION', false),
+      );
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/organizations/current')
+        .set('Authorization', await bearer())
+        .set('X-Organization-Id', ORG)
+        .expect(403);
+      expect(res.body.code).toBe('MFA_SETUP_REQUIRED');
+    });
+
+    it('lets bank users with MFA enabled through', async () => {
+      prisma.forTenant
+        .mockResolvedValueOnce(
+          memberWith(['organization.read'], 'VERIFIED', 'FINANCIAL_INSTITUTION', true),
+        )
+        .mockResolvedValueOnce({ id: ORG });
+      await request(app.getHttpServer())
+        .get('/api/v1/organizations/current')
+        .set('Authorization', await bearer())
+        .set('X-Organization-Id', ORG)
+        .expect(200);
     });
 
     it('refuses a member without the required permission', async () => {

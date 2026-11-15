@@ -6,14 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MFA_REQUIRED_ORG_TYPES, type OrganizationType } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
 import type { RequestMeta } from '../common/request-context';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountService } from './account.service';
+import { MfaService } from './mfa/mfa.service';
 import {
   ACCESS_TOKEN_TTL_SECONDS,
   ADMIN_ROLE_BY_TYPE,
+  MFA_CHALLENGE_AUDIENCE,
+  MFA_CHALLENGE_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
 } from './auth.constants';
 import type { LoginDto } from './dto/login.dto';
@@ -27,6 +31,17 @@ export interface IssuedTokens {
   expiresIn: number;
   refreshToken: string;
   refreshExpiresAt: Date;
+}
+
+/** Returned by login when the password is right but a second factor is still needed. */
+export interface MfaChallenge {
+  mfaRequired: true;
+  mfaToken: string;
+  expiresIn: number;
+}
+
+export function isMfaChallenge(r: IssuedTokens | MfaChallenge): r is MfaChallenge {
+  return (r as MfaChallenge).mfaRequired === true;
 }
 
 export interface MembershipView {
@@ -46,12 +61,22 @@ export interface MeView {
     locale: string;
     emailVerified: boolean;
     mfaEnabled: boolean;
+    /** True when a membership makes MFA mandatory and it is not enabled yet. */
+    mfaSetupRequired: boolean;
   };
   memberships: MembershipView[];
 }
 
 /** One message for every login failure, so responses never reveal whether an email exists. */
 const INVALID_CREDENTIALS = { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' };
+const INVALID_MFA = {
+  code: 'INVALID_MFA_CODE',
+  message: 'The code is invalid or has already been used.',
+};
+const INVALID_CHALLENGE = {
+  code: 'MFA_CHALLENGE_EXPIRED',
+  message: 'Sign-in expired. Please start again.',
+};
 const INVALID_SESSION = {
   code: 'INVALID_SESSION',
   message: 'Session expired. Please sign in again.',
@@ -70,6 +95,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly audit: AuditService,
     private readonly account: AccountService,
+    private readonly mfa: MfaService,
   ) {}
 
   /**
@@ -158,7 +184,7 @@ export class AuthService {
     return this.issueSession(userId, meta);
   }
 
-  async login(dto: LoginDto, meta: RequestMeta): Promise<IssuedTokens> {
+  async login(dto: LoginDto, meta: RequestMeta): Promise<IssuedTokens | MfaChallenge> {
     const now = new Date();
     // users is a global table (no RLS): lookup by email needs no tenant context.
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
@@ -175,29 +201,85 @@ export class AuthService {
     }
 
     if (!(await verifyPassword(user.passwordHash, dto.password))) {
-      const failedLoginCount = user.failedLoginCount + 1;
-      const lockedUntil = lockUntilAfterFailure(failedLoginCount, now);
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { failedLoginCount, ...(lockedUntil ? { lockedUntil } : {}) },
-      });
-      await this.recordAuthEvent(
-        user.id,
-        lockedUntil ? 'auth.account_locked' : 'auth.login_failed',
-        meta,
-        {
-          failedLoginCount,
-        },
-      );
+      await this.registerFailure(user.id, user.failedLoginCount, 'auth.login_failed', meta, now);
       throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
 
+    // Password correct but MFA enabled: no session yet, only a short-lived challenge token
+    // that cannot be used as an access token (different audience).
+    if (user.mfaEnabled) {
+      await this.recordAuthEvent(user.id, 'auth.mfa_challenge_issued', meta);
+      const mfaToken = await this.jwt.signAsync(
+        { sub: user.id, purpose: 'mfa' },
+        { audience: MFA_CHALLENGE_AUDIENCE, expiresIn: MFA_CHALLENGE_TTL_SECONDS },
+      );
+      return { mfaRequired: true, mfaToken, expiresIn: MFA_CHALLENGE_TTL_SECONDS };
+    }
+
+    return this.completeLogin(user.id, meta, now, 'password');
+  }
+
+  /** Second step of an MFA login: a TOTP code or a recovery code. Failures count toward lockout. */
+  async verifyMfaLogin(mfaToken: string, code: string, meta: RequestMeta): Promise<IssuedTokens> {
+    let userId: string;
+    try {
+      const payload = await this.jwt.verifyAsync<{ sub?: unknown; purpose?: unknown }>(mfaToken, {
+        audience: MFA_CHALLENGE_AUDIENCE,
+      });
+      if (typeof payload.sub !== 'string' || payload.purpose !== 'mfa')
+        throw new Error('bad payload');
+      userId = payload.sub;
+    } catch {
+      throw new UnauthorizedException(INVALID_CHALLENGE);
+    }
+
+    const now = new Date();
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.deletedAt || !user.mfaEnabled)
+      throw new UnauthorizedException(INVALID_CHALLENGE);
+    if (isLocked(user.lockedUntil, now)) {
+      await this.recordAuthEvent(user.id, 'auth.login_blocked_locked', meta);
+      throw new UnauthorizedException(INVALID_MFA);
+    }
+
+    const method = await this.mfa.consumeCode(user.id, code);
+    if (!method) {
+      await this.registerFailure(user.id, user.failedLoginCount, 'auth.mfa_failed', meta, now);
+      throw new UnauthorizedException(INVALID_MFA);
+    }
+    return this.completeLogin(user.id, meta, now, method);
+  }
+
+  private async completeLogin(
+    userId: string,
+    meta: RequestMeta,
+    now: Date,
+    method: 'password' | 'totp' | 'recovery',
+  ): Promise<IssuedTokens> {
     await this.prisma.user.update({
-      where: { id: user.id },
+      where: { id: userId },
       data: { failedLoginCount: 0, lockedUntil: null, lastLoginAt: now },
     });
-    await this.recordAuthEvent(user.id, 'auth.login_succeeded', meta);
-    return this.issueSession(user.id, meta);
+    await this.recordAuthEvent(userId, 'auth.login_succeeded', meta, { method });
+    return this.issueSession(userId, meta);
+  }
+
+  private async registerFailure(
+    userId: string,
+    previousFailures: number,
+    action: string,
+    meta: RequestMeta,
+    now: Date,
+  ): Promise<void> {
+    const failedLoginCount = previousFailures + 1;
+    const lockedUntil = lockUntilAfterFailure(failedLoginCount, now);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { failedLoginCount, ...(lockedUntil ? { lockedUntil } : {}) },
+    });
+    await this.recordAuthEvent(userId, lockedUntil ? 'auth.account_locked' : action, meta, {
+      failedLoginCount,
+    });
   }
 
   /**
@@ -307,6 +389,12 @@ export class AuthService {
           locale: user.locale,
           emailVerified: user.emailVerifiedAt !== null,
           mfaEnabled: user.mfaEnabled,
+          mfaSetupRequired:
+            !user.mfaEnabled &&
+            members.some(
+              (m: { organization: { type: OrganizationType; deletedAt: Date | null } }) =>
+                !m.organization.deletedAt && MFA_REQUIRED_ORG_TYPES.includes(m.organization.type),
+            ),
         },
         memberships: members
           .filter((m: { organization: { deletedAt: Date | null } }) => !m.organization.deletedAt)

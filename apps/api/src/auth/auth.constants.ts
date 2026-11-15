@@ -1,4 +1,7 @@
 export const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
+/** Second-step login token: 5 minutes to type the authenticator code. */
+export const MFA_CHALLENGE_TTL_SECONDS = 5 * 60;
+export const MFA_CHALLENGE_AUDIENCE = 'tasheel-mfa';
 export const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 export const REFRESH_COOKIE = 'tasheel_rt';

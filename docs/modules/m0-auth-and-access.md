@@ -39,6 +39,17 @@ All under `/api/v1`. Every route requires a Bearer access token unless marked pu
 
 Database queries then run through `PrismaService.forTenant(tenant, …)`, which sets the RLS context, so the database enforces isolation again.
 
+## Two-factor authentication (TOTP)
+
+- RFC 6238, HMAC-SHA1, 6 digits, 30-second steps, ±1 step of clock drift. This works with every common authenticator app. The implementation is in-house and checked against the RFC test vectors.
+- **Mandatory** for members of `PLATFORM` and `FINANCIAL_INSTITUTION` organizations (`MFA_REQUIRED_ORG_TYPES` in `@tasheel/shared`). Until it is enabled, they can sign in and set it up, but every organization route answers `403 MFA_SETUP_REQUIRED`. `GET /auth/me` returns `mfaSetupRequired: true` so the web app can send them to the setup screen.
+- Two-step login: a correct password returns a 5-minute challenge token (JWT audience `tasheel-mfa`), which the API never accepts as an access token. No session or cookie exists until the second step succeeds.
+- Secrets are encrypted at rest with AES-256-GCM (`MFA_ENCRYPTION_KEY`, 32 bytes, base64). Production refuses the development key.
+- Replay protection: the last accepted time step is stored, and a code at or before it is refused. The check is a conditional UPDATE, so two simultaneous requests cannot both use the same code.
+- Recovery codes: 10 codes in `xxxx-xxxx` form, avoiding look-alike characters, stored as SHA-256 hashes. Each one is removed atomically when used.
+- Wrong second-step codes count toward the same progressive lockout as wrong passwords.
+- Setup and disable require the current password. Enabling MFA signs out every other session.
+
 ## Email verification and password reset
 
 - Links point to the web app (`WEB_APP_URL`): `/verify-email?token=…` and `/reset-password?token=…`. The token is `<userId>.<secret>`; only SHA-256(secret) is stored, in `user_tokens` (visible to its owner only, through RLS).
@@ -50,12 +61,12 @@ Database queries then run through `PrismaService.forTenant(tenant, …)`, which 
 
 ## Audit events
 
-`auth.registered`, `auth.email_verification_sent`, `auth.email_verified`, `auth.password_reset_requested`, `auth.password_reset_completed`, `auth.login_succeeded`, `auth.login_failed`, `auth.account_locked`, `auth.login_blocked_locked`, `auth.refresh_reuse_detected`, `auth.logged_out`.
+`auth.registered`, `auth.email_verification_sent`, `auth.email_verified`, `auth.password_reset_requested`, `auth.password_reset_completed`, `auth.mfa_setup_started`, `auth.mfa_enabled`, `auth.mfa_disabled`, `auth.mfa_recovery_codes_regenerated`, `auth.mfa_challenge_issued`, `auth.mfa_failed`, `auth.login_succeeded` (with `method`: password, totp or recovery), `auth.login_failed`, `auth.account_locked`, `auth.login_blocked_locked`, `auth.refresh_reuse_detected`, `auth.logged_out`.
 
 ## Error codes
 
-`UNAUTHENTICATED`, `TOKEN_INVALID`, `INVALID_TOKEN` (email link), `INVALID_CREDENTIALS`, `INVALID_SESSION`, `EMAIL_TAKEN`, `ORGANIZATION_REQUIRED`, `NOT_A_MEMBER`, `ORGANIZATION_BLOCKED`, `PERMISSION_DENIED`.
+`UNAUTHENTICATED`, `TOKEN_INVALID`, `INVALID_TOKEN` (email link), `INVALID_CREDENTIALS`, `INVALID_SESSION`, `EMAIL_TAKEN`, `INVALID_MFA_CODE`, `MFA_CHALLENGE_EXPIRED`, `MFA_SETUP_REQUIRED`, `MFA_REQUIRED_BY_POLICY`, `MFA_ALREADY_ENABLED`, `MFA_NOT_ENABLED`, `MFA_SETUP_NOT_STARTED`, `PASSWORD_INCORRECT`, `ORGANIZATION_REQUIRED`, `NOT_A_MEMBER`, `ORGANIZATION_BLOCKED`, `PERMISSION_DENIED`.
 
 ## Not yet built
 
-MFA (TOTP, mandatory for platform and institution users), invitations, and the session list with "sign out other devices".
+Invitations, and the session list with "sign out other devices".

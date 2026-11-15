@@ -87,7 +87,10 @@ model User {
   locale           Locale    @default(fr)
   emailVerifiedAt  DateTime? @map("email_verified_at")
   mfaEnabled       Boolean   @default(false) @map("mfa_enabled")
-  mfaSecret        String?   @map("mfa_secret") // encrypted at application level
+  mfaSecret        String?   @map("mfa_secret") // AES-256-GCM sealed (apps/api/src/auth/mfa/secret-box.ts)
+  mfaPendingSecret String?   @map("mfa_pending_secret") // sealed; set during enrolment until confirmed
+  mfaRecoveryCodes String[]  @default([]) @map("mfa_recovery_codes") // SHA-256 hashes, removed when used
+  mfaLastUsedStep  Int?      @map("mfa_last_used_step") // last accepted TOTP step (replay protection)
   failedLoginCount Int       @default(0) @map("failed_login_count")
   lockedUntil      DateTime? @map("locked_until")
   lastLoginAt      DateTime? @map("last_login_at")

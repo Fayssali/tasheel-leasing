@@ -5,9 +5,16 @@ import type { Request, Response } from 'express';
 import { CurrentUser, Public } from '../common/decorators';
 import { requestMeta, type AuthUser } from '../common/request-context';
 import { REFRESH_COOKIE, REFRESH_COOKIE_PATH } from './auth.constants';
-import { AuthService, type IssuedTokens, type MeView } from './auth.service';
+import {
+  AuthService,
+  isMfaChallenge,
+  type IssuedTokens,
+  type MeView,
+  type MfaChallenge,
+} from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { MfaLoginDto } from './mfa/mfa.dto';
 
 interface TokenResponse {
   accessToken: string;
@@ -44,8 +51,26 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
+  ): Promise<TokenResponse | MfaChallenge> {
+    const result = await this.auth.login(dto, requestMeta(req));
+    // With MFA enabled, no cookie is set until the second step succeeds.
+    return isMfaChallenge(result) ? result : this.respond(res, result);
+  }
+
+  /** Second step of an MFA login. */
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('mfa/verify')
+  @HttpCode(200)
+  async verifyMfa(
+    @Body() dto: MfaLoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.respond(res, await this.auth.login(dto, requestMeta(req)));
+    return this.respond(
+      res,
+      await this.auth.verifyMfaLogin(dto.mfaToken, dto.code, requestMeta(req)),
+    );
   }
 
   @Public()

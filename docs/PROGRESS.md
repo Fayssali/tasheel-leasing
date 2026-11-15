@@ -46,10 +46,19 @@
 - Sign-up sends the verification email automatically.
 - Tests: 40 unit and HTTP tests passing; the integration test now also covers verify → forgot → reset on PostgreSQL (runs in CI).
 
+### Done — 2026-11-15, two-factor authentication
+
+- TOTP (RFC 6238) written in-house and checked against the RFC test vectors; base32; otpauth URI for authenticator apps.
+- Secrets encrypted with AES-256-GCM (`MFA_ENCRYPTION_KEY`); production rejects the development key.
+- Migration `20261115000300_user_mfa`: pending secret, hashed recovery codes, last used step.
+- Setup → enable (10 recovery codes, other sessions signed out) → disable → regenerate codes.
+- Two-step login with a 5-minute challenge token that cannot act as an access token. Replay protection and atomic recovery-code use. Wrong codes count toward lockout.
+- Mandatory for platform and institution members: organization routes return `MFA_SETUP_REQUIRED` until enabled, and disabling is refused.
+- Tests: 66 unit and HTTP tests passing; the integration test now covers the bank-user MFA journey on PostgreSQL (runs in CI).
+
 ### Next
 
-1. MFA (TOTP) for platform and institution users.
-2. Members and invitations (with the SECURITY DEFINER accept function).
-3. Admin console API: verification queue, verify/reject/suspend, audit log viewer.
-4. Web: login, registration, email verification, password reset and organization switcher screens; admin console screens.
-5. Phase 1 demo.
+1. Members and invitations (with the SECURITY DEFINER accept function).
+2. Admin console API: verification queue, verify/reject/suspend, audit log viewer.
+3. Web: login, registration, email verification, password reset, MFA setup and organization switcher screens; admin console screens.
+4. Phase 1 demo.
