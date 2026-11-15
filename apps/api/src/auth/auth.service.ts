@@ -414,7 +414,8 @@ export class AuthService {
     });
   }
 
-  private async issueSession(userId: string, meta: RequestMeta): Promise<IssuedTokens> {
+  /** Opens a new session (also used when an invitation creates an account). */
+  async issueSession(userId: string, meta: RequestMeta): Promise<IssuedTokens> {
     const sessionId = uuidv7();
     const secret = newSecret();
     const refreshExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);

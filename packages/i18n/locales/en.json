@@ -35,6 +35,7 @@
   },
   "email": {
     "greeting": "Hello {{name}},",
+    "greetingNoName": "Hello,",
     "footer": "Tasheel Leasing is a technology intermediation platform. It is neither a bank nor a leasing company.",
     "ignore": "If you did not make this request, you can ignore this message.",
     "verify": {
@@ -50,6 +51,23 @@
     "passwordChanged": {
       "subject": "Your password was changed — Tasheel Leasing",
       "body": "Your account password was just changed and all your sessions were signed out. If you did not make this change, contact support immediately."
+    },
+    "invite": {
+      "subject": "{{organization}} invites you to Tasheel Leasing",
+      "body": "{{inviter}} invites you to join {{organization}} on Tasheel Leasing as \"{{role}}\". This invitation is valid for {{days}} days.",
+      "cta": "Accept the invitation"
+    },
+    "orgVerified": {
+      "subject": "Your organization is verified — Tasheel Leasing",
+      "body": "{{organization}} has been verified by the Tasheel Leasing team. You now have access to all platform features."
+    },
+    "orgRejected": {
+      "subject": "Verification of your organization — Tasheel Leasing",
+      "body": "The verification of {{organization}} could not be completed. Reason: {{reason}}. You can complete your file and contact support."
+    },
+    "orgSuspended": {
+      "subject": "Your organization is suspended — Tasheel Leasing",
+      "body": "Access for {{organization}} to Tasheel Leasing is suspended. Reason: {{reason}}. Contact support for more information."
     }
   }
 }

@@ -62,3 +62,31 @@ export function parseUserToken(raw: unknown): ParsedUserToken | null {
   if (!m) return null;
   return { userId: m[1]!.toLowerCase(), secret: m[2]! };
 }
+
+/**
+ * Invitation token: `<organizationId>.<invitationId>.<secret>`. The organization id lets the
+ * server set the RLS tenant context before looking the invitation up (the invitee is not a
+ * member yet). Only SHA-256(secret) is stored; a forged id finds nothing.
+ */
+const INVITATION_RE = new RegExp(`^(${UUID})\\.(${UUID})\\.([A-Za-z0-9_-]{43})$`, 'i');
+
+export interface ParsedInvitationToken {
+  organizationId: string;
+  invitationId: string;
+  secret: string;
+}
+
+export function formatInvitationToken(
+  organizationId: string,
+  invitationId: string,
+  secret: string,
+): string {
+  return `${organizationId}.${invitationId}.${secret}`;
+}
+
+export function parseInvitationToken(raw: unknown): ParsedInvitationToken | null {
+  if (typeof raw !== 'string') return null;
+  const m = INVITATION_RE.exec(raw.trim());
+  if (!m) return null;
+  return { organizationId: m[1]!.toLowerCase(), invitationId: m[2]!.toLowerCase(), secret: m[3]! };
+}

@@ -35,7 +35,14 @@ interface TemplateInput {
   to: string;
   name: string;
   /** Translation key prefix, e.g. "email.verify". */
-  key: 'email.verify' | 'email.reset' | 'email.passwordChanged';
+  key:
+    | 'email.verify'
+    | 'email.reset'
+    | 'email.passwordChanged'
+    | 'email.invite'
+    | 'email.orgVerified'
+    | 'email.orgRejected'
+    | 'email.orgSuspended';
   vars?: Record<string, string | number>;
   /** Call-to-action link; omitted for notification-only emails. */
   actionUrl?: string;
@@ -52,7 +59,7 @@ export function buildMail({
 }: TemplateInput): OutgoingMail {
   const t = (k: string) => interpolate(lookup(locale, k), { name, ...vars });
   const subject = t(`${key}.subject`);
-  const greeting = t('email.greeting');
+  const greeting = name.trim() ? t('email.greeting') : t('email.greetingNoName');
   const body = t(`${key}.body`);
   const footer = t('email.footer');
   const ignore = actionUrl ? t('email.ignore') : null;
