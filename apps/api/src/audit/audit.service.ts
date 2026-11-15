@@ -32,11 +32,15 @@ function mask(
 /**
  * Writes to the append-only audit log, inside the caller's tenant transaction so the
  * entry commits or rolls back together with the change it records.
+ *
+ * Uses createMany (a plain INSERT): `create` adds RETURNING, which PostgreSQL also checks
+ * against the SELECT policy, and entries outside any organization (sign-in failures,
+ * password resets) are deliberately not readable by the app role.
  */
 @Injectable()
 export class AuditService {
   async record(tx: TenantTx, entry: AuditEntry): Promise<void> {
-    await tx.auditLog.create({
+    await tx.auditLog.createMany({
       data: {
         organizationId: entry.organizationId,
         actorUserId: entry.actorUserId,

@@ -107,7 +107,8 @@ describe('Auth flow (PostgreSQL + RLS)', () => {
       .set('X-Organization-Id', orgA.organizationId)
       .expect(200);
     expect(members.body).toHaveLength(1);
-    expect(JSON.stringify(members.body)).not.toMatch(/password|mfa/i);
+    // The 2FA flag is shown on the team page; secrets must never appear.
+    expect(JSON.stringify(members.body)).not.toMatch(/password|mfaSecret|recoveryCode|tokenHash/i);
 
     // Cross-tenant: A cannot act in B's organization.
     await request(http)
