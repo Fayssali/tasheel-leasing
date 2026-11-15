@@ -258,3 +258,165 @@ describe('marketplace row-level security', () => {
     );
   });
 });
+
+describe('financing row-level security', () => {
+  let bank: string, bankUser: string, otherBank: string, otherBankUser: string;
+  let attachedDoc: string, privateDoc: string, applicationId: string, submissionId: string;
+
+  before(async () => {
+    const mkBank = async (label: string) => {
+      const org = await admin.organization.create({
+        data: { type: 'FINANCIAL_INSTITUTION', status: 'VERIFIED', legalName: `${label} ${run}` },
+      });
+      const user = await admin.user.create({
+        data: {
+          email: `${label.toLowerCase()}-${run}@test.local`,
+          passwordHash: 'x',
+          firstName: label,
+          lastName: 'Test',
+        },
+      });
+      await admin.organizationMember.create({ data: { organizationId: org.id, userId: user.id } });
+      return { org: org.id, user: user.id };
+    };
+    ({ org: bank, user: bankUser } = await mkBank('BankD'));
+    ({ org: otherBank, user: otherBankUser } = await mkBank('BankE'));
+    await admin.documentType.upsert({
+      where: { code: `iso-doc-${run}` },
+      update: {},
+      create: { code: `iso-doc-${run}`, name: { fr: 'Iso' }, ownerTypes: ['BUSINESS'] },
+    });
+    const mkDoc = async (title: string) =>
+      (
+        await admin.document.create({
+          data: {
+            organizationId: orgA,
+            typeCode: `iso-doc-${run}`,
+            title,
+            fileName: 'x.pdf',
+            mimeType: 'application/pdf',
+            sizeBytes: 1,
+            sha256: 'a'.repeat(64),
+            storageKey: `iso/${run}/${title}`,
+            uploadedById: userA,
+          },
+        })
+      ).id;
+    attachedDoc = await mkDoc('attached');
+    privateDoc = await mkDoc('private');
+    const category = await admin.equipmentCategory.create({
+      data: { code: `iso-fin-${run}`, name: { fr: 'Iso' }, specSchema: [] },
+    });
+    const listing = await admin.equipmentListing.create({
+      data: {
+        organizationId: orgB,
+        reference: `ISO-FIN-${run}`,
+        categoryId: category.id,
+        title: { fr: 'Iso' },
+        status: 'PUBLISHED',
+        createdById: userB,
+      },
+    });
+    applicationId = (
+      await admin.financingApplication.create({
+        data: {
+          organizationId: orgA,
+          reference: `ISO-FA-${run}`,
+          quotationId: randomUUID(),
+          listingId: listing.id,
+          supplierOrgId: orgB,
+          categoryCode: `iso-fin-${run}`,
+          equipmentAmount: '1000000',
+          downPayment: '100000',
+          financedAmount: '900000',
+          durationMonths: 36,
+          status: 'SUBMITTED',
+          createdById: userA,
+        },
+      })
+    ).id;
+    await admin.applicationDocument.create({
+      data: { organizationId: orgA, applicationId, documentId: attachedDoc },
+    });
+    submissionId = (
+      await admin.applicationSubmission.create({
+        data: { organizationId: orgA, applicationId, institutionOrgId: bank },
+      })
+    ).id;
+    await admin.offer.create({
+      data: {
+        organizationId: bank,
+        submissionId,
+        applicationId,
+        businessOrgId: orgA,
+        reference: `ISO-OF-${run}`,
+        financedAmount: '900000',
+        durationMonths: 36,
+        ratePct: '8',
+        installmentAmount: '28202.49',
+        totalCost: '1015289.64',
+        validUntil: new Date(Date.now() + 86_400_000),
+        issuedById: bankUser,
+      },
+    });
+  });
+
+  test('the institution that received the application sees it and only its attached documents', async () => {
+    const [found, docs] = await withTenantContext(
+      app,
+      { organizationId: bank, userId: bankUser },
+      (tx) =>
+        Promise.all([
+          tx.financingApplication.count({ where: { id: applicationId } }),
+          tx.document.findMany({
+            where: { id: { in: [attachedDoc, privateDoc] } },
+            select: { id: true },
+          }),
+        ]),
+    );
+    assert.equal(found, 1);
+    assert.deepEqual(
+      docs.map((d) => d.id),
+      [attachedDoc],
+    );
+  });
+
+  test('another institution sees neither the application, the documents nor the offer', async () => {
+    const [found, docs, offers] = await withTenantContext(
+      app,
+      { organizationId: otherBank, userId: otherBankUser },
+      (tx) =>
+        Promise.all([
+          tx.financingApplication.count({ where: { id: applicationId } }),
+          tx.document.count({ where: { id: { in: [attachedDoc, privateDoc] } } }),
+          tx.offer.count({ where: { applicationId } }),
+        ]),
+    );
+    assert.deepEqual([found, docs, offers], [0, 0, 0]);
+  });
+
+  test('an institution cannot change the business’s application', async () => {
+    const res = await withTenantContext(app, { organizationId: bank, userId: bankUser }, (tx) =>
+      tx.financingApplication.updateMany({
+        where: { id: applicationId },
+        data: { financedAmount: '1' },
+      }),
+    );
+    assert.equal(res.count, 0);
+  });
+
+  test('offers and documents cannot be deleted by the app role', async () => {
+    await assert.rejects(
+      withTenantContext(app, { organizationId: orgA, userId: userA }, (tx) =>
+        tx.document.deleteMany({ where: { id: privateDoc } }),
+      ),
+      /permission denied/i,
+    );
+    await assert.rejects(
+      withTenantContext(app, { organizationId: bank, userId: bankUser }, (tx) =>
+        tx.offer.deleteMany({ where: { applicationId } }),
+      ),
+      /permission denied/i,
+    );
+  });
+});

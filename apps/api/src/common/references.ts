@@ -4,6 +4,8 @@ const SEQUENCES = {
   EQ: 'equipment_listing_ref_seq',
   QR: 'quotation_request_ref_seq',
   QT: 'quotation_ref_seq',
+  FA: 'financing_application_ref_seq',
+  OF: 'offer_ref_seq',
 } as const;
 
 /** Human reference such as EQ-2026-000123, from a PostgreSQL sequence (no gaps reused, no races). */
