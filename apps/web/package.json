@@ -16,12 +16,15 @@
     "@tasheel/i18n": "workspace:*",
     "@tasheel/shared": "workspace:*",
     "i18next": "^24.0.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-i18next": "^15.1.0"
+    "react-i18next": "^15.1.0",
+    "react-router": "^7.18.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",

@@ -7,6 +7,6 @@
     "./locales/*.json": "./locales/*.json"
   },
   "scripts": {
-    "test": "node scripts/check-keys.mjs"
+    "test": "node scripts/check-keys.mjs && node scripts/check-usage.mjs"
   }
 }
