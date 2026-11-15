@@ -24,5 +24,11 @@ export function validateEnv(env: Record<string, unknown>): Record<string, unknow
     }
   }
 
+  if (env.NODE_ENV === 'production' && env.SCAN_MODE !== 'clamav') {
+    throw new Error(
+      'SCAN_MODE must be "clamav" in production: uploaded documents are always scanned',
+    );
+  }
+
   return { ...env, API_PORT: Number(env.API_PORT ?? 3000) };
 }

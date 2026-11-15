@@ -118,6 +118,51 @@
       "subject": "Quotation {{reference}} declined — Tasheel Leasing",
       "body": "{{business}} declined your quotation for \"{{listing}}\".",
       "cta": "View the quotation"
+    },
+    "documentRejected": {
+      "subject": "Document to replace: {{document}} — Tasheel Leasing",
+      "body": "The document \"{{document}}\" could not be accepted. Reason: {{reason}}. Please upload a new version.",
+      "cta": "View my documents"
+    },
+    "applicationReceived": {
+      "subject": "New financing application {{reference}} — Tasheel Leasing",
+      "body": "{{business}} sent you a financing application for {{amount}}. The file and its attachments are available in your area.",
+      "cta": "Review the application"
+    },
+    "infoRequested": {
+      "subject": "Information requested on {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} asks for more information: {{note}}",
+      "cta": "Reply"
+    },
+    "infoProvided": {
+      "subject": "Information received on {{reference}} — Tasheel Leasing",
+      "body": "{{business}} replied to your request for information.",
+      "cta": "View the reply"
+    },
+    "offerReceived": {
+      "subject": "Financing proposal for {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} sent you a proposal: {{installment}} per month over {{duration}} months. It remains subject to the institution’s final decision and contract.",
+      "cta": "View the proposal"
+    },
+    "applicationDeclined": {
+      "subject": "Answer from {{institution}} on {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} will not proceed with your application. Reason given: {{reason}}. Your other open applications are not affected.",
+      "cta": "View my application"
+    },
+    "offerAccepted": {
+      "subject": "Proposal accepted — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} accepted your proposal. You can continue directly with the company for the final decision and contract.",
+      "cta": "View the file"
+    },
+    "offerDeclined": {
+      "subject": "Proposal not selected — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} did not select your proposal.",
+      "cta": "View the file"
+    },
+    "applicationWithdrawn": {
+      "subject": "Application withdrawn — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} withdrew its financing application. The file and its documents are no longer accessible.",
+      "cta": "View applications"
     }
   },
   "auth": {

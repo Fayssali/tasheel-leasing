@@ -118,6 +118,51 @@
       "subject": "تم رفض عرض السعر {{reference}} — تسهيل ليزينغ",
       "body": "رفضت {{business}} عرض سعركم لـ «{{listing}}».",
       "cta": "عرض عرض السعر"
+    },
+    "documentRejected": {
+      "subject": "وثيقة يجب استبدالها: {{document}} — تسهيل ليزينغ",
+      "body": "تعذّر قبول الوثيقة «{{document}}». السبب: {{reason}}. يرجى إيداع نسخة جديدة.",
+      "cta": "عرض وثائقي"
+    },
+    "applicationReceived": {
+      "subject": "طلب تمويل جديد {{reference}} — تسهيل ليزينغ",
+      "body": "أرسلت إليكم {{business}} طلب تمويل بمبلغ {{amount}}. الملف والوثائق المرفقة متاحة في فضائكم.",
+      "cta": "دراسة الطلب"
+    },
+    "infoRequested": {
+      "subject": "طلب معلومات إضافية حول {{reference}} — تسهيل ليزينغ",
+      "body": "تطلب {{institution}} معلومات إضافية: {{note}}",
+      "cta": "الرد"
+    },
+    "infoProvided": {
+      "subject": "تم استلام المعلومات الإضافية حول {{reference}} — تسهيل ليزينغ",
+      "body": "ردّت {{business}} على طلبكم للمعلومات الإضافية.",
+      "cta": "عرض الرد"
+    },
+    "offerReceived": {
+      "subject": "عرض تمويل للطلب {{reference}} — تسهيل ليزينغ",
+      "body": "قدّمت لكم {{institution}} عرضاً: {{installment}} شهرياً لمدة {{duration}} شهراً. يبقى خاضعاً للقرار النهائي للمؤسسة وللعقد.",
+      "cta": "عرض الاقتراح"
+    },
+    "applicationDeclined": {
+      "subject": "رد {{institution}} على الطلب {{reference}} — تسهيل ليزينغ",
+      "body": "لن تتابع {{institution}} طلبكم. السبب المُبلّغ: {{reason}}. طلباتكم الأخرى الجارية غير معنية.",
+      "cta": "عرض طلبي"
+    },
+    "offerAccepted": {
+      "subject": "تم قبول العرض — {{reference}} — تسهيل ليزينغ",
+      "body": "قبلت {{business}} عرضكم. يمكنكم المتابعة مباشرة مع المؤسسة من أجل القرار النهائي والعقد.",
+      "cta": "عرض الملف"
+    },
+    "offerDeclined": {
+      "subject": "لم يتم اختيار العرض — {{reference}} — تسهيل ليزينغ",
+      "body": "لم تختر {{business}} عرضكم.",
+      "cta": "عرض الملف"
+    },
+    "applicationWithdrawn": {
+      "subject": "تم سحب الطلب — {{reference}} — تسهيل ليزينغ",
+      "body": "سحبت {{business}} طلب التمويل. لم يعد الملف ووثائقه متاحين.",
+      "cta": "عرض الطلبات"
     }
   },
   "auth": {

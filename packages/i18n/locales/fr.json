@@ -118,6 +118,51 @@
       "subject": "Devis {{reference}} refusé — Tasheel Leasing",
       "body": "{{business}} a refusé votre devis pour « {{listing}} ».",
       "cta": "Voir le devis"
+    },
+    "documentRejected": {
+      "subject": "Document à remplacer : {{document}} — Tasheel Leasing",
+      "body": "Le document « {{document}} » n’a pas pu être validé. Motif : {{reason}}. Merci d’en déposer une nouvelle version.",
+      "cta": "Voir mes documents"
+    },
+    "applicationReceived": {
+      "subject": "Nouvelle demande de financement {{reference}} — Tasheel Leasing",
+      "body": "{{business}} vous a transmis une demande de financement de {{amount}}. Le dossier et les pièces jointes sont disponibles dans votre espace.",
+      "cta": "Étudier la demande"
+    },
+    "infoRequested": {
+      "subject": "Complément demandé sur {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} demande un complément d’information : {{note}}",
+      "cta": "Répondre"
+    },
+    "infoProvided": {
+      "subject": "Complément reçu sur {{reference}} — Tasheel Leasing",
+      "body": "{{business}} a répondu à votre demande de complément.",
+      "cta": "Voir la réponse"
+    },
+    "offerReceived": {
+      "subject": "Proposition de financement pour {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} vous adresse une proposition : {{installment}} par mois sur {{duration}} mois. Elle reste soumise à la décision finale de l’établissement et au contrat.",
+      "cta": "Voir la proposition"
+    },
+    "applicationDeclined": {
+      "subject": "Réponse de {{institution}} sur {{reference}} — Tasheel Leasing",
+      "body": "{{institution}} ne donne pas suite à votre demande. Motif communiqué : {{reason}}. Vos autres demandes en cours ne sont pas concernées.",
+      "cta": "Voir ma demande"
+    },
+    "offerAccepted": {
+      "subject": "Proposition acceptée — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} a accepté votre proposition. Vous pouvez poursuivre directement avec l’entreprise pour la décision finale et le contrat.",
+      "cta": "Voir le dossier"
+    },
+    "offerDeclined": {
+      "subject": "Proposition non retenue — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} n’a pas retenu votre proposition.",
+      "cta": "Voir le dossier"
+    },
+    "applicationWithdrawn": {
+      "subject": "Demande retirée — {{reference}} — Tasheel Leasing",
+      "body": "{{business}} a retiré sa demande de financement. Le dossier et ses pièces ne sont plus accessibles.",
+      "cta": "Voir mes demandes"
     }
   },
   "auth": {

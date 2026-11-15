@@ -46,7 +46,16 @@ interface TemplateInput {
     | 'email.quoteRequested'
     | 'email.quoteIssued'
     | 'email.quoteAccepted'
-    | 'email.quoteDeclined';
+    | 'email.quoteDeclined'
+    | 'email.documentRejected'
+    | 'email.applicationReceived'
+    | 'email.infoRequested'
+    | 'email.infoProvided'
+    | 'email.offerReceived'
+    | 'email.applicationDeclined'
+    | 'email.offerAccepted'
+    | 'email.offerDeclined'
+    | 'email.applicationWithdrawn';
   vars?: Record<string, string | number>;
   /** Call-to-action link; omitted for notification-only emails. */
   actionUrl?: string;

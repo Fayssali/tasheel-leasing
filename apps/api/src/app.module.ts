@@ -12,6 +12,7 @@ import { MarketplaceModule } from './marketplace/marketplace.module';
 import { StorageModule } from './storage/storage.module';
 import { MailModule } from './mail/mail.module';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { DocumentsModule } from './documents/documents.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { QuotationsModule } from './quotations/quotations.module';
 import { PermissionsGuard } from './tenancy/permissions.guard';
@@ -31,6 +32,7 @@ import { TenantGuard } from './tenancy/tenant.guard';
     AdminModule,
     MarketplaceModule,
     QuotationsModule,
+    DocumentsModule,
   ],
   // Global guards run in this order: rate limit → authentication → organization → permissions.
   providers: [

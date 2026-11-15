@@ -4,6 +4,8 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import type { TenantTx } from '@tasheel/db';
 import type { SpecField } from '@tasheel/shared';
@@ -12,6 +14,7 @@ import { AuditService } from '../audit/audit.service';
 import { nextReference } from '../common/references';
 import type { RequestMeta, TenantInfo } from '../common/request-context';
 import { PrismaService } from '../prisma/prisma.service';
+import { Scanner } from '../storage/scanner';
 import { Storage } from '../storage/storage';
 import {
   assertImage,
@@ -59,6 +62,7 @@ export class ListingsService {
     private readonly audit: AuditService,
     private readonly storage: Storage,
     private readonly settings: SettingsService,
+    @Optional() private readonly scanner?: Scanner,
   ) {}
 
   list(tenant: TenantInfo, status?: string) {
@@ -330,6 +334,14 @@ export class ListingsService {
     meta: RequestMeta,
   ) {
     const type = assertPdf(file);
+    // Public PDFs go through the same antivirus scan as vault documents.
+    const verdict = (await this.scanner?.scan(file!.buffer)) ?? { status: 'NOT_SCANNED' as const };
+    if (verdict.status === 'INFECTED') {
+      throw new UnprocessableEntityException({
+        code: 'FILE_INFECTED',
+        message: 'The antivirus flagged this file. It was not stored.',
+      });
+    }
     return this.prisma.forTenant(tenant, async (tx) => {
       await this.owned(tx, tenant, listingId);
       if (
