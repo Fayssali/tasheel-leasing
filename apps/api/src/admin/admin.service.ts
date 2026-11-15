@@ -288,15 +288,15 @@ export class AdminService {
   async kpis(tenant: TenantInfo) {
     const since = new Date(Date.now() - 30 * 86_400_000);
     return this.prisma.forTenant(tenant, async (tx) => {
-      const byTypeStatus = (await tx.organization.groupBy({
-        by: ['type', 'status'],
-        where: { deletedAt: null, type: { not: 'PLATFORM' } },
-        _count: { _all: true },
-        orderBy: [{ type: 'asc' }, { status: 'asc' }],
-      })) as Array<{
+      // Plain SQL: Prisma's groupBy typings do not resolve inside interactive transactions.
+      const byTypeStatus = (await tx.$queryRaw`
+        SELECT type::text AS type, status::text AS status, count(*)::int AS n
+        FROM organizations
+        WHERE deleted_at IS NULL AND type <> 'PLATFORM'
+        GROUP BY type, status`) as Array<{
         type: OrganizationType;
         status: OrganizationStatus;
-        _count: { _all: number };
+        n: number;
       }>;
       const [users, newOrganizations30d] = await Promise.all([
         tx.user.count({ where: { deletedAt: null } }),
@@ -308,7 +308,7 @@ export class AdminService {
       const organizations: Record<string, Record<string, number>> = {};
       for (const row of byTypeStatus) {
         organizations[row.type] ??= {};
-        organizations[row.type]![row.status] = row._count._all;
+        organizations[row.type]![row.status] = row.n;
       }
       const pendingVerification = byTypeStatus
         .filter((r) => r.status === 'PENDING_VERIFICATION')
