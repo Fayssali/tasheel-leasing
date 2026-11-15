@@ -1,0 +1,28 @@
+{
+  "name": "tasheel",
+  "private": true,
+  "description": "Tasheel Leasing — B2B digital leasing marketplace and financing intermediation SaaS",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "infra:up": "docker compose -f infra/docker/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "db:migrate": "pnpm --filter @tasheel/db migrate:dev",
+    "db:deploy": "pnpm --filter @tasheel/db migrate:deploy",
+    "db:seed": "pnpm --filter @tasheel/db seed",
+    "db:studio": "pnpm --filter @tasheel/db studio"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "turbo": "^2.3.0",
+    "typescript": "^5.6.3"
+  }
+}

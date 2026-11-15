@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+/* Design tokens — Phase 0 specification, section 8.1. CSS variables so a dark theme can be added later. */
+@theme {
+  --color-primary-900: #0b2e4f;
+  --color-primary-600: #1f5f99;
+  --color-primary-50: #eef4fa;
+  --color-accent-500: #d99a2b;
+  --color-success-600: #1e8e5a;
+  --color-warning-600: #b7791f;
+  --color-danger-600: #c53030;
+
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --radius-card: 8px;
+}
+
+/* Arabic: Plex Sans Arabic first, slightly larger body and looser leading (section 8.2). */
+:root[lang='ar'] {
+  --font-sans: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+}
+:root[lang='ar'] body {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}

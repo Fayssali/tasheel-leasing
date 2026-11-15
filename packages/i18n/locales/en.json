@@ -1,0 +1,36 @@
+{
+  "app": {
+    "name": "Tasheel Leasing",
+    "tagline": "Digital leasing marketplace and financing intermediation"
+  },
+  "nav": {
+    "marketplace": "Marketplace",
+    "applications": "Financing applications",
+    "offers": "Offers",
+    "documents": "Documents",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "register": "Create an account"
+  },
+  "home": {
+    "title": "Finance your professional equipment, simply",
+    "subtitle": "One file, several financial institutions, offers compared side by side.",
+    "cta": "Request financing",
+    "status": "Development environment — fictional data only"
+  },
+  "disclaimer": {
+    "intermediary": "Tasheel Leasing is a technology intermediation platform. It is neither a bank nor a leasing company. Financing decisions rest solely with the financial institutions.",
+    "indicative": "Indicative estimate based on your assumptions. Only a proposal issued by a financial institution is an offer."
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "ar": "العربية",
+    "en": "English"
+  },
+  "health": {
+    "api": "API",
+    "ok": "up",
+    "down": "unavailable"
+  }
+}

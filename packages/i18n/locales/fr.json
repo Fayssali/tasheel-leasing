@@ -1,0 +1,36 @@
+{
+  "app": {
+    "name": "Tasheel Leasing",
+    "tagline": "Place de marché du leasing d'équipements et intermédiation de financement"
+  },
+  "nav": {
+    "marketplace": "Place de marché",
+    "applications": "Demandes de financement",
+    "offers": "Offres",
+    "documents": "Documents",
+    "settings": "Paramètres",
+    "signIn": "Se connecter",
+    "register": "Créer un compte"
+  },
+  "home": {
+    "title": "Financez vos équipements professionnels, simplement",
+    "subtitle": "Un seul dossier, plusieurs établissements financiers, des offres comparées côte à côte.",
+    "cta": "Demander un financement",
+    "status": "Environnement de développement — données fictives uniquement"
+  },
+  "disclaimer": {
+    "intermediary": "Tasheel Leasing est une plateforme d'intermédiation technologique. Elle n'est ni une banque ni une société de leasing. Les décisions de financement relèvent exclusivement des établissements financiers.",
+    "indicative": "Estimation indicative fondée sur vos hypothèses. Seule une proposition émise par un établissement financier constitue une offre."
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "ar": "العربية",
+    "en": "English"
+  },
+  "health": {
+    "api": "API",
+    "ok": "opérationnelle",
+    "down": "indisponible"
+  }
+}

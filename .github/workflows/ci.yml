@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_dev
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 10
+
+    env:
+      DATABASE_URL_ADMIN: postgresql://tasheel_admin:tasheel_admin_dev@localhost:5432/tasheel
+      DATABASE_URL: postgresql://tasheel_app:tasheel_app_dev@localhost:5432/tasheel
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: cp .env.example .env
+
+      - name: Create database roles
+        run: PGPASSWORD=postgres_dev psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f infra/docker/postgres/init/01-roles.sql
+
+      - name: Apply migrations
+        run: pnpm db:deploy
+
+      - name: Build
+        run: pnpm build
+
+      - name: Unit and API tests
+        run: pnpm --filter @tasheel/shared --filter @tasheel/api --filter @tasheel/i18n test
+
+      - name: Tenant isolation — SQL suite
+        run: pnpm --filter @tasheel/db test:rls
+
+      - name: Tenant isolation — Prisma suite
+        run: pnpm --filter @tasheel/db test
+
+      - name: Seed (smoke test)
+        run: pnpm db:seed
+
+      - name: Formatting
+        run: pnpm format:check

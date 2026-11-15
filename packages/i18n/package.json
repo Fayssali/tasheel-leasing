@@ -1,0 +1,12 @@
+{
+  "name": "@tasheel/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./locales/*.json": "./locales/*.json"
+  },
+  "scripts": {
+    "test": "node scripts/check-keys.mjs"
+  }
+}
