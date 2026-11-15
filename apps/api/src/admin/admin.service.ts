@@ -312,7 +312,7 @@ export class AdminService {
       }
       const pendingVerification = byTypeStatus
         .filter((r) => r.status === 'PENDING_VERIFICATION')
-        .reduce((sum, r) => sum + r._count._all, 0);
+        .reduce((sum, r) => sum + r.n, 0);
 
       return {
         organizations,

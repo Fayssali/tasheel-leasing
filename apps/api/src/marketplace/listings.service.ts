@@ -7,8 +7,8 @@ import {
   Optional,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import type { ListingStatus, Prisma, TenantTx } from '@tasheel/db';
-import type { SpecField } from '@tasheel/shared';
+import { asJson, type TenantTx } from '@tasheel/db';
+import type { ListingStatus, SpecField } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
 import { nextReference } from '../common/references';
@@ -45,14 +45,14 @@ const NOT_FOUND = { code: 'NOT_FOUND', message: 'Listing not found.' };
 const LISTING_INCLUDE = {
   category: { select: { id: true, code: true, name: true, specSchema: true } },
   images: {
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    orderBy: [{ sortOrder: 'asc' as const }, { createdAt: 'asc' as const }],
     select: { id: true, mimeType: true, sizeBytes: true, sortOrder: true },
   },
   documents: {
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: 'asc' as const },
     select: { id: true, kind: true, fileName: true, sizeBytes: true, createdAt: true },
   },
-} satisfies Prisma.EquipmentListingInclude;
+};
 
 /** Supplier side of the catalogue (permission listing.manage) plus Tasheel moderation. */
 @Injectable()
@@ -76,7 +76,7 @@ export class ListingsService {
         include: {
           category: { select: { code: true, name: true } },
           images: {
-            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' as const }, { createdAt: 'asc' as const }],
             take: 1,
             select: { id: true },
           },
@@ -418,7 +418,7 @@ export class ListingsService {
           category: { select: { code: true, name: true } },
           organization: { select: { id: true, legalName: true } },
           images: {
-            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' as const }, { createdAt: 'asc' as const }],
             take: 1,
             select: { id: true },
           },
@@ -552,7 +552,7 @@ export class ListingsService {
         ...(input.title.fr ? { fr: input.title.fr } : {}),
         ...(input.title.ar ? { ar: input.title.ar } : {}),
       },
-      description: (input.description ?? {}) as Prisma.InputJsonValue,
+      description: asJson(input.description ?? {}),
       brand: input.brand || null,
       model: input.model || null,
       year: input.year ?? null,
@@ -564,7 +564,7 @@ export class ListingsService {
       leadTimeDays: input.leadTimeDays ?? null,
       deliveryWilayas: [...new Set(input.deliveryWilayas)].sort(),
       warrantyMonths: input.warrantyMonths ?? null,
-      specs: validateSpecs(input.specs, category.specSchema) as Prisma.InputJsonValue,
+      specs: asJson(validateSpecs(input.specs, category.specSchema)),
     };
   }
 }

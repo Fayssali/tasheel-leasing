@@ -7,12 +7,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { QuotationRequestStatus, TenantContext, TenantTx } from '@tasheel/db';
+import type { TenantContext, TenantTx } from '@tasheel/db';
 import {
   computeQuotationTotals,
   formatMoney,
   type Locale,
   type QuotationLineInput,
+  type QuotationRequestStatus,
 } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';

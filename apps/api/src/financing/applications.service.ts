@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { Prisma, SubmissionStatus, TenantTx } from '@tasheel/db';
+import { asJson, type TenantTx } from '@tasheel/db';
 import {
   computeInstallment,
   formatMoney,
@@ -13,6 +13,7 @@ import {
   matchProduct,
   toCentimes,
   type Locale,
+  type SubmissionStatus,
 } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
@@ -180,7 +181,7 @@ export class ApplicationsService {
           durationMonths: dto.durationMonths,
           preferredType: dto.preferredType ?? null,
           purpose: dto.purpose || null,
-          companyProfile: dto.companyProfile as object,
+          companyProfile: asJson(dto.companyProfile),
           equipmentSnapshot: {
             quotationReference: q.reference,
             listingReference: q.listing.reference,
@@ -223,7 +224,7 @@ export class ApplicationsService {
           durationMonths: dto.durationMonths,
           preferredType: dto.preferredType ?? null,
           purpose: dto.purpose || null,
-          companyProfile: dto.companyProfile as object,
+          companyProfile: asJson(dto.companyProfile),
         },
       });
       await this.audit.record(tx, {

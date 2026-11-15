@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { SubmissionStatus, TenantTx } from '@tasheel/db';
+import type { TenantTx } from '@tasheel/db';
 import {
   computeInstallment,
   computeTotalCost,
@@ -12,6 +12,7 @@ import {
   fromCentimes,
   toCentimes,
   type Locale,
+  type SubmissionStatus,
 } from '@tasheel/shared';
 import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';

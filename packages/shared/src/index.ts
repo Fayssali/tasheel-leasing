@@ -4,3 +4,4 @@ export * from './money';
 export * from './catalogue';
 export * from './documents';
 export * from './financing';
+export * from './statuses';
