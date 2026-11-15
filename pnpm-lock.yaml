@@ -191,6 +191,9 @@ importers:
         specifier: workspace:*
         version: link:../shared
     devDependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1169.0
+        version: 3.1169.0
       '@node-rs/argon2':
         specifier: ^2.0.2
         version: 2.2.2

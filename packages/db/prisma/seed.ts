@@ -3,12 +3,13 @@
  * organizations. Runs with the admin role (DATABASE_URL_ADMIN), which owns the tables
  * and is therefore not subject to RLS. Safe to run repeatedly (upserts).
  *
- * Full demonstration data (3 suppliers, 2 institutions, 5 businesses, 20 listings,
- * applications in every status) is added in Phases 2–3 when those tables exist.
+ * Marketplace demo (3 suppliers, 5 businesses, 20 listings, quotations) comes from
+ * demo-marketplace.ts. Financing applications are added in Phase 3.
  */
 import { hash } from '@node-rs/argon2';
 import { PrismaClient, type OrganizationType } from '@prisma/client';
 import { EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
+import { seedDemoMarketplace } from './demo-marketplace';
 
 const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL_ADMIN });
 
@@ -48,6 +49,48 @@ const DEMO_ORGS: Array<{
     wilayaCode: '31',
     adminRole: 'business_admin',
     user: { email: 'entreprise@demo.tasheel.local', firstName: 'Yacine', lastName: 'Demo' },
+  },
+  {
+    type: 'SUPPLIER',
+    legalName: 'Sahel Agri Équipement EURL (fictif)',
+    wilayaCode: '07',
+    adminRole: 'supplier_admin',
+    user: { email: 'fournisseur2@demo.tasheel.local', firstName: 'Lamine', lastName: 'Demo' },
+  },
+  {
+    type: 'SUPPLIER',
+    legalName: 'MediTech Solutions Algérie SPA (fictif)',
+    wilayaCode: '16',
+    adminRole: 'supplier_admin',
+    user: { email: 'fournisseur3@demo.tasheel.local', firstName: 'Nesrine', lastName: 'Demo' },
+  },
+  {
+    type: 'BUSINESS',
+    legalName: 'Djurdjura Travaux Publics SPA (fictif)',
+    wilayaCode: '15',
+    adminRole: 'business_admin',
+    user: { email: 'entreprise2@demo.tasheel.local', firstName: 'Mourad', lastName: 'Demo' },
+  },
+  {
+    type: 'BUSINESS',
+    legalName: 'Clinique Les Palmiers SARL (fictif)',
+    wilayaCode: '16',
+    adminRole: 'business_admin',
+    user: { email: 'entreprise3@demo.tasheel.local', firstName: 'Lina', lastName: 'Demo' },
+  },
+  {
+    type: 'BUSINESS',
+    legalName: 'Oasis Froid Industriel SARL (fictif)',
+    wilayaCode: '30',
+    adminRole: 'business_admin',
+    user: { email: 'entreprise4@demo.tasheel.local', firstName: 'Nadia', lastName: 'Demo' },
+  },
+  {
+    type: 'BUSINESS',
+    legalName: 'Imprimerie El Bahdja EURL (fictif)',
+    wilayaCode: '16',
+    adminRole: 'business_admin',
+    user: { email: 'entreprise5@demo.tasheel.local', firstName: 'Sofiane', lastName: 'Demo' },
   },
 ];
 
@@ -98,8 +141,11 @@ async function seedCategories(): Promise<void> {
   }
 }
 
-async function seedDemoOrganizations(): Promise<void> {
+async function seedDemoOrganizations(): Promise<
+  Map<string, { id: string; userId: string; name: string }>
+> {
   const passwordHash = await hash(DEMO_PASSWORD);
+  const byName = new Map<string, { id: string; userId: string; name: string }>();
 
   for (const d of DEMO_ORGS) {
     const user = await prisma.user.upsert({
@@ -135,7 +181,9 @@ async function seedDemoOrganizations(): Promise<void> {
       update: {},
       create: { memberId: member.id, roleId: role.id, organizationId: org.id },
     });
+    byName.set(d.legalName, { id: org.id, userId: user.id, name: d.legalName });
   }
+  return byName;
 }
 
 async function main(): Promise<void> {
@@ -150,10 +198,12 @@ async function main(): Promise<void> {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Refusing to create demo organizations in production. Use --catalogue-only.');
   }
-  await seedDemoOrganizations();
+  const orgs = await seedDemoOrganizations();
+  const marketplace = await seedDemoMarketplace(prisma, orgs);
   console.log(
     `Seeded ${PERMISSIONS.length} permissions, ${SYSTEM_ROLES.length} system roles, ${DEMO_ORGS.length} demo organizations.`,
   );
+  console.log(`Marketplace demo: ${marketplace}.`);
   console.log(
     `Demo users: ${DEMO_ORGS.map((d) => d.user.email).join(', ')} (password from SEED_DEMO_PASSWORD).`,
   );

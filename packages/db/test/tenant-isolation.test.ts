@@ -147,3 +147,114 @@ describe('row-level security', () => {
     assert.ok(!rows[0]?.org, 'app.org_id must be empty outside withTenantContext');
   });
 });
+
+describe('marketplace row-level security', () => {
+  let orgC: string, userC: string;
+  let draftId: string, publishedId: string, requestId: string;
+
+  before(async () => {
+    const c = await admin.organization.create({
+      data: { type: 'SUPPLIER', legalName: `TenantC ${run}` },
+    });
+    const u = await admin.user.create({
+      data: {
+        email: `tenantc-${run}@test.local`,
+        passwordHash: 'x',
+        firstName: 'C',
+        lastName: 'Test',
+      },
+    });
+    await admin.organizationMember.create({ data: { organizationId: c.id, userId: u.id } });
+    orgC = c.id;
+    userC = u.id;
+    // Created here: in CI this suite runs before the seed.
+    const category = await admin.equipmentCategory.create({
+      data: { code: `iso-${run}`, name: { fr: 'Isolation' }, specSchema: [] },
+    });
+    const mkListing = async (status: 'DRAFT' | 'PUBLISHED', ref: string) =>
+      (
+        await admin.equipmentListing.create({
+          data: {
+            organizationId: orgB,
+            reference: `ISO-${ref}-${run}`,
+            categoryId: category.id,
+            title: { fr: `Iso ${ref}` },
+            status,
+            createdById: userB,
+          },
+        })
+      ).id;
+    draftId = await mkListing('DRAFT', 'D');
+    publishedId = await mkListing('PUBLISHED', 'P');
+    requestId = (
+      await admin.quotationRequest.create({
+        data: {
+          organizationId: orgA,
+          supplierOrgId: orgB,
+          reference: `ISO-QR-${run}`,
+          listingId: publishedId,
+          requestedById: userA,
+        },
+      })
+    ).id;
+    await admin.favourite.create({
+      data: { organizationId: orgA, userId: userA, listingId: publishedId },
+    });
+  });
+
+  test('the public sees published listings, never drafts', async () => {
+    const ids = await withTenantContext(app, { organizationId: null, userId: null }, (tx) =>
+      tx.equipmentListing.findMany({
+        where: { id: { in: [draftId, publishedId] } },
+        select: { id: true },
+      }),
+    );
+    assert.deepEqual(
+      ids.map((l) => l.id),
+      [publishedId],
+    );
+  });
+
+  test('another supplier cannot read or change a supplier’s listings', async () => {
+    const [seen, changed] = await withTenantContext(
+      app,
+      { organizationId: orgC, userId: userC },
+      (tx) =>
+        Promise.all([
+          tx.equipmentListing.count({ where: { id: draftId } }),
+          tx.equipmentListing.updateMany({
+            where: { id: publishedId },
+            data: { title: { fr: 'hijacked' } },
+          }),
+        ]),
+    );
+    assert.equal(seen, 0);
+    assert.equal(changed.count, 0);
+  });
+
+  test('quotation requests are visible to their two parties only', async () => {
+    const count = (organizationId: string, userId: string) =>
+      withTenantContext(app, { organizationId, userId }, (tx) =>
+        tx.quotationRequest.count({ where: { id: requestId } }),
+      );
+    assert.equal(await count(orgA, userA), 1);
+    assert.equal(await count(orgB, userB), 1);
+    assert.equal(await count(orgC, userC), 0);
+  });
+
+  test('favourites are private to their user', async () => {
+    const count = await withTenantContext(app, { organizationId: orgB, userId: userB }, (tx) =>
+      tx.favourite.count({ where: { listingId: publishedId } }),
+    );
+    assert.equal(count, 0);
+  });
+
+  test('commercial records cannot be deleted by the app role', async () => {
+    await assert.rejects(
+      withTenantContext(app, { organizationId: orgA, userId: userA }, (tx) =>
+        tx.quotationRequest.deleteMany({ where: { id: requestId } }),
+      ),
+      /permission denied/i,
+    );
+  });
+});

@@ -88,6 +88,43 @@
 - [ ] CI green on GitHub (first run of Prisma generate, migrations and integration tests). To be confirmed
 - [ ] Demo accepted by the project owner (`docs/demo/phase-1.md`)
 
-## Phase 2 — Marketplace (next)
+## Phase 2 — Marketplace (built, awaiting demo acceptance)
 
-Supplier onboarding documents, equipment categories, listings with images and specifications, search and filters, equipment pages, quotations.
+### Done — 2026-11-15
+
+- Database: migrations `0400_marketplace` (categories, listings, images, documents, favourites, quotation requests, quotations, platform settings; full-text search with `unaccent`; reference sequences), `0500_public_profiles` (verified suppliers and institutions readable publicly) and `0600_quotation_requester` (requester snapshot; a business keeps sight of listings it asked about after archiving). RLS suite: 20/20 checks.
+- Storage: S3 adapter (MinIO locally), private bucket; files are only served through the API after an RLS check. Upload type is checked from the file's first bytes, not the name.
+- Catalogue: 8 categories with their own specification fields (stored in the database). Suppliers draft, edit, publish, archive and restore listings, with up to 10 photos and 5 PDF documents. Publishing needs a verified organization, a photo and a price or "price on request".
+- Moderation: database switch "review before publication" (off by default), queue with approve / reject / withdraw (reason required, audited).
+- Public marketplace: search (prefix, accent-insensitive, ranked), filters by category, condition, wilaya and price, sorting, equipment page with view counter, supplier profile. No sign-in needed to browse.
+- Quotations: verified businesses request a quotation from a listing; suppliers answer with lines, their own VAT rate and a validity date. Totals are computed exactly in centimes. Replace, withdraw, accept, decline, cancel, automatic expiry. Emails in FR / AR / EN.
+- Favourites for business users.
+- Screens: marketplace, equipment page, supplier profile, supplier catalogue and editor, quotations (both sides), favourites, admin moderation. 509 strings complete in FR / AR / EN. 13 screens checked in headless Chrome, FR / AR, desktop and mobile.
+- Demo data (fictional): 3 suppliers, 5 businesses, 20 listings (17 published, plus a draft, one under review and one rejected), quotation requests in every state, favourites. Photos are plain colour placeholders.
+- Tests: 107 API unit and HTTP tests; quotation totals tested in `shared`; a marketplace integration test (publish → search → request → quotation → acceptance → archive) runs in CI.
+- Docs: `docs/modules/m2-marketplace.md`, demo script `docs/demo/phase-2.md`.
+
+### Not verified in the sandbox
+
+- The seed (including the marketplace demo) and the integration tests run only where the Prisma client can be generated, which means CI or a local machine. The SQL behind them was checked directly on PostgreSQL.
+
+### Deferred from the Phase 2 scope
+
+- Supplier onboarding documents (company registration papers) move to Phase 3 with the document vault shared by financing applications.
+- Antivirus scanning of uploads (ClamAV is in Docker Compose under the `scan` profile) is planned with the document vault.
+
+### Phase 2 exit checklist
+
+- [x] Categories, listings, photos, documents, specifications
+- [x] Search, filters, equipment and supplier pages
+- [x] Quotations end to end, with emails
+- [x] Moderation and its database switch
+- [x] Isolation checks for every new table (SQL suite 20/20)
+- [x] Screens in French and Arabic, responsive
+- [x] Fictional demo data
+- [ ] CI green on GitHub. To be confirmed
+- [ ] Demo accepted by the project owner (`docs/demo/phase-2.md`)
+
+## Phase 3 — Financing applications (next)
+
+Financing request from an accepted quotation, document vault, submission to financial institutions, institution offers. Matching scores and simulations stay labelled indicative; decisions belong to the institutions.
