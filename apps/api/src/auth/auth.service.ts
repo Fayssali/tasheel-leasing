@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
 import type { RequestMeta } from '../common/request-context';
 import { PrismaService } from '../prisma/prisma.service';
+import { AccountService } from './account.service';
 import {
   ACCESS_TOKEN_TTL_SECONDS,
   ADMIN_ROLE_BY_TYPE,
@@ -61,10 +63,13 @@ function isUniqueViolation(err: unknown): boolean {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly audit: AuditService,
+    private readonly account: AccountService,
   ) {}
 
   /**
@@ -144,6 +149,12 @@ export class AuthService {
       throw err;
     }
 
+    // The account exists even if the email cannot be sent; the user can ask for a new link.
+    await this.account.sendEmailVerification(userId, meta).catch((err: unknown) => {
+      this.logger.error(
+        `Verification email not created: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    });
     return this.issueSession(userId, meta);
   }
 

@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { validateEnv } from './config/env';
 import { HealthModule } from './health/health.module';
+import { MailModule } from './mail/mail.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PermissionsGuard } from './tenancy/permissions.guard';
@@ -18,6 +19,7 @@ import { TenantGuard } from './tenancy/tenant.guard';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     PrismaModule,
     AuditModule,
+    MailModule,
     AuthModule,
     HealthModule,
     OrganizationsModule,

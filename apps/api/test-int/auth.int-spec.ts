@@ -9,6 +9,15 @@ import cookieParser from 'cookie-parser';
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { Mailer, type OutgoingMail } from '../src/mail/mailer';
+
+const outbox: OutgoingMail[] = [];
+const flush = () => new Promise((r) => setTimeout(r, 50));
+const lastTokenFor = (to: string) => {
+  const mail = [...outbox].reverse().find((m) => m.to === to && /token=/.test(m.text));
+  if (!mail) throw new Error(`No email with a token for ${to}`);
+  return decodeURIComponent(/token=([^\s"&<]+)/.exec(mail.text)![1]!);
+};
 
 const run = randomUUID().slice(0, 8);
 const password = 'integration-test-password';
@@ -26,6 +35,8 @@ describe('Auth flow (PostgreSQL + RLS)', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(Mailer)
+      .useValue({ send: async (m: OutgoingMail) => void outbox.push(m) })
       .overrideProvider(ThrottlerStorage)
       .useValue({
         increment: async () => ({
@@ -153,5 +164,52 @@ describe('Auth flow (PostgreSQL + RLS)', () => {
       .send({ email: `nobody-${run}@int-test.local`, password })
       .expect(401);
     expect(unknown.body.code).toBe('INVALID_CREDENTIALS');
+  });
+
+  it('verifies the email, then resets a forgotten password and signs out every session', async () => {
+    const email = `delta-${run}@int-test.local`;
+    const signup = await register('Delta', 'BUSINESS').expect(201);
+    await flush();
+
+    // Verification link sent at sign-up works once.
+    const verifyToken = lastTokenFor(email);
+    await request(http).post('/api/v1/auth/email/verify').send({ token: verifyToken }).expect(204);
+    await request(http).post('/api/v1/auth/email/verify').send({ token: verifyToken }).expect(400);
+    const me = await request(http)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${signup.body.accessToken}`)
+      .expect(200);
+    expect(me.body.user.emailVerified).toBe(true);
+
+    // Forgot password: same answer for known and unknown emails.
+    await request(http).post('/api/v1/auth/password/forgot').send({ email }).expect(202);
+    await request(http)
+      .post('/api/v1/auth/password/forgot')
+      .send({ email: `nobody-${run}@int-test.local` })
+      .expect(202);
+    await flush();
+
+    const resetToken = lastTokenFor(email);
+    await request(http)
+      .post('/api/v1/auth/password/reset')
+      .send({ token: resetToken, password: 'a-completely-new-password' })
+      .expect(204);
+
+    // Old session is gone, old password refused, new password works, link is single-use.
+    await request(http)
+      .post('/api/v1/auth/refresh')
+      .set('Cookie', refreshCookie(signup))
+      .expect(401);
+    await request(http).post('/api/v1/auth/login').send({ email, password }).expect(401);
+    await request(http)
+      .post('/api/v1/auth/login')
+      .send({ email, password: 'a-completely-new-password' })
+      .expect(200);
+    await request(http)
+      .post('/api/v1/auth/password/reset')
+      .send({ token: resetToken, password: 'yet-another-password' })
+      .expect(400);
+    await flush();
+    expect(outbox.some((m) => m.to === email && /modifié/.test(m.subject))).toBe(true);
   });
 });

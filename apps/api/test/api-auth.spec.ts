@@ -10,6 +10,7 @@ import { ThrottlerStorage } from '@nestjs/throttler';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { AccountService } from '../src/auth/account.service';
 import { AuthService } from '../src/auth/auth.service';
 import { PrismaService } from '../src/prisma/prisma.service';
 
@@ -46,6 +47,12 @@ describe('Auth and access control (HTTP)', () => {
     me: jest.fn(),
   };
   const prisma = { forTenant: jest.fn(), $queryRaw: jest.fn(), $disconnect: jest.fn() };
+  const accountService = {
+    sendEmailVerification: jest.fn(),
+    confirmEmail: jest.fn(),
+    forgotPassword: jest.fn(),
+    resetPassword: jest.fn(),
+  };
 
   const tokens = {
     accessToken: 'access.jwt',
@@ -58,6 +65,8 @@ describe('Auth and access control (HTTP)', () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(AuthService)
       .useValue(authService)
+      .overrideProvider(AccountService)
+      .useValue(accountService)
       .overrideProvider(PrismaService)
       .useValue(prisma)
       // Rate limiting is tested separately below; here every request counts as the first.
@@ -126,6 +135,44 @@ describe('Auth and access control (HTTP)', () => {
         .set('Cookie', `tasheel_rt=${tokens.refreshToken}`)
         .expect(200);
       expect(authService.refresh.mock.calls[0][0]).toBe(tokens.refreshToken);
+    });
+  });
+
+  describe('email verification and password reset', () => {
+    it('answers 202 to forgot-password without waiting for the lookup', async () => {
+      accountService.forgotPassword.mockReturnValueOnce(new Promise(() => undefined)); // never resolves
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/auth/password/forgot')
+        .send({ email: 'Unknown@Example.dz' })
+        .expect(202);
+      expect(res.body).toEqual({ status: 'accepted' });
+      expect(accountService.forgotPassword.mock.calls[0][0]).toBe('unknown@example.dz');
+    });
+
+    it('validates the reset body before calling the service', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/password/reset')
+        .send({ token: 'x'.repeat(80), password: 'short' })
+        .expect(400);
+      expect(accountService.resetPassword).not.toHaveBeenCalled();
+    });
+
+    it('confirms an email token publicly', async () => {
+      accountService.confirmEmail.mockResolvedValueOnce(undefined);
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/email/verify')
+        .send({ token: 'x'.repeat(80) })
+        .expect(204);
+    });
+
+    it('requires sign-in to re-send the verification email', async () => {
+      await request(app.getHttpServer()).post('/api/v1/auth/email/verification').expect(401);
+      accountService.sendEmailVerification.mockResolvedValueOnce('sent');
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/auth/email/verification')
+        .set('Authorization', await bearer())
+        .expect(202);
+      expect(res.body).toEqual({ status: 'sent' });
     });
   });
 

@@ -1,6 +1,8 @@
 -- Run as tasheel_admin (table owner, not subject to RLS). Creates fixed test tenants.
 BEGIN;
 DELETE FROM audit_logs WHERE entity_type = 'RlsTest';
+DELETE FROM user_tokens WHERE user_id IN (
+  '00000000-0000-7000-8000-0000000000a1', '00000000-0000-7000-8000-0000000000b1', '00000000-0000-7000-8000-0000000000f1');
 DELETE FROM organization_members WHERE organization_id IN (
   '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-00000000000b', '00000000-0000-7000-8000-00000000000f');
 DELETE FROM users WHERE email LIKE '%@rls-test.local';
@@ -25,4 +27,8 @@ INSERT INTO organization_members (id, organization_id, user_id, updated_at) VALU
 INSERT INTO audit_logs (id, organization_id, action, entity_type) VALUES
   (gen_random_uuid(), '00000000-0000-7000-8000-00000000000a', 'test', 'RlsTest'),
   (gen_random_uuid(), '00000000-0000-7000-8000-00000000000b', 'test', 'RlsTest');
+
+INSERT INTO user_tokens (id, user_id, purpose, token_hash, expires_at) VALUES
+  (gen_random_uuid(), '00000000-0000-7000-8000-0000000000a1', 'PASSWORD_RESET', 'rls-test-hash-a', now() + interval '1 hour'),
+  (gen_random_uuid(), '00000000-0000-7000-8000-0000000000b1', 'PASSWORD_RESET', 'rls-test-hash-b', now() + interval '1 hour');
 COMMIT;

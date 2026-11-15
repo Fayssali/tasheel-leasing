@@ -39,14 +39,23 @@ All under `/api/v1`. Every route requires a Bearer access token unless marked pu
 
 Database queries then run through `PrismaService.forTenant(tenant, …)`, which sets the RLS context, so the database enforces isolation again.
 
+## Email verification and password reset
+
+- Links point to the web app (`WEB_APP_URL`): `/verify-email?token=…` and `/reset-password?token=…`. The token is `<userId>.<secret>`; only SHA-256(secret) is stored, in `user_tokens` (visible to its owner only, through RLS).
+- Verification links last 48 hours and reset links 30 minutes. All links are single-use, and requesting a new link invalidates earlier ones of the same kind.
+- Sign-up sends the verification email automatically. Login is allowed before verification; later phases will require a verified email for sensitive actions (submitting an application, issuing a proposal).
+- A completed reset clears any lockout, verifies the email (the link proves mailbox ownership), revokes every session and sends a "password changed" notification.
+- Emails are sent after the transaction commits and are never awaited by the response. Phase 6 moves sending to a queue with retries. Locally, emails arrive in Mailpit at http://localhost:8025.
+- Email text lives in `packages/i18n/locales/*.json` (`email.*`) and is sent in the user's language. Arabic is right-to-left.
+
 ## Audit events
 
-`auth.registered`, `auth.login_succeeded`, `auth.login_failed`, `auth.account_locked`, `auth.login_blocked_locked`, `auth.refresh_reuse_detected`, `auth.logged_out`.
+`auth.registered`, `auth.email_verification_sent`, `auth.email_verified`, `auth.password_reset_requested`, `auth.password_reset_completed`, `auth.login_succeeded`, `auth.login_failed`, `auth.account_locked`, `auth.login_blocked_locked`, `auth.refresh_reuse_detected`, `auth.logged_out`.
 
 ## Error codes
 
-`UNAUTHENTICATED`, `TOKEN_INVALID`, `INVALID_CREDENTIALS`, `INVALID_SESSION`, `EMAIL_TAKEN`, `ORGANIZATION_REQUIRED`, `NOT_A_MEMBER`, `ORGANIZATION_BLOCKED`, `PERMISSION_DENIED`.
+`UNAUTHENTICATED`, `TOKEN_INVALID`, `INVALID_TOKEN` (email link), `INVALID_CREDENTIALS`, `INVALID_SESSION`, `EMAIL_TAKEN`, `ORGANIZATION_REQUIRED`, `NOT_A_MEMBER`, `ORGANIZATION_BLOCKED`, `PERMISSION_DENIED`.
 
 ## Not yet built
 
-Email verification, password reset, MFA (TOTP, mandatory for platform and institution users), invitations, and the session list with "sign out other devices".
+MFA (TOTP, mandatory for platform and institution users), invitations, and the session list with "sign out other devices".

@@ -38,11 +38,18 @@
 - Documentation: `docs/modules/m0-auth-and-access.md`.
 - Decision D1 recorded as accepted (ADR 0002).
 
+### Done — 2026-11-15, email verification and password reset
+
+- `user_tokens` table (migration `20261115000200_user_tokens`) with RLS: owner-only, no deletes by the app role. Two new SQL isolation checks (12/12 passing) and a Prisma-level case.
+- Mailer abstraction with an SMTP implementation (Mailpit locally). Email templates in FR / AR / EN from the i18n files, right-to-left for Arabic, HTML-escaped.
+- Endpoints: re-send verification, verify, forgot password (always 202, background lookup), reset (single-use, clears lockout, revokes all sessions, notifies).
+- Sign-up sends the verification email automatically.
+- Tests: 40 unit and HTTP tests passing; the integration test now also covers verify → forgot → reset on PostgreSQL (runs in CI).
+
 ### Next
 
-1. Email verification and password reset (Mailpit locally).
-2. MFA (TOTP) for platform and institution users.
-3. Members and invitations (with the SECURITY DEFINER accept function).
-4. Admin console API: verification queue, verify/reject/suspend, audit log viewer.
-5. Web: login, registration and organization switcher screens; admin console screens.
-6. Phase 1 demo.
+1. MFA (TOTP) for platform and institution users.
+2. Members and invitations (with the SECURITY DEFINER accept function).
+3. Admin console API: verification queue, verify/reject/suspend, audit log viewer.
+4. Web: login, registration, email verification, password reset and organization switcher screens; admin console screens.
+5. Phase 1 demo.

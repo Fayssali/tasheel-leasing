@@ -106,3 +106,25 @@ DO $$ BEGIN
   END;
 END $$;
 COMMIT;
+
+-- 11. A user sees only their own email tokens, even with a known hash
+BEGIN;
+SELECT set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF (SELECT count(*) FROM user_tokens WHERE token_hash = 'rls-test-hash-b') <> 0
+     OR (SELECT count(*) FROM user_tokens WHERE token_hash = 'rls-test-hash-a') <> 1 THEN
+    RAISE EXCEPTION 'FAIL 11: user can read another user''s tokens';
+  END IF;
+  RAISE NOTICE 'ok 11 - email tokens visible only to their owner';
+END $$;
+
+-- 12. Email tokens cannot be deleted by the app role
+DO $$ BEGIN
+  BEGIN
+    DELETE FROM user_tokens WHERE token_hash = 'rls-test-hash-a';
+    RAISE EXCEPTION 'FAIL 12: app role deleted a token';
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'ok 12 - email token delete denied';
+  END;
+END $$;
+COMMIT;

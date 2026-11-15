@@ -32,5 +32,24 @@
     "api": "API",
     "ok": "up",
     "down": "unavailable"
+  },
+  "email": {
+    "greeting": "Hello {{name}},",
+    "footer": "Tasheel Leasing is a technology intermediation platform. It is neither a bank nor a leasing company.",
+    "ignore": "If you did not make this request, you can ignore this message.",
+    "verify": {
+      "subject": "Confirm your email address — Tasheel Leasing",
+      "body": "To activate your account, please confirm your email address. This link is valid for {{hours}} hours.",
+      "cta": "Confirm my email address"
+    },
+    "reset": {
+      "subject": "Reset your password — Tasheel Leasing",
+      "body": "A password reset was requested for your account. This link is valid for {{minutes}} minutes and can be used once.",
+      "cta": "Choose a new password"
+    },
+    "passwordChanged": {
+      "subject": "Your password was changed — Tasheel Leasing",
+      "body": "Your account password was just changed and all your sessions were signed out. If you did not make this change, contact support immediately."
+    }
   }
 }

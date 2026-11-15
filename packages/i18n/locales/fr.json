@@ -32,5 +32,24 @@
     "api": "API",
     "ok": "opérationnelle",
     "down": "indisponible"
+  },
+  "email": {
+    "greeting": "Bonjour {{name}},",
+    "footer": "Tasheel Leasing est une plateforme d'intermédiation technologique. Elle n'est ni une banque ni une société de leasing.",
+    "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.",
+    "verify": {
+      "subject": "Confirmez votre adresse e-mail — Tasheel Leasing",
+      "body": "Pour activer votre compte, confirmez votre adresse e-mail. Ce lien est valable {{hours}} heures.",
+      "cta": "Confirmer mon adresse e-mail"
+    },
+    "reset": {
+      "subject": "Réinitialisation de votre mot de passe — Tasheel Leasing",
+      "body": "Une réinitialisation du mot de passe a été demandée pour votre compte. Ce lien est valable {{minutes}} minutes et ne peut être utilisé qu'une fois.",
+      "cta": "Choisir un nouveau mot de passe"
+    },
+    "passwordChanged": {
+      "subject": "Votre mot de passe a été modifié — Tasheel Leasing",
+      "body": "Le mot de passe de votre compte vient d'être modifié et toutes vos sessions ont été fermées. Si vous n'êtes pas à l'origine de ce changement, contactez immédiatement le support."
+    }
   }
 }

@@ -124,6 +124,21 @@ describe('row-level security', () => {
     );
   });
 
+  test('a user cannot read another user’s email tokens', async () => {
+    await admin.userToken.create({
+      data: {
+        userId: userB,
+        purpose: 'PASSWORD_RESET',
+        tokenHash: `iso-${run}`,
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    const found = await withTenantContext(app, { organizationId: null, userId: userA }, (tx) =>
+      tx.userToken.findUnique({ where: { tokenHash: `iso-${run}` } }),
+    );
+    assert.equal(found, null);
+  });
+
   test('context does not leak between transactions on a pooled connection', async () => {
     await withTenantContext(app, { organizationId: orgA, userId: userA }, async () => undefined);
     const rows = await app.$queryRaw<

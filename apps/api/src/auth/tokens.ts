@@ -40,3 +40,25 @@ export function digestEquals(a: string, b: string): boolean {
   const bb = Buffer.from(b, 'hex');
   return ba.length === bb.length && ba.length > 0 && timingSafeEqual(ba, bb);
 }
+
+/**
+ * Emailed single-use tokens: `<userId>.<secret>`. As with refresh tokens, the user id lets
+ * the server set the RLS user context before the lookup; only SHA-256(secret) is stored.
+ */
+const USER_TOKEN_RE = new RegExp(`^(${UUID})\\.([A-Za-z0-9_-]{43})$`, 'i');
+
+export interface ParsedUserToken {
+  userId: string;
+  secret: string;
+}
+
+export function formatUserToken(userId: string, secret: string): string {
+  return `${userId}.${secret}`;
+}
+
+export function parseUserToken(raw: unknown): ParsedUserToken | null {
+  if (typeof raw !== 'string') return null;
+  const m = USER_TOKEN_RE.exec(raw.trim());
+  if (!m) return null;
+  return { userId: m[1]!.toLowerCase(), secret: m[2]! };
+}
