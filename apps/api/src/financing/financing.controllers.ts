@@ -41,6 +41,12 @@ export class ProductsController {
     return this.products.list(t);
   }
 
+  @Get('document-types')
+  @RequirePermissions('product.manage')
+  documentTypes(@CurrentTenant() t: TenantInfo) {
+    return this.products.documentTypes(t);
+  }
+
   @Post()
   @RequirePermissions('product.manage')
   create(@CurrentTenant() t: TenantInfo, @Body() dto: ProductDto, @Req() req: Request) {

@@ -19,6 +19,7 @@ import {
   TextInput,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { OrgDocumentsPanel } from './OrgDocumentsPanel';
 import { formatDate, useErrorMessage, useLocalizedName } from '../../lib/format';
 import type {
   AdminOrganizationDetail,
@@ -401,6 +402,8 @@ export function AdminOrganizationDetailPage() {
           </ul>
         </Card>
       </div>
+
+      {o.type !== 'PLATFORM' && <OrgDocumentsPanel organizationId={o.id} />}
 
       <Card title={t('admin.history')} className="mt-6">
         <AuditTable entries={logs.data?.items ?? []} loading={logs.isLoading} />

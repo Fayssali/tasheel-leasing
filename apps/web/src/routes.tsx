@@ -13,6 +13,13 @@ import {
 } from './pages/admin/AdminPages';
 import { AdminListingsPage } from './pages/admin/AdminListingsPage';
 import { DashboardPage } from './pages/app/DashboardPage';
+import { DocumentsPage } from './pages/app/DocumentsPage';
+import {
+  ApplicationPage,
+  ApplicationsPage,
+  NewApplicationPage,
+} from './pages/financing/BusinessFinancing';
+import { InboxPage, ProductsPage, ReviewPage } from './pages/financing/InstitutionFinancing';
 import { FavouritesPage } from './pages/app/FavouritesPage';
 import { QuotationsPage } from './pages/app/QuotationsPage';
 import { ListingPage } from './pages/marketplace/ListingPage';
@@ -93,14 +100,31 @@ function AppArea() {
       ? [
           { to: '/app/catalogue', label: t('nav.catalogue') },
           { to: '/app/quotations', label: t('nav.quotationRequests') },
+          { to: '/app/documents', label: t('nav.documents') },
         ]
       : activeOrg?.type === 'BUSINESS'
         ? [
             { to: '/marketplace', label: t('nav.marketplace') },
             { to: '/app/quotations', label: t('nav.quotations') },
+            {
+              to: '/app/financing',
+              label: t('nav.financing'),
+              isActive: (path: string) => path.startsWith('/app/financing'),
+            },
             { to: '/app/favourites', label: t('nav.favourites') },
+            { to: '/app/documents', label: t('nav.documents') },
           ]
-        : [];
+        : activeOrg?.type === 'FINANCIAL_INSTITUTION'
+          ? [
+              {
+                to: '/app/financing/inbox',
+                label: t('nav.inbox'),
+                isActive: (path: string) => path.startsWith('/app/financing/inbox'),
+              },
+              { to: '/app/financing/products', label: t('nav.products') },
+              { to: '/app/documents', label: t('nav.documents') },
+            ]
+          : [];
   return (
     <RequireAuth area="app">
       <AppShell
@@ -192,6 +216,13 @@ export const router = createBrowserRouter([
       { path: 'catalogue/:id', element: <ListingEditorPage /> },
       { path: 'quotations', element: <QuotationsPage /> },
       { path: 'favourites', element: <FavouritesPage /> },
+      { path: 'documents', element: <DocumentsPage /> },
+      { path: 'financing', element: <ApplicationsPage /> },
+      { path: 'financing/new', element: <NewApplicationPage /> },
+      { path: 'financing/inbox', element: <InboxPage /> },
+      { path: 'financing/inbox/:id', element: <ReviewPage /> },
+      { path: 'financing/products', element: <ProductsPage /> },
+      { path: 'financing/:id', element: <ApplicationPage /> },
     ],
   },
   {

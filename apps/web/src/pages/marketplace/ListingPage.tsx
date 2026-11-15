@@ -229,9 +229,9 @@ export function ListingPage() {
                   {t('market.signInToQuote')}
                 </Link>
               )}
-              <Button variant="ghost" className="w-full" disabled title={t('market.financingSoon')}>
-                {t('market.requestFinancing')} · {t('market.soon')}
-              </Button>
+              <p className="rounded bg-gray-50 p-3 text-xs text-gray-600">
+                {t('market.financingHow')}
+              </p>
             </div>
 
             <Card title={t('market.supplier')}>

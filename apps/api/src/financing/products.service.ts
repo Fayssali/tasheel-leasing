@@ -24,6 +24,16 @@ export class ProductsService {
     );
   }
 
+  /** Document types a business can provide: what an institution may require for a product. */
+  documentTypes(tenant: TenantInfo) {
+    return this.prisma.forTenant(tenant, (tx) =>
+      tx.documentType.findMany({
+        where: { isActive: true, ownerTypes: { has: 'BUSINESS' } },
+        orderBy: { sortOrder: 'asc' },
+      }),
+    );
+  }
+
   async create(tenant: TenantInfo, dto: ProductDto, meta: RequestMeta) {
     this.validate(dto);
     return this.prisma.forTenant(tenant, async (tx) => {

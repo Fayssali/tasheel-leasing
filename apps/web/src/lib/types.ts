@@ -262,3 +262,207 @@ export interface QuotationRequestRow {
   };
   quotations: Quotation[];
 }
+
+// --- Phase 3: documents and financing -------------------------------------------
+
+export type DocState = 'MISSING' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
+
+export interface DocumentType {
+  code: string;
+  name: LocalizedName;
+  ownerTypes: string[];
+  requiredForVerification: string[];
+  requiredForApplication: boolean;
+  hasExpiry: boolean;
+}
+
+export interface VaultDocument {
+  id: string;
+  typeCode: string;
+  title: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  scanStatus: 'PENDING' | 'CLEAN' | 'INFECTED' | 'NOT_SCANNED';
+  reviewStatus: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  reviewReason: string | null;
+  expiresOn: string | null;
+  createdAt: string;
+}
+
+export interface Vault {
+  types: DocumentType[];
+  documents: VaultDocument[];
+  checklist: {
+    verification: Array<{ typeCode: string; state: DocState }>;
+    application: Array<{ typeCode: string; state: DocState }>;
+  };
+}
+
+export type ProductType = 'LEASING' | 'IJARA';
+
+export interface FinancingProduct {
+  id: string;
+  name: LocalizedName;
+  description: LocalizedName;
+  productType: ProductType;
+  minAmount: string;
+  maxAmount: string;
+  minDurationMonths: number;
+  maxDurationMonths: number;
+  minDownPaymentPct: string;
+  categoryCodes: string[];
+  wilayaCodes: string[];
+  minYearsInBusiness: number;
+  indicativeRateMin: string;
+  indicativeRateMax: string;
+  requiredDocumentTypes: string[];
+  isActive: boolean;
+  _count?: { submissions: number; offers: number };
+}
+
+export type ApplicationStatus = 'DRAFT' | 'SUBMITTED' | 'OFFER_ACCEPTED' | 'WITHDRAWN' | 'CLOSED';
+export type SubmissionStatus =
+  'SENT' | 'UNDER_REVIEW' | 'INFO_REQUESTED' | 'OFFER_MADE' | 'DECLINED' | 'WITHDRAWN' | 'CLOSED';
+export type OfferStatus = 'ISSUED' | 'ACCEPTED' | 'DECLINED' | 'EXPIRED' | 'WITHDRAWN';
+
+export interface CompanyProfile {
+  yearsInBusiness?: number;
+  employees?: number;
+  annualRevenue?: string;
+  sector?: string;
+}
+
+export interface EquipmentSnapshot {
+  quotationReference: string;
+  listingReference: string;
+  title: LocalizedText;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  condition: string;
+  supplierName: string | null;
+}
+
+export interface Offer {
+  id: string;
+  organizationId: string;
+  submissionId: string;
+  reference: string;
+  financedAmount: string;
+  downPayment: string;
+  durationMonths: number;
+  ratePct: string;
+  residualValue: string;
+  feesAmount: string;
+  installmentAmount: string;
+  totalCost: string;
+  validUntil: string;
+  conditions: string | null;
+  status: OfferStatus;
+  createdAt: string;
+}
+
+export interface TimelineEvent {
+  id: string;
+  organizationId: string;
+  kind: string;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface Submission {
+  id: string;
+  institutionOrgId: string;
+  institutionName?: string;
+  status: SubmissionStatus;
+  matchScore: number | null;
+  declineReason: string | null;
+  createdAt: string;
+  product: { id: string; name: LocalizedName; productType: ProductType } | null;
+  events: TimelineEvent[];
+}
+
+export interface Application {
+  id: string;
+  reference: string;
+  status: ApplicationStatus;
+  quotationId: string;
+  categoryCode: string;
+  equipmentAmount: string;
+  downPayment: string;
+  financedAmount: string;
+  durationMonths: number;
+  preferredType: ProductType | null;
+  purpose: string | null;
+  companyProfile: CompanyProfile;
+  businessSnapshot: {
+    legalName?: string;
+    tradeName?: string | null;
+    nif?: string | null;
+    rcNumber?: string | null;
+    nis?: string | null;
+    wilayaCode?: string | null;
+    address?: string | null;
+  };
+  equipmentSnapshot: EquipmentSnapshot;
+  submittedAt: string | null;
+  createdAt: string;
+}
+
+export interface ApplicationDetail extends Application {
+  documents: Array<{
+    document: Pick<
+      VaultDocument,
+      'id' | 'typeCode' | 'title' | 'fileName' | 'reviewStatus' | 'scanStatus' | 'expiresOn'
+    >;
+  }>;
+  submissions: Submission[];
+  offers: Offer[];
+}
+
+export interface ProductMatch {
+  productId: string;
+  institutionOrgId: string;
+  institutionName: string;
+  name: LocalizedName;
+  productType: ProductType;
+  indicativeRateMin: string;
+  indicativeRateMax: string;
+  requiredDocumentTypes: string[];
+  indicative: true;
+  score: number;
+  checks: Array<{ criterion: string; met: boolean }>;
+  installmentRange: { min: string; max: string };
+}
+
+export interface InboxRow {
+  id: string;
+  status: SubmissionStatus;
+  matchScore: number | null;
+  createdAt: string;
+  application: Pick<
+    Application,
+    | 'reference'
+    | 'status'
+    | 'equipmentAmount'
+    | 'downPayment'
+    | 'financedAmount'
+    | 'durationMonths'
+    | 'categoryCode'
+    | 'businessSnapshot'
+    | 'equipmentSnapshot'
+    | 'submittedAt'
+  >;
+  product: { id: string; name: LocalizedName; productType: ProductType } | null;
+}
+
+export interface ReviewDetail {
+  id: string;
+  status: SubmissionStatus;
+  declineReason: string | null;
+  application: Application & { documents: Array<{ document: VaultDocument }> };
+  product: FinancingProduct | null;
+  events: TimelineEvent[];
+  offers: Offer[];
+}

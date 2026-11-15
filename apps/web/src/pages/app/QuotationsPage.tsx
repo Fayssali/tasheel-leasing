@@ -461,9 +461,22 @@ export function QuotationsPage() {
                     </Button>
                   )}
                 </div>
-                {!isSupplier && r.status === 'CLOSED' && (
-                  <p className="mt-3 text-xs text-gray-500">{t('quotes.acceptedNext')}</p>
-                )}
+                {!isSupplier &&
+                  r.status === 'CLOSED' &&
+                  (() => {
+                    const accepted = r.quotations.find((q) => q.status === 'ACCEPTED');
+                    return accepted ? (
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded bg-primary-50 p-3">
+                        <p className="text-xs text-gray-700">{t('quotes.acceptedNext')}</p>
+                        <Link
+                          to={`/app/financing/new?quotation=${accepted.id}`}
+                          className="rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary-900"
+                        >
+                          {t('quotes.requestFinancing')}
+                        </Link>
+                      </div>
+                    ) : null;
+                  })()}
               </Card>
             );
           })}

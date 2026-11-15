@@ -132,3 +132,23 @@ export async function api<T>(path: string, opts: RequestOptions = {}, retried = 
 export function getAccessToken(): string | null {
   return accessToken;
 }
+
+/** Downloads a file that needs the session (Authorization + organization headers). */
+export async function downloadFile(path: string, fileName: string): Promise<void> {
+  const headers: Record<string, string> = {};
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  const org = getActiveOrg();
+  if (org) headers['X-Organization-Id'] = org;
+  let res = await fetch(`${BASE}${path}`, { headers, credentials: 'include' });
+  if (res.status === 401 && (await refreshSession())) {
+    headers.Authorization = `Bearer ${accessToken}`;
+    res = await fetch(`${BASE}${path}`, { headers, credentials: 'include' });
+  }
+  if (!res.ok) throw new ApiError(res.status, `HTTP_${res.status}`, res.statusText);
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
