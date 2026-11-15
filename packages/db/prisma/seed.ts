@@ -8,7 +8,7 @@
  */
 import { hash } from '@node-rs/argon2';
 import { PrismaClient, type OrganizationType } from '@prisma/client';
-import { PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
+import { EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
 
 const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL_ADMIN });
 
@@ -88,6 +88,16 @@ async function seedCatalogue(): Promise<void> {
   }
 }
 
+async function seedCategories(): Promise<void> {
+  for (const [i, c] of EQUIPMENT_CATEGORIES.entries()) {
+    await prisma.equipmentCategory.upsert({
+      where: { code: c.code },
+      update: { name: c.name, specSchema: c.specSchema as object[], sortOrder: i },
+      create: { code: c.code, name: c.name, specSchema: c.specSchema as object[], sortOrder: i },
+    });
+  }
+}
+
 async function seedDemoOrganizations(): Promise<void> {
   const passwordHash = await hash(DEMO_PASSWORD);
 
@@ -130,6 +140,7 @@ async function seedDemoOrganizations(): Promise<void> {
 
 async function main(): Promise<void> {
   await seedCatalogue();
+  await seedCategories();
   if (process.argv.includes('--catalogue-only')) {
     console.log(
       `Seeded ${PERMISSIONS.length} permissions and ${SYSTEM_ROLES.length} system roles (no demo data).`,

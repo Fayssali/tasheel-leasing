@@ -71,6 +71,7 @@ model Organization {
   roles       Role[]
   invitations Invitation[]
   auditLogs   AuditLog[]
+  listings    EquipmentListing[]
 
   @@index([type, status])
   @@map("organizations")
@@ -256,4 +257,226 @@ model AuditLog {
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([entityType, entityId])
   @@map("audit_logs")
+}
+
+// =============================================================================
+// Phase 2 — Marketplace (M1)
+// =============================================================================
+
+enum EquipmentCondition {
+  NEW
+  USED
+  REFURBISHED
+}
+
+enum EquipmentAvailability {
+  IN_STOCK
+  ON_ORDER
+  UNAVAILABLE
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+  REJECTED
+}
+
+enum EquipmentDocumentKind {
+  BROCHURE
+  SPEC_SHEET
+  OTHER
+}
+
+enum QuotationRequestStatus {
+  OPEN
+  QUOTED
+  CLOSED
+  CANCELLED
+}
+
+enum QuotationStatus {
+  ISSUED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  WITHDRAWN
+}
+
+// Global reference data, edited by Tasheel. specSchema lists the technical fields of the
+// category: [{ key, label: {fr,ar,en}, type: "number"|"text"|"select", unit?, options? }].
+model EquipmentCategory {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  parentId   String?  @map("parent_id") @db.Uuid
+  code       String   @unique
+  name       Json // { "fr": "...", "ar": "...", "en": "..." }
+  specSchema Json     @default("[]") @map("spec_schema")
+  sortOrder  Int      @default(0) @map("sort_order")
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  parent   EquipmentCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children EquipmentCategory[] @relation("CategoryTree")
+  listings EquipmentListing[]
+
+  @@index([parentId, sortOrder])
+  @@map("equipment_categories")
+}
+
+model EquipmentListing {
+  id                String                @id @default(uuid(7)) @db.Uuid
+  organizationId    String                @map("organization_id") @db.Uuid // supplier
+  reference         String                @unique // EQ-YYYY-NNNNNN
+  categoryId        String                @map("category_id") @db.Uuid
+  title             Json // { fr?, ar? } at least one
+  description       Json                  @default("{}")
+  brand             String?
+  model             String?
+  year              Int?
+  condition         EquipmentCondition    @default(NEW)
+  price             Decimal?              @db.Decimal(18, 2)
+  currency          String                @default("DZD") @db.Char(3)
+  priceOnRequest    Boolean               @default(false) @map("price_on_request")
+  priceIncludesVat  Boolean               @default(false) @map("price_includes_vat")
+  availability      EquipmentAvailability @default(IN_STOCK)
+  leadTimeDays      Int?                  @map("lead_time_days")
+  deliveryWilayas   String[]              @default([]) @map("delivery_wilayas") // empty = nationwide
+  warrantyMonths    Int?                  @map("warranty_months")
+  specs             Json                  @default("{}")
+  status            ListingStatus         @default(DRAFT)
+  statusReason      String?               @map("status_reason")
+  publishedAt       DateTime?             @map("published_at")
+  viewCount         Int                   @default(0) @map("view_count")
+  searchVector      Unsupported("tsvector")? @map("search_vector") // maintained by trigger
+  createdById       String                @map("created_by_id") @db.Uuid
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  deletedAt         DateTime?             @map("deleted_at")
+
+  organization      Organization          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  category          EquipmentCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images            EquipmentImage[]
+  documents         EquipmentDocument[]
+  favourites        Favourite[]
+  quotationRequests QuotationRequest[]
+  quotations        Quotation[]
+
+  @@index([organizationId, status, createdAt(sort: Desc)])
+  @@index([status, categoryId, price])
+  @@map("equipment_listings")
+}
+
+model EquipmentImage {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  listingId      String   @map("listing_id") @db.Uuid
+  storageKey     String   @unique @map("storage_key")
+  mimeType       String   @map("mime_type")
+  sizeBytes      Int      @map("size_bytes")
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  listing EquipmentListing @relation(fields: [listingId], references: [id], onDelete: Restrict)
+
+  @@index([listingId, sortOrder])
+  @@map("equipment_images")
+}
+
+model EquipmentDocument {
+  id             String                @id @default(uuid(7)) @db.Uuid
+  organizationId String                @map("organization_id") @db.Uuid
+  listingId      String                @map("listing_id") @db.Uuid
+  kind           EquipmentDocumentKind @default(BROCHURE)
+  fileName       String                @map("file_name")
+  storageKey     String                @unique @map("storage_key")
+  mimeType       String                @map("mime_type")
+  sizeBytes      Int                   @map("size_bytes")
+  createdAt      DateTime              @default(now()) @map("created_at")
+
+  listing EquipmentListing @relation(fields: [listingId], references: [id], onDelete: Restrict)
+
+  @@index([listingId])
+  @@map("equipment_documents")
+}
+
+model Favourite {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  listingId      String   @map("listing_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  listing EquipmentListing @relation(fields: [listingId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, listingId])
+  @@index([organizationId])
+  @@map("favourites")
+}
+
+// Owned by the requesting business; shared with the supplier through supplier_org_id.
+model QuotationRequest {
+  id              String                 @id @default(uuid(7)) @db.Uuid
+  organizationId  String                 @map("organization_id") @db.Uuid // business
+  supplierOrgId   String                 @map("supplier_org_id") @db.Uuid
+  reference       String                 @unique // QR-YYYY-NNNNNN
+  listingId       String                 @map("listing_id") @db.Uuid
+  requestedById   String                 @map("requested_by_id") @db.Uuid
+  quantity        Int                    @default(1)
+  message         String?
+  deliveryWilaya  String?                @map("delivery_wilaya") @db.VarChar(2)
+  status          QuotationRequestStatus @default(OPEN)
+  createdAt       DateTime               @default(now()) @map("created_at")
+  updatedAt       DateTime               @updatedAt @map("updated_at")
+
+  listing    EquipmentListing @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  quotations Quotation[]
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([supplierOrgId, status, createdAt(sort: Desc)])
+  @@map("quotation_requests")
+}
+
+// Owned by the issuing supplier; shared with the business through business_org_id.
+// lines: [{ label, quantity, unitPrice }] as decimal strings. Totals are stored as computed
+// at issue time; vatRate is entered by the supplier (no hardcoded tax rate).
+model Quotation {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  organizationId  String          @map("organization_id") @db.Uuid // supplier
+  businessOrgId   String          @map("business_org_id") @db.Uuid
+  requestId       String          @map("request_id") @db.Uuid
+  listingId       String          @map("listing_id") @db.Uuid
+  reference       String          @unique // QT-YYYY-NNNNNN
+  issuedById      String          @map("issued_by_id") @db.Uuid
+  currency        String          @default("DZD") @db.Char(3)
+  lines           Json
+  subtotal        Decimal         @db.Decimal(18, 2)
+  vatRate         Decimal         @default(0) @map("vat_rate") @db.Decimal(7, 4)
+  vatAmount       Decimal         @map("vat_amount") @db.Decimal(18, 2)
+  total           Decimal         @db.Decimal(18, 2)
+  validUntil      DateTime        @map("valid_until") @db.Date
+  deliveryTerms   String?         @map("delivery_terms")
+  notes           String?
+  status          QuotationStatus @default(ISSUED)
+  decidedAt       DateTime?       @map("decided_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  request QuotationRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  listing EquipmentListing @relation(fields: [listingId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([businessOrgId, status, createdAt(sort: Desc)])
+  @@map("quotations")
+}
+
+// Platform-wide settings edited from the admin console, e.g. "marketplace.moderation".
+model PlatformSetting {
+  key         String   @id
+  value       Json
+  updatedById String?  @map("updated_by_id") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
 }

@@ -32,6 +32,28 @@ export const PERMISSIONS = [
   { code: 'role.manage', description: 'Create and edit custom roles', allowedOrgTypes: ALL },
   { code: 'audit.read', description: 'Read own organization audit log', allowedOrgTypes: ALL },
 
+  // Marketplace (Phase 2)
+  {
+    code: 'listing.manage',
+    description: 'Create, edit, publish and archive equipment listings',
+    allowedOrgTypes: ['SUPPLIER'],
+  },
+  {
+    code: 'quotation.respond',
+    description: 'Read quotation requests and issue quotations',
+    allowedOrgTypes: ['SUPPLIER'],
+  },
+  {
+    code: 'quotation.request',
+    description: 'Request quotations and accept or decline them',
+    allowedOrgTypes: ['BUSINESS'],
+  },
+  {
+    code: 'favourite.manage',
+    description: 'Save equipment to favourites',
+    allowedOrgTypes: ['BUSINESS'],
+  },
+
   // Platform administration (Tasheel only)
   {
     code: 'admin.organization.read',
@@ -51,6 +73,11 @@ export const PERMISSIONS = [
   {
     code: 'admin.support_session',
     description: 'Open a time-boxed support session on a tenant',
+    allowedOrgTypes: ['PLATFORM'],
+  },
+  {
+    code: 'admin.listing.moderate',
+    description: 'Review, approve or reject equipment listings',
     allowedOrgTypes: ['PLATFORM'],
   },
   {
@@ -96,6 +123,7 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.support_session',
       'admin.audit.read',
       'admin.kpi.read',
+      'admin.listing.moderate',
     ],
   },
   {
@@ -107,19 +135,20 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.organization.read',
       'admin.organization.verify',
       'admin.kpi.read',
+      'admin.listing.moderate',
     ],
   },
   {
     code: 'supplier_admin',
     organizationType: 'SUPPLIER',
     name: { fr: 'Administrateur fournisseur', ar: 'مسؤول المورد', en: 'Supplier admin' },
-    permissions: ORG_ADMIN_PERMS,
+    permissions: [...ORG_ADMIN_PERMS, 'listing.manage', 'quotation.respond'],
   },
   {
     code: 'supplier_member',
     organizationType: 'SUPPLIER',
     name: { fr: 'Commercial', ar: 'مندوب مبيعات', en: 'Sales rep' },
-    permissions: ORG_MEMBER_PERMS,
+    permissions: [...ORG_MEMBER_PERMS, 'listing.manage', 'quotation.respond'],
   },
   {
     code: 'institution_admin',
@@ -137,12 +166,12 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
     code: 'business_admin',
     organizationType: 'BUSINESS',
     name: { fr: "Administrateur de l'entreprise", ar: 'مسؤول المؤسسة', en: 'Business admin' },
-    permissions: ORG_ADMIN_PERMS,
+    permissions: [...ORG_ADMIN_PERMS, 'quotation.request', 'favourite.manage'],
   },
   {
     code: 'business_member',
     organizationType: 'BUSINESS',
     name: { fr: 'Collaborateur', ar: 'متعاون', en: 'Member' },
-    permissions: ORG_MEMBER_PERMS,
+    permissions: [...ORG_MEMBER_PERMS, 'quotation.request', 'favourite.manage'],
   },
 ];
