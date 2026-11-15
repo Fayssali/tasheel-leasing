@@ -1,6 +1,6 @@
 # ADR 0002 — Multi-tenancy with shared schema and Row-Level Security
 
-- Status: Proposed (decision D1 in the Phase 0 specification, awaiting owner validation)
+- Status: Accepted, 2026-11-15 (decision D1: the owner approved moving on to authentication on this basis)
 - Date: 2026-11-15
 
 ## Context

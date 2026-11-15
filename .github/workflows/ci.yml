@@ -53,8 +53,11 @@ jobs:
       - name: Tenant isolation — Prisma suite
         run: pnpm --filter @tasheel/db test
 
-      - name: Seed (smoke test)
+      - name: Seed
         run: pnpm db:seed
+
+      - name: API integration tests (auth flow on PostgreSQL + RLS)
+        run: pnpm --filter @tasheel/api test:int
 
       - name: Formatting
         run: pnpm format:check
