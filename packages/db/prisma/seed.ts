@@ -9,6 +9,7 @@
 import { hash } from '@node-rs/argon2';
 import { PrismaClient, type OrganizationType } from '@prisma/client';
 import { DOCUMENT_TYPES, EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
+import { seedDemoFinancing } from './demo-financing';
 import { seedDemoMarketplace } from './demo-marketplace';
 
 const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL_ADMIN });
@@ -84,6 +85,20 @@ const DEMO_ORGS: Array<{
     wilayaCode: '30',
     adminRole: 'business_admin',
     user: { email: 'entreprise4@demo.tasheel.local', firstName: 'Nadia', lastName: 'Demo' },
+  },
+  {
+    type: 'FINANCIAL_INSTITUTION',
+    legalName: 'Banque Fictive du Sahel SPA',
+    wilayaCode: '30',
+    adminRole: 'institution_admin',
+    user: { email: 'banque2@demo.tasheel.local', firstName: 'Karima', lastName: 'Demo' },
+  },
+  {
+    type: 'FINANCIAL_INSTITUTION',
+    legalName: 'Crédit Populaire Fictif SPA',
+    wilayaCode: '16',
+    adminRole: 'institution_admin',
+    user: { email: 'banque3@demo.tasheel.local', firstName: 'Rachid', lastName: 'Demo' },
   },
   {
     type: 'BUSINESS',
@@ -219,7 +234,9 @@ async function main(): Promise<void> {
   console.log(
     `Seeded ${PERMISSIONS.length} permissions, ${SYSTEM_ROLES.length} system roles, ${DEMO_ORGS.length} demo organizations.`,
   );
+  const financing = await seedDemoFinancing(prisma, orgs);
   console.log(`Marketplace demo: ${marketplace}.`);
+  console.log(`Financing demo: ${financing}.`);
   console.log(
     `Demo users: ${DEMO_ORGS.map((d) => d.user.email).join(', ')} (password from SEED_DEMO_PASSWORD).`,
   );

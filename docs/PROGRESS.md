@@ -125,6 +125,38 @@
 - [ ] CI green on GitHub. To be confirmed
 - [ ] Demo accepted by the project owner (`docs/demo/phase-2.md`)
 
-## Phase 3 — Financing applications (next)
+## Phase 3 — Documents and financing applications (built, awaiting demo acceptance)
 
-Financing request from an accepted quotation, document vault, submission to financial institutions, institution offers. Matching scores and simulations stay labelled indicative; decisions belong to the institutions.
+### Done — 2026-11-15
+
+- Database: migration `0700_financing` — document types (reference data), documents (scan and review status, never deleted), financing products, applications from accepted quotations, attachments, one submission per institution, an append-only shared timeline, offers. Two reference sequences (FA, OF). RLS suite: 26/26 checks; Prisma-level isolation cases for the new tables.
+- Document vault with antivirus: ClamAV adapter (clamd INSTREAM); infected files refused and never stored; uploads refused when the scanner is down; production refuses to start without `SCAN_MODE=clamav`. Listing PDFs now scanned too. Replacement by superseding. Downloads by other organizations audited.
+- Verification papers: checklists per organization type from the database; Tasheel staff accept or ask to replace each paper, with an emailed reason. (Moved here from Phase 2.)
+- Institutions configure products: amounts, durations, minimum down payment, categories, wilayas, seniority, indicative rates, extra documents. Nothing hardcoded.
+- Business: application from an accepted quotation; indicative matching per product (criteria met, installment range); submission to chosen institutions with required documents enforced; replies to information requests; side-by-side comparison; accept or decline; withdrawal.
+- Institution: inbox, review, information requests, decline with reason, offers with the installment and total cost computed exactly from its terms; analysts review, admins issue offers.
+- Access rule recorded in ADR 0003: an institution sees an application and its attached documents only once submitted to it, and loses access on withdrawal.
+- Emails for every step in FR / AR / EN. 771 interface strings complete. 14 new screens checked in headless Chrome (FR / AR, desktop and mobile).
+- Demo data (fictional): 3 banks with 4 products, papers for two businesses (placeholder PDFs), one application with two offers and a decline, one draft.
+- Tests: 133 API unit and HTTP tests (including the ClamAV protocol against a fake clamd), 9 shared tests, financing integration test (CI).
+- Docs: `docs/modules/m3-financing.md`, ADR 0003, demo script `docs/demo/phase-3.md`.
+
+### Not verified in the sandbox
+
+- The seed, the Prisma-level isolation test and the integration tests need the generated Prisma client, so they run in CI or locally. The SQL behind them (RLS, constraints, sequences) was checked directly on PostgreSQL.
+- Real ClamAV was not available here; the adapter was tested against a protocol-faithful fake.
+
+### Phase 3 exit checklist
+
+- [x] Document vault, antivirus, verification papers review
+- [x] Institution products and indicative matching
+- [x] Application, submission, information requests, offers, decision
+- [x] Isolation checks for every new table (SQL 26/26, Prisma cases)
+- [x] Screens in French and Arabic, responsive
+- [x] Fictional demo data
+- [ ] CI green on GitHub. To be confirmed
+- [ ] Demo accepted by the project owner (`docs/demo/phase-3.md`)
+
+## Phase 4 — Next (proposed, to be confirmed against the Phase 0 roadmap)
+
+Proposed scope: monetization (commission rules configured in the database, invoicing), notifications centre, reporting and KPIs for each side, and production readiness (deployment, backups, monitoring). Any deployment needs explicit authorization from the project owner.

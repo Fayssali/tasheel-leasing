@@ -388,7 +388,7 @@ export function placeholderPng([r, g, b]: [number, number, number], shade: numbe
   ]);
 }
 
-function storage(): { s3: S3Client; bucket: string } | null {
+export function storage(): { s3: S3Client; bucket: string } | null {
   if (!process.env.S3_ENDPOINT) return null;
   return {
     s3: new S3Client({
@@ -549,7 +549,7 @@ export async function seedDemoMarketplace(
       listing: 16,
       quantity: 2,
       message: 'Pour le service des urgences.',
-      outcome: 'QUOTED',
+      outcome: 'ACCEPTED', // feeds the draft financing application of the Phase 3 demo
     },
     {
       business: 'Oasis Froid Industriel SARL (fictif)',
