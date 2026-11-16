@@ -466,3 +466,96 @@ export interface ReviewDetail {
   events: TimelineEvent[];
   offers: Offer[];
 }
+
+// --- Phase 4: billing ------------------------------------------------------------
+
+export type CommissionTrigger = 'QUOTATION_ACCEPTED' | 'OFFER_ACCEPTED';
+
+export interface CommissionRule {
+  id: string;
+  name: LocalizedName;
+  trigger: CommissionTrigger;
+  payerOrgId: string | null;
+  basis: 'PERCENT' | 'FIXED';
+  ratePct: string | null;
+  fixedAmount: string | null;
+  minAmount: string | null;
+  maxAmount: string | null;
+  categoryCodes: string[];
+  validFrom: string;
+  validTo: string | null;
+  isActive: boolean;
+  _count?: { commissions: number };
+}
+
+export interface Commission {
+  id: string;
+  organizationId: string;
+  organizationName?: string;
+  trigger: CommissionTrigger;
+  sourceType: 'Quotation' | 'Offer';
+  sourceReference: string;
+  baseAmount: string;
+  ratePct: string | null;
+  amount: string;
+  status: 'ACCRUED' | 'INVOICED' | 'CANCELLED';
+  invoiceId: string | null;
+  invoice?: { id?: string; number: string | null; status: string } | null;
+  rule?: { name: LocalizedName; basis: string };
+  accruedAt: string;
+}
+
+export interface PartyIdentity {
+  legalName?: string;
+  tradeName?: string | null;
+  address?: string | null;
+  wilayaCode?: string | null;
+  rcNumber?: string | null;
+  nif?: string | null;
+  nis?: string | null;
+  articleImposition?: string | null;
+  bankName?: string;
+  rib?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface Invoice {
+  id: string;
+  organizationId: string;
+  organizationName?: string;
+  kind: 'INVOICE' | 'CREDIT_NOTE';
+  number: string | null;
+  status: 'DRAFT' | 'ISSUED' | 'PAID' | 'CANCELLED';
+  creditedInvoiceId: string | null;
+  periodStart: string;
+  periodEnd: string;
+  issueDate: string | null;
+  dueDate: string | null;
+  subtotal: string;
+  vatRate: string;
+  vatAmount: string;
+  total: string;
+  currency: string;
+  issuer: PartyIdentity;
+  customer: PartyIdentity;
+  notes: string | null;
+  paidAt: string | null;
+  paymentReference: string | null;
+  createdAt: string;
+  lines?: Array<{ id: string; label: string; amount: string; sortOrder: number }>;
+}
+
+export interface BillingSettings {
+  issuer: Required<
+    Pick<
+      PartyIdentity,
+      'legalName' | 'address' | 'wilayaCode' | 'rcNumber' | 'nif' | 'nis' | 'articleImposition'
+    >
+  > &
+    Pick<PartyIdentity, 'bankName' | 'rib' | 'email' | 'phone'>;
+  vatRate: string;
+  paymentTermsDays: number;
+  invoicePrefix: string;
+  creditNotePrefix: string;
+}

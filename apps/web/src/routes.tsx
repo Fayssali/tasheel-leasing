@@ -11,9 +11,12 @@ import {
   AdminOrganizationDetailPage,
   AdminOrganizationsPage,
 } from './pages/admin/AdminPages';
+import { AdminBillingPage, AdminInvoicePage } from './pages/admin/AdminBilling';
 import { AdminListingsPage } from './pages/admin/AdminListingsPage';
 import { DashboardPage } from './pages/app/DashboardPage';
 import { DocumentsPage } from './pages/app/DocumentsPage';
+import { NotificationsPage } from './pages/app/NotificationsPage';
+import { BillingPage, InvoicePage } from './pages/billing/PayerBilling';
 import {
   ApplicationPage,
   ApplicationsPage,
@@ -101,6 +104,7 @@ function AppArea() {
           { to: '/app/catalogue', label: t('nav.catalogue') },
           { to: '/app/quotations', label: t('nav.quotationRequests') },
           { to: '/app/documents', label: t('nav.documents') },
+          { to: '/app/billing', label: t('nav.billing') },
         ]
       : activeOrg?.type === 'BUSINESS'
         ? [
@@ -123,6 +127,7 @@ function AppArea() {
               },
               { to: '/app/financing/products', label: t('nav.products') },
               { to: '/app/documents', label: t('nav.documents') },
+              { to: '/app/billing', label: t('nav.billing') },
             ]
           : [];
   return (
@@ -162,6 +167,7 @@ function AdminArea() {
               path.startsWith('/admin/organizations') && q.get('status') !== 'PENDING_VERIFICATION',
           },
           { to: '/admin/listings', label: t('nav.moderation') },
+          { to: '/admin/billing', label: t('nav.billing') },
           { to: '/admin/audit', label: t('nav.audit') },
           { to: '/admin/team', label: t('nav.team') },
           { to: '/admin/security', label: t('nav.security') },
@@ -223,6 +229,9 @@ export const router = createBrowserRouter([
       { path: 'financing/inbox/:id', element: <ReviewPage /> },
       { path: 'financing/products', element: <ProductsPage /> },
       { path: 'financing/:id', element: <ApplicationPage /> },
+      { path: 'billing', element: <BillingPage /> },
+      { path: 'billing/invoices/:id', element: <InvoicePage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
     ],
   },
   {
@@ -233,6 +242,9 @@ export const router = createBrowserRouter([
       { path: 'organizations', element: <AdminOrganizationsPage /> },
       { path: 'organizations/:id', element: <AdminOrganizationDetailPage /> },
       { path: 'listings', element: <AdminListingsPage /> },
+      { path: 'billing', element: <AdminBillingPage /> },
+      { path: 'billing/invoices/:id', element: <AdminInvoicePage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
       { path: 'audit', element: <AdminAuditPage /> },
       { path: 'team', element: <TeamPage /> },
       { path: 'security', element: <SecurityPage /> },

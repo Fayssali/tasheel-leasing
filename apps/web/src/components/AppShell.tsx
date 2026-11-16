@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth';
 import { homePathFor } from '../routes';
 import { ApiStatus } from './ApiStatus';
 import { LanguageSwitch } from './LanguageSwitch';
+import { NotificationsNavItem } from '../pages/app/NotificationsPage';
 import { OrgStatusBadge } from './StatusBadge';
 import { Alert, Button } from './ui';
 
@@ -140,6 +141,10 @@ export function AppShell({ nav, area }: { nav: NavItem[]; area: 'app' | 'admin' 
           </li>
         ))}
       </ul>
+      <NotificationsNavItem
+        to={area === 'admin' ? '/admin/notifications' : '/app/notifications'}
+        onNavigate={() => setOpen(false)}
+      />
       <div className="space-y-3 border-t border-white/10 pt-4 text-sm">
         <p className="truncate text-white/80" title={me?.user.email}>
           {me?.user.firstName} {me?.user.lastName}
@@ -160,9 +165,9 @@ export function AppShell({ nav, area }: { nav: NavItem[]; area: 'app' | 'admin' 
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 lg:flex">
-      <aside className="hidden w-64 shrink-0 lg:block">{sidebar}</aside>
-      <div className="flex items-center justify-between bg-primary-900 px-4 py-3 text-white lg:hidden">
+    <div className="min-h-screen bg-gray-50 lg:flex print:bg-white">
+      <aside className="hidden w-64 shrink-0 lg:block print:hidden">{sidebar}</aside>
+      <div className="flex items-center justify-between bg-primary-900 px-4 py-3 text-white lg:hidden print:hidden">
         <span className="font-semibold">{t('app.name')}</span>
         <button
           type="button"
@@ -175,8 +180,10 @@ export function AppShell({ nav, area }: { nav: NavItem[]; area: 'app' | 'admin' 
       </div>
       {open && <div className="lg:hidden">{sidebar}</div>}
       <div className="flex min-w-0 flex-1 flex-col">
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">
-          <Banners />
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 print:max-w-none print:p-0">
+          <div className="print:hidden">
+            <Banners />
+          </div>
           {me && me.memberships.length === 0 ? (
             <Alert tone="action" title={t('shell.noMembershipTitle')}>
               {t('shell.noMembershipBody')}
@@ -185,7 +192,7 @@ export function AppShell({ nav, area }: { nav: NavItem[]; area: 'app' | 'admin' 
             <Outlet />
           )}
         </main>
-        <footer className="flex flex-col gap-2 border-t border-gray-200 px-8 py-4 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+        <footer className="flex flex-col gap-2 border-t print:hidden border-gray-200 px-8 py-4 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-3xl text-start">{t('disclaimer.intermediary')}</p>
           <ApiStatus />
         </footer>

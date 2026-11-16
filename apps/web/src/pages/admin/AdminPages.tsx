@@ -19,6 +19,7 @@ import {
   TextInput,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { PlatformReport } from './AdminBilling';
 import { OrgDocumentsPanel } from './OrgDocumentsPanel';
 import { formatDate, useErrorMessage, useLocalizedName } from '../../lib/format';
 import type {
@@ -98,6 +99,7 @@ export function AdminDashboardPage() {
           );
         })}
       </div>
+      <PlatformReport />
       <Card title={t('admin.byStatus')} className="mt-6">
         <Table head={[t('fields.type'), ...STATUSES.map((s) => t(`status.${s}`))]}>
           {TYPES.map((type) => (

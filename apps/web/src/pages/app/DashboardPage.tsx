@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { ActivityOverview } from '../../components/ActivityOverview';
 import { Link } from 'react-router';
 import { OrgStatusBadge } from '../../components/StatusBadge';
 import { Card, PageHeader } from '../../components/ui';
@@ -70,36 +71,38 @@ export function DashboardPage() {
             </div>
           </dl>
         </Card>
-        <Card title={t('dashboard.nextSteps')} className="lg:col-span-2">
-          <ol className="space-y-3">
-            {steps.map((s, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm">
-                <span
-                  aria-hidden
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${s.done ? 'bg-success-600 text-white' : 'bg-gray-200 text-gray-600'}`}
-                >
-                  {s.done ? '✓' : i + 1}
-                </span>
-                <span className={s.done ? 'text-gray-500' : 'text-gray-900'}>
-                  {s.label}
-                  {s.required && !s.done && (
-                    <strong className="ms-2 text-warning-600">{t('dashboard.required')}</strong>
-                  )}
-                </span>
-                {s.to && !s.done && (
-                  <Link
-                    to={s.to}
-                    className="ms-auto text-sm font-semibold text-primary-600 hover:underline"
+        {steps.some((s) => !s.done) && (
+          <Card title={t('dashboard.nextSteps')} className="lg:col-span-2">
+            <ol className="space-y-3">
+              {steps.map((s, i) => (
+                <li key={i} className="flex items-center gap-3 text-sm">
+                  <span
+                    aria-hidden
+                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${s.done ? 'bg-success-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                   >
-                    {t('common.open')}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ol>
-        </Card>
+                    {s.done ? '✓' : i + 1}
+                  </span>
+                  <span className={s.done ? 'text-gray-500' : 'text-gray-900'}>
+                    {s.label}
+                    {s.required && !s.done && (
+                      <strong className="ms-2 text-warning-600">{t('dashboard.required')}</strong>
+                    )}
+                  </span>
+                  {s.to && !s.done && (
+                    <Link
+                      to={s.to}
+                      className="ms-auto text-sm font-semibold text-primary-600 hover:underline"
+                    >
+                      {t('common.open')}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </Card>
+        )}
       </div>
-      <p className="mt-6 text-sm text-gray-500">{t('dashboard.comingSoon')}</p>
+      <ActivityOverview />
     </>
   );
 }
