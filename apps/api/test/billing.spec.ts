@@ -38,6 +38,12 @@ function store(withSettings = true) {
   const db = {
     settings: withSettings ? { value: SETTINGS } : null,
     counter: 0,
+    customer: {
+      legalName: 'Atlas Machines (fictif)',
+      rcNumber: '09/00-1111111B20' as string | null,
+      nif: '000009012345678' as string | null,
+      type: 'SUPPLIER',
+    },
     commissions: [
       {
         id: 'c1',
@@ -129,11 +135,7 @@ function store(withSettings = true) {
       create: async ({ data }: { data: Record<string, unknown> }) => void db.lines.push(data),
     },
     organization: {
-      findUnique: async () => ({
-        legalName: 'Atlas Machines (fictif)',
-        nif: '000009',
-        type: 'SUPPLIER',
-      }),
+      findUnique: async () => db.customer,
       findMany: async () => [],
     },
     commissionRule: {
@@ -201,6 +203,19 @@ describe('invoicing', () => {
     await expect(service.issue(platform, first!.id as string, meta)).rejects.toMatchObject({
       response: { code: 'INVOICE_NOT_DRAFT' },
     });
+  });
+
+  it('refuses to issue to a customer without RC or NIF, without using a number', async () => {
+    const { service, db } = store();
+    await service.generateDrafts(platform, todayIso, meta);
+    db.customer.nif = null;
+    await expect(service.issue(platform, db.invoices[0]!.id as string, meta)).rejects.toMatchObject(
+      {
+        response: { code: 'CUSTOMER_IDENTITY_INCOMPLETE' },
+      },
+    );
+    expect(db.invoices[0]).toMatchObject({ status: 'DRAFT', number: null });
+    expect(db.counter).toBe(0);
   });
 
   it('cancels an issued invoice only through a credit note that mirrors it, releasing the commissions', async () => {

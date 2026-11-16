@@ -111,9 +111,10 @@ jobs:
 
       - name: Production configuration is refused when unsafe
         run: |
-          if docker run --rm -e NODE_ENV=production -e DATABASE_URL=postgresql://x -e JWT_ACCESS_SECRET=change-me-access tasheel/api:ci 2>&1 | tee out.txt; then
-            echo "the API started with an unsafe configuration"; exit 1
-          fi
+          status=0
+          docker run --rm -e NODE_ENV=production -e DATABASE_URL=postgresql://x -e JWT_ACCESS_SECRET=change-me-access tasheel/api:ci > out.txt 2>&1 || status=$?
+          cat out.txt
+          test "$status" -ne 0 || { echo "the API started with an unsafe configuration"; exit 1; }
           grep -q "Unsafe production configuration" out.txt
 
       - name: Start API and web in production mode

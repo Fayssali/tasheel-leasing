@@ -456,7 +456,19 @@
     "REASON_REQUIRED": "A reason is required.",
     "CONCURRENT_CHANGE": "The organization changed meanwhile. Reload the page.",
     "PLATFORM_IMMUTABLE": "The Tasheel organization cannot be changed here.",
-    "NOT_FOUND": "Not found."
+    "NOT_FOUND": "Not found.",
+    "BILLING_NOT_CONFIGURED": "Fill in the billing settings first (issuer identity, VAT, payment terms, numbering).",
+    "CUSTOMER_IDENTITY_INCOMPLETE": "The customer organization has no commercial register number or NIF: complete its profile before issuing.",
+    "INVOICE_NOT_DRAFT": "Only a draft can be issued or discarded.",
+    "INVOICE_NOT_ISSUED": "Only an issued invoice can be marked as paid.",
+    "INVOICE_NOT_CREDITABLE": "Only an issued or paid invoice can be cancelled with a credit note.",
+    "INVALID_DATE": "The payment date cannot be in the future.",
+    "INVALID_PERIOD": "The period must end today or earlier.",
+    "INVALID_RANGE": "The bounds are inconsistent (end before start, or maximum below minimum).",
+    "INVALID_PAYER": "This organization does not match the trigger (supplier or institution).",
+    "NAME_REQUIRED": "Give the rule a name in French or Arabic.",
+    "RATE_REQUIRED": "A percentage rule needs a rate.",
+    "AMOUNT_REQUIRED": "A fixed rule needs an amount."
   },
   "listingStatus": {
     "DRAFT": "Draft",

@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { asJson, sql, type TenantTx } from '@tasheel/db';
 import {
@@ -327,6 +328,14 @@ export class BillingService {
           code: 'INVOICE_NOT_DRAFT',
           message: 'Only a draft can be issued.',
         });
+      // RC and NIF of the customer are mandatory mentions on an invoice: refuse rather than
+      // issue a document that cannot be used for accounting. Fixed in the organization profile.
+      const customer = await this.customer(tx, inv.organizationId);
+      if (!customer.rcNumber || !customer.nif)
+        throw new UnprocessableEntityException({
+          code: 'CUSTOMER_IDENTITY_INCOMPLETE',
+          message: 'The customer organization has no commercial register number or NIF.',
+        });
       const issueDate = today();
       const number = await this.nextNumber(tx, settings, 'INVOICE', issueDate);
       const totals = computeInvoiceTotals(
@@ -343,7 +352,7 @@ export class BillingService {
           issueDate,
           dueDate: addDays(issueDate, settings.paymentTermsDays),
           issuer: asJson(settings.issuer),
-          customer: asJson(await this.customer(tx, inv.organizationId)),
+          customer: asJson(customer),
         },
       });
       if (count !== 1)

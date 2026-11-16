@@ -456,7 +456,19 @@
     "REASON_REQUIRED": "Un motif est obligatoire.",
     "CONCURRENT_CHANGE": "L'organisation a été modifiée entre-temps. Rechargez la page.",
     "PLATFORM_IMMUTABLE": "L'organisation Tasheel ne peut pas être modifiée ici.",
-    "NOT_FOUND": "Élément introuvable."
+    "NOT_FOUND": "Élément introuvable.",
+    "BILLING_NOT_CONFIGURED": "Renseignez d’abord les paramètres de facturation (identité de l’émetteur, TVA, échéance, numérotation).",
+    "CUSTOMER_IDENTITY_INCOMPLETE": "L’organisation cliente n’a pas de N° RC ou de NIF : complétez son profil avant d’émettre la facture.",
+    "INVOICE_NOT_DRAFT": "Seul un brouillon peut être émis ou abandonné.",
+    "INVOICE_NOT_ISSUED": "Seule une facture émise peut être marquée comme payée.",
+    "INVOICE_NOT_CREDITABLE": "Seule une facture émise ou payée peut être annulée par un avoir.",
+    "INVALID_DATE": "La date de paiement ne peut pas être dans le futur.",
+    "INVALID_PERIOD": "La période doit se terminer aujourd’hui au plus tard.",
+    "INVALID_RANGE": "Les bornes sont incohérentes (fin avant début, ou maximum inférieur au minimum).",
+    "INVALID_PAYER": "Cette organisation ne correspond pas au fait générateur (fournisseur ou établissement).",
+    "NAME_REQUIRED": "Donnez un nom à la règle, en français ou en arabe.",
+    "RATE_REQUIRED": "Une règle en pourcentage a besoin d’un taux.",
+    "AMOUNT_REQUIRED": "Une règle forfaitaire a besoin d’un montant."
   },
   "listingStatus": {
     "DRAFT": "Brouillon",

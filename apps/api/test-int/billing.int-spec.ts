@@ -73,7 +73,12 @@ describe('Billing (PostgreSQL + RLS)', () => {
     const orgId = me.body.memberships[0].organizationId as string;
     await adminDb.organization.update({
       where: { id: orgId },
-      data: { status: 'VERIFIED', verifiedAt: new Date(), nif: `0000160000${run.slice(0, 5)}` },
+      data: {
+        status: 'VERIFIED',
+        verifiedAt: new Date(),
+        nif: `0000160000${run.slice(0, 5)}`,
+        rcNumber: `16/00-${run.slice(0, 7)}B26`,
+      },
     });
     return {
       headers: { Authorization: bearer, 'X-Organization-Id': orgId },

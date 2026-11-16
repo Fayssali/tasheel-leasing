@@ -167,6 +167,60 @@ First fully green run: build, unit tests, SQL and Prisma isolation suites, seed,
 - [x] CI green on GitHub, 2026-11-15 ([run](https://github.com/Fayssali/tasheel-leasing/actions/runs/43765095069))
 - [x] Demo accepted by the project owner, 2026-11-15 (`docs/demo/phase-3.md`)
 
-## Phase 4 — Next (proposed, to be confirmed against the Phase 0 roadmap)
+## Phase 4 — Commissions, invoicing, notifications, reporting, production readiness (demo pending)
 
-Proposed scope: monetization (commission rules configured in the database, invoicing), notifications centre, reporting and KPIs for each side, and production readiness (deployment, backups, monitoring). Any deployment needs explicit authorization from the project owner.
+Scope confirmed by the project owner's go-ahead on 2026-11-16. The Phase 0 roadmap is not in
+the repository, so this scope should still be checked against it.
+
+### Done — 2026-11-16
+
+- Database: migration `0800_billing` — commission rules, commissions (one per accepted deal),
+  invoices and credit notes with frozen identity snapshots, lines, gapless yearly counters,
+  notifications. `platform_settings` now under RLS (writable by Tasheel staff only).
+  RLS suite: 32/32 checks.
+- Commissions: rules entirely in the database (payer kind or specific contract, percentage
+  with minimum/maximum or fixed fee, categories, validity). Accrued inside the transaction that
+  accepts a quotation or a financing proposal; missing ones can be computed after a new rule.
+- Invoicing: monthly drafts per payer, issue with continuous numbering, payment recording,
+  correction only by credit note. Issuing is refused while billing is not configured or when
+  the customer has no RC or NIF. Printable invoice in FR / AR / EN.
+- Notification centre mirroring every email, with unread count.
+- Reporting: activity overview per organization type and a platform report, with six-month
+  charts. Figures computed under the caller's tenant context.
+- Production readiness, nothing deployed: production configuration checks (refuses development
+  secrets, http URLs, antivirus off), liveness and readiness probes, JSON logs with request ids,
+  security headers on API and web; Dockerfiles; example single-host compose (Caddy TLS, Nginx,
+  role initialisation from secrets, migration and bucket jobs); backup and restore scripts;
+  CI job that builds both images and smoke-tests them in production mode; runbook and
+  deployment checklist (`docs/operations/`).
+- Fixed on the way: organization status emails had no button label once linked (now checked
+  for every template); billing errors translated; month labels hardened.
+- Demo data (fictional): billing settings for a fictional issuer, two demo rules, the
+  commissions they produce, legal identifiers for the demo organizations.
+- Tests: 155 API unit and HTTP tests, 10 shared tests, billing integration test (CI).
+- Docs: `docs/modules/m4-billing.md`, demo script `docs/demo/phase-4.md`.
+
+### Not verified in the sandbox
+
+- Seed and integration tests need the generated Prisma client: CI only.
+- Backup and restore were not run against the full container stack; the dump-and-restore path
+  was rehearsed on the development database (all RLS policies and functions restored, the app
+  role still isolated).
+- The legal mentions required on Tasheel's own invoices must be confirmed by its accountant.
+
+### Phase 4 exit checklist
+
+- [x] Commission rules, accrual, invoices, payments, credit notes
+- [x] Notification centre and reporting for each side
+- [x] Isolation checks for every new table (SQL 32/32)
+- [x] Screens in French and Arabic, responsive
+- [x] Production readiness files, without any deployment
+- [x] Fictional demo data
+- [ ] CI green on GitHub
+- [ ] Demo accepted by the project owner (`docs/demo/phase-4.md`)
+
+## Next
+
+- Deployment: needs the project owner's explicit authorization, a hosting choice and the
+  decisions listed in `docs/operations/deployment-checklist.md`.
+- Decisions D2–D8 from Phase 0 still to be validated.

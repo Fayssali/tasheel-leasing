@@ -9,6 +9,7 @@
 import { hash } from '@node-rs/argon2';
 import { PrismaClient, type OrganizationType } from '@prisma/client';
 import { DOCUMENT_TYPES, EQUIPMENT_CATEGORIES, PERMISSIONS, SYSTEM_ROLES } from '@tasheel/shared';
+import { seedDemoBilling } from './demo-billing';
 import { seedDemoFinancing } from './demo-financing';
 import { seedDemoMarketplace } from './demo-marketplace';
 
@@ -178,7 +179,15 @@ async function seedDemoOrganizations(): Promise<
   const passwordHash = await hash(DEMO_PASSWORD);
   const byName = new Map<string, { id: string; userId: string; name: string }>();
 
-  for (const d of DEMO_ORGS) {
+  for (const [i, d] of DEMO_ORGS.entries()) {
+    // Fictional legal identifiers (format only), needed on invoices addressed to demo payers.
+    const n = String(i + 1).padStart(7, '0');
+    const identity = {
+      rcNumber: `${d.wilayaCode}/00-${n}B26`,
+      nif: `00${d.wilayaCode}${n}0000`,
+      nis: `0${d.wilayaCode}1${n}0000`,
+      address: `Adresse fictive n° ${i + 1}, wilaya ${d.wilayaCode}`,
+    };
     const user = await prisma.user.upsert({
       where: { email: d.user.email },
       update: {},
@@ -194,8 +203,11 @@ async function seedDemoOrganizations(): Promise<
           wilayaCode: d.wilayaCode,
           status: 'VERIFIED',
           verifiedAt: new Date(),
+          ...identity,
         },
       });
+    } else if (!org.rcNumber || !org.nif) {
+      org = await prisma.organization.update({ where: { id: org.id }, data: identity });
     }
 
     const member = await prisma.organizationMember.upsert({
@@ -235,8 +247,10 @@ async function main(): Promise<void> {
     `Seeded ${PERMISSIONS.length} permissions, ${SYSTEM_ROLES.length} system roles, ${DEMO_ORGS.length} demo organizations.`,
   );
   const financing = await seedDemoFinancing(prisma, orgs);
+  const billing = await seedDemoBilling(prisma, orgs);
   console.log(`Marketplace demo: ${marketplace}.`);
   console.log(`Financing demo: ${financing}.`);
+  console.log(`Billing demo: ${billing}.`);
   console.log(
     `Demo users: ${DEMO_ORGS.map((d) => d.user.email).join(', ')} (password from SEED_DEMO_PASSWORD).`,
   );
