@@ -86,3 +86,29 @@ export function computeQuotationTotals(
     total: fromCentimes(subtotal + vat),
   };
 }
+
+export interface InvoiceTotals {
+  subtotal: string;
+  vatAmount: string;
+  total: string;
+}
+
+/**
+ * Invoice totals from line amounts (excluding VAT) and the VAT rate configured by Tasheel.
+ * VAT is computed once on the subtotal, rounded half away from zero to the centime, so a credit
+ * note (negative lines) mirrors its invoice exactly.
+ */
+export function computeInvoiceTotals(lineAmounts: string[], vatRate: string): InvoiceTotals {
+  if (!/^\d{1,2}(\.\d{1,4})?$/.test(vatRate)) throw new Error(`Invalid VAT rate: ${vatRate}`);
+  const [ri = '0', rf = ''] = vatRate.split('.');
+  const rate = BigInt(ri) * 10_000n + BigInt(rf.padEnd(4, '0'));
+  const subtotal = lineAmounts.reduce((sum, a) => sum + toCentimes(a), 0n);
+  const abs = subtotal < 0n ? -subtotal : subtotal;
+  const vatAbs = (abs * rate + 500_000n) / 1_000_000n;
+  const vat = subtotal < 0n ? -vatAbs : vatAbs;
+  return {
+    subtotal: fromCentimes(subtotal),
+    vatAmount: fromCentimes(vat),
+    total: fromCentimes(subtotal + vat),
+  };
+}

@@ -1,5 +1,11 @@
 -- Run as tasheel_admin (table owner, not subject to RLS). Creates fixed test tenants.
 BEGIN;
+DELETE FROM notifications WHERE key = 'rls.test';
+DELETE FROM invoice_lines WHERE label LIKE 'RLS %';
+DELETE FROM invoices WHERE notes = 'rls-test';
+DELETE FROM commissions WHERE source_reference LIKE 'RLS-%';
+DELETE FROM commission_rules WHERE name->>'fr' LIKE 'RLS %';
+DELETE FROM quotations WHERE reference = 'RLS-QT';
 DELETE FROM offers WHERE reference LIKE 'RLS-%';
 DELETE FROM submission_events WHERE note = 'rls-test';
 DELETE FROM application_submissions WHERE application_id IN (SELECT id FROM financing_applications WHERE reference LIKE 'RLS-%');
@@ -84,4 +90,13 @@ INSERT INTO submission_events (id, organization_id, submission_id, business_org_
   (gen_random_uuid(), '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-0000000000fb', '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-00000000000d', 'SUBMITTED', 'rls-test', '00000000-0000-7000-8000-0000000000a1');
 INSERT INTO offers (id, organization_id, submission_id, application_id, business_org_id, reference, financed_amount, duration_months, rate_pct, installment_amount, total_cost, valid_until, issued_by_id, updated_at) VALUES
   ('00000000-0000-7000-8000-0000000000fc', '00000000-0000-7000-8000-00000000000d', '00000000-0000-7000-8000-0000000000fb', '00000000-0000-7000-8000-0000000000fa', '00000000-0000-7000-8000-00000000000a', 'RLS-OF', 900000, 36, 8, 28202.49, 1015289.64, current_date + 30, '00000000-0000-7000-8000-0000000000d1', now());
+
+-- Phase 4: an accepted quotation (B → A) and the accepted offer (D → A); commission rules.
+INSERT INTO quotations (id, organization_id, business_org_id, request_id, listing_id, reference, issued_by_id, lines, subtotal, vat_rate, vat_amount, total, valid_until, status, updated_at) VALUES
+  ('00000000-0000-7000-8000-0000000001a1', '00000000-0000-7000-8000-00000000000b', '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-0000000000e3', '00000000-0000-7000-8000-0000000000e1', 'RLS-QT', '00000000-0000-7000-8000-0000000000b1', '[]', 1000000, 19, 190000, 1190000, current_date + 10, 'ACCEPTED', now());
+UPDATE offers SET status = 'ACCEPTED' WHERE reference = 'RLS-OF';
+INSERT INTO commission_rules (id, name, trigger, payer_org_id, basis, rate_pct, fixed_amount, min_amount, valid_from, created_by_id, updated_at) VALUES
+  ('00000000-0000-7000-8000-0000000001b1', '{"fr": "RLS fournisseurs 2 %"}', 'QUOTATION_ACCEPTED', NULL, 'PERCENT', 2, NULL, 5000, current_date - 1, '00000000-0000-7000-8000-0000000000f1', now()),
+  ('00000000-0000-7000-8000-0000000001b2', '{"fr": "RLS banques forfait"}', 'OFFER_ACCEPTED', NULL, 'FIXED', NULL, 50000, NULL, current_date - 1, '00000000-0000-7000-8000-0000000000f1', now()),
+  ('00000000-0000-7000-8000-0000000001b3', '{"fr": "RLS contrat banque E"}', 'OFFER_ACCEPTED', '00000000-0000-7000-8000-00000000000e', 'PERCENT', 1, NULL, NULL, current_date - 1, '00000000-0000-7000-8000-0000000000f1', now());
 COMMIT;

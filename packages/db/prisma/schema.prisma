@@ -735,3 +735,156 @@ model Offer {
   @@index([businessOrgId, status])
   @@map("offers")
 }
+
+// ---------------------------------------------------------------------------
+// Phase 4 — commissions, invoicing, notifications
+// ---------------------------------------------------------------------------
+
+enum CommissionTrigger {
+  QUOTATION_ACCEPTED // paid by the supplier
+  OFFER_ACCEPTED // paid by the financial institution
+}
+
+enum CommissionBasis {
+  PERCENT
+  FIXED
+}
+
+// Configured by Tasheel. An organization-specific rule takes precedence over the general one.
+model CommissionRule {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  name          Json
+  trigger       CommissionTrigger
+  payerOrgId    String?           @map("payer_org_id") @db.Uuid // null = every payer of that kind
+  basis         CommissionBasis
+  ratePct       Decimal?          @map("rate_pct") @db.Decimal(7, 4)
+  fixedAmount   Decimal?          @map("fixed_amount") @db.Decimal(18, 2)
+  minAmount     Decimal?          @map("min_amount") @db.Decimal(18, 2)
+  maxAmount     Decimal?          @map("max_amount") @db.Decimal(18, 2)
+  categoryCodes String[]          @default([]) @map("category_codes") // empty = all
+  validFrom     DateTime          @map("valid_from") @db.Date
+  validTo       DateTime?         @map("valid_to") @db.Date
+  isActive      Boolean           @default(true) @map("is_active")
+  createdById   String            @map("created_by_id") @db.Uuid
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  commissions Commission[]
+
+  @@index([trigger, isActive])
+  @@map("commission_rules")
+}
+
+enum CommissionStatus {
+  ACCRUED
+  INVOICED
+  CANCELLED
+}
+
+// One commission per accepted quotation or offer, computed when the acceptance commits.
+model Commission {
+  id              String            @id @default(uuid(7)) @db.Uuid
+  organizationId  String            @map("organization_id") @db.Uuid // payer
+  ruleId          String            @map("rule_id") @db.Uuid
+  trigger         CommissionTrigger
+  sourceType      String            @map("source_type") // Quotation | Offer
+  sourceId        String            @map("source_id") @db.Uuid
+  sourceReference String            @map("source_reference")
+  baseAmount      Decimal           @map("base_amount") @db.Decimal(18, 2)
+  ratePct         Decimal?          @map("rate_pct") @db.Decimal(7, 4)
+  amount          Decimal           @db.Decimal(18, 2) // excluding VAT
+  currency        String            @default("DZD") @db.Char(3)
+  status          CommissionStatus  @default(ACCRUED)
+  invoiceId       String?           @map("invoice_id") @db.Uuid
+  accruedAt       DateTime          @default(now()) @map("accrued_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  rule    CommissionRule @relation(fields: [ruleId], references: [id], onDelete: Restrict)
+  invoice Invoice?       @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@unique([sourceType, sourceId])
+  @@index([organizationId, status])
+  @@map("commissions")
+}
+
+enum InvoiceKind {
+  INVOICE
+  CREDIT_NOTE
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED // only through a credit note
+}
+
+model Invoice {
+  id                String        @id @default(uuid(7)) @db.Uuid
+  organizationId    String        @map("organization_id") @db.Uuid // customer (payer)
+  kind              InvoiceKind   @default(INVOICE)
+  number            String?       @unique // gapless, given when issued
+  status            InvoiceStatus @default(DRAFT)
+  creditedInvoiceId String?       @map("credited_invoice_id") @db.Uuid
+  periodStart       DateTime      @map("period_start") @db.Date
+  periodEnd         DateTime      @map("period_end") @db.Date
+  issueDate         DateTime?     @map("issue_date") @db.Date
+  dueDate           DateTime?     @map("due_date") @db.Date
+  subtotal          Decimal       @db.Decimal(18, 2)
+  vatRate           Decimal       @map("vat_rate") @db.Decimal(7, 4)
+  vatAmount         Decimal       @map("vat_amount") @db.Decimal(18, 2)
+  total             Decimal       @db.Decimal(18, 2)
+  currency          String        @default("DZD") @db.Char(3)
+  issuer            Json          @default("{}") // snapshot of Tasheel's legal identity
+  customer          Json          @default("{}") // snapshot of the payer's identity
+  notes             String?
+  paidAt            DateTime?     @map("paid_at")
+  paymentReference  String?       @map("payment_reference")
+  createdById       String        @map("created_by_id") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  lines       InvoiceLine[]
+  commissions Commission[]
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  invoiceId      String   @map("invoice_id") @db.Uuid
+  commissionId   String?  @map("commission_id") @db.Uuid
+  label          String
+  amount         Decimal  @db.Decimal(18, 2) // excluding VAT
+  sortOrder      Int      @default(0) @map("sort_order")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId])
+  @@map("invoice_lines")
+}
+
+// Gapless invoice numbering per year (a row lock serializes issuing).
+model InvoiceCounter {
+  year Int @id
+  last Int @default(0)
+
+  @@map("invoice_counters")
+}
+
+model Notification {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  organizationId String?   @map("organization_id") @db.Uuid
+  key            String // email template key, e.g. email.offerReceived
+  vars           Json      @default("{}")
+  link           String?
+  readAt         DateTime? @map("read_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}

@@ -333,3 +333,130 @@ DO $$ BEGIN
   RAISE NOTICE 'ok 26 - withdrawal removes the institution''s access to the application and documents';
 END $$;
 ROLLBACK;
+
+-- ---------------------------------------------------------------- Phase 4
+-- 27. Platform settings: readable by everyone, written by Tasheel staff only
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  UPDATE platform_settings SET value = 'true' WHERE key = 'marketplace.moderation';
+  IF FOUND THEN RAISE EXCEPTION 'FAIL 27: a supplier changed a platform setting'; END IF;
+  BEGIN INSERT INTO platform_settings (key, value, updated_at) VALUES ('rls.hack', '1', now()); RAISE EXCEPTION 'FAIL 27: a supplier added a platform setting';
+  EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  IF NOT EXISTS (SELECT 1 FROM platform_settings WHERE key = 'marketplace.moderation') THEN RAISE EXCEPTION 'FAIL 27: settings not readable'; END IF;
+  RAISE NOTICE 'ok 27 - platform settings are written by Tasheel staff only';
+END $$;
+COMMIT;
+-- 28. Commission rules: each payer reads the rules that apply to it, never another's contract
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM commission_rules WHERE name->>'fr' = 'RLS fournisseurs 2 %') THEN RAISE EXCEPTION 'FAIL 28: supplier cannot read its rule'; END IF;
+  IF EXISTS (SELECT 1 FROM commission_rules WHERE trigger = 'OFFER_ACCEPTED' AND name->>'fr' LIKE 'RLS %') THEN RAISE EXCEPTION 'FAIL 28: supplier reads bank rules'; END IF;
+  BEGIN INSERT INTO commission_rules (id, name, trigger, basis, fixed_amount, valid_from, created_by_id, updated_at) VALUES (gen_random_uuid(), '{"fr": "RLS hack"}', 'QUOTATION_ACCEPTED', 'FIXED', 1, current_date, '00000000-0000-7000-8000-0000000000b1', now());
+    RAISE EXCEPTION 'FAIL 28: a supplier created a commission rule'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000d', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d1', true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM commission_rules WHERE name->>'fr' = 'RLS banques forfait') THEN RAISE EXCEPTION 'FAIL 28: bank cannot read the general rule'; END IF;
+  IF EXISTS (SELECT 1 FROM commission_rules WHERE name->>'fr' = 'RLS contrat banque E') THEN RAISE EXCEPTION 'FAIL 28: bank D reads bank E''s contract'; END IF;
+  RAISE NOTICE 'ok 28 - commission rules are visible to the payers they apply to only';
+END $$;
+COMMIT;
+-- 29. Accrual on acceptance: computed from the rule, idempotent, only by a party to the deal
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  PERFORM app_accrue_commission('Quotation', '00000000-0000-7000-8000-0000000001a1');
+  PERFORM app_accrue_commission('Quotation', '00000000-0000-7000-8000-0000000001a1');
+  PERFORM app_accrue_commission('Offer', '00000000-0000-7000-8000-0000000000fc');
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000c', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000c1', true);
+DO $$ BEGIN
+  BEGIN PERFORM app_accrue_commission('Quotation', '00000000-0000-7000-8000-0000000001a1'); RAISE EXCEPTION 'FAIL 29: an outsider triggered an accrual';
+  EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  IF (SELECT count(*) FROM commissions WHERE source_reference = 'RLS-QT') <> 1 THEN RAISE EXCEPTION 'FAIL 29: expected exactly one commission for the quotation'; END IF;
+  IF (SELECT amount FROM commissions WHERE source_reference = 'RLS-QT') <> 20000.00 THEN RAISE EXCEPTION 'FAIL 29: 2 %% of 1 000 000 should be 20 000.00'; END IF;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000d', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000d1', true);
+DO $$ BEGIN
+  IF (SELECT amount FROM commissions WHERE source_reference = 'RLS-OF') <> 50000.00 THEN RAISE EXCEPTION 'FAIL 29: bank D should pay the general fixed fee'; END IF;
+  RAISE NOTICE 'ok 29 - commissions accrue once, from the applicable rule, only for parties to the deal';
+END $$;
+COMMIT;
+-- 30. Commissions: payers read their own; nobody but Tasheel can create or change them
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM commissions WHERE source_reference LIKE 'RLS-%') THEN RAISE EXCEPTION 'FAIL 30: the business sees the supplier''s commission'; END IF;
+  BEGIN INSERT INTO commissions (id, organization_id, rule_id, trigger, source_type, source_id, source_reference, base_amount, amount, updated_at)
+    VALUES (gen_random_uuid(), '00000000-0000-7000-8000-00000000000a', '00000000-0000-7000-8000-0000000001b1', 'QUOTATION_ACCEPTED', 'Quotation', gen_random_uuid(), 'RLS-X', 1, 1, now());
+    RAISE EXCEPTION 'FAIL 30: commission inserted directly'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  UPDATE commissions SET amount = 0 WHERE source_reference = 'RLS-QT';
+  IF FOUND THEN RAISE EXCEPTION 'FAIL 30: the supplier changed its commission'; END IF;
+  RAISE NOTICE 'ok 30 - commissions cannot be created or edited outside Tasheel';
+END $$;
+COMMIT;
+-- 31. Invoices: issued by Tasheel, readable by the customer only, never deleted
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000f', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000f1', true);
+DO $$ BEGIN
+  INSERT INTO invoices (id, organization_id, period_start, period_end, subtotal, vat_rate, vat_amount, total, notes, created_by_id, updated_at)
+    VALUES ('00000000-0000-7000-8000-0000000001c1', '00000000-0000-7000-8000-00000000000b', current_date - 30, current_date, 20000, 19, 3800, 23800, 'rls-test', '00000000-0000-7000-8000-0000000000f1', now());
+  INSERT INTO invoice_lines (id, organization_id, invoice_id, label, amount) VALUES (gen_random_uuid(), '00000000-0000-7000-8000-00000000000b', '00000000-0000-7000-8000-0000000001c1', 'RLS commission', 20000);
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM invoices WHERE notes = 'rls-test') OR NOT EXISTS (SELECT 1 FROM invoice_lines WHERE label = 'RLS commission') THEN RAISE EXCEPTION 'FAIL 31: customer cannot read its invoice'; END IF;
+  UPDATE invoices SET total = 0 WHERE notes = 'rls-test';
+  IF FOUND THEN RAISE EXCEPTION 'FAIL 31: customer changed its invoice'; END IF;
+  BEGIN DELETE FROM invoices WHERE notes = 'rls-test'; RAISE EXCEPTION 'FAIL 31: invoice deleted'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000c', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000c1', true);
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM invoices WHERE notes = 'rls-test') THEN RAISE EXCEPTION 'FAIL 31: another organization reads the invoice'; END IF;
+  RAISE NOTICE 'ok 31 - invoices are written by Tasheel and read by their customer only';
+END $$;
+COMMIT;
+-- 32. Notifications: each user sees only their own; the server writes them in the recipient's organization context
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '', true);
+INSERT INTO notifications (id, user_id, organization_id, key) VALUES (gen_random_uuid(), '00000000-0000-7000-8000-0000000000a1', '00000000-0000-7000-8000-00000000000a', 'rls.test');
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000b', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000b1', true);
+DO $$ BEGIN
+  BEGIN INSERT INTO notifications (id, user_id, organization_id, key) VALUES (gen_random_uuid(), '00000000-0000-7000-8000-0000000000a1', '00000000-0000-7000-8000-00000000000a', 'rls.test');
+    RAISE EXCEPTION 'FAIL 32: another organization wrote a notification to user A'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  IF EXISTS (SELECT 1 FROM notifications WHERE key = 'rls.test') THEN RAISE EXCEPTION 'FAIL 32: user B reads user A''s notifications'; END IF;
+END $$;
+COMMIT;
+BEGIN;
+SELECT set_config('app.org_id', '00000000-0000-7000-8000-00000000000a', true), set_config('app.user_id', '00000000-0000-7000-8000-0000000000a1', true);
+DO $$ BEGIN
+  IF (SELECT count(*) FROM notifications WHERE key = 'rls.test') <> 1 THEN RAISE EXCEPTION 'FAIL 32: user A cannot read its notification'; END IF;
+  UPDATE notifications SET read_at = now() WHERE key = 'rls.test';
+  IF NOT FOUND THEN RAISE EXCEPTION 'FAIL 32: user A cannot mark it read'; END IF;
+  RAISE NOTICE 'ok 32 - notifications are private to their recipient';
+END $$;
+COMMIT;

@@ -38,3 +38,15 @@ test('computes quotation totals exactly, VAT rounded half up to the centime', ()
   );
   assert.throws(() => computeQuotationTotals([{ label: 'x', quantity: 1, unitPrice: '1' }], '100'));
 });
+
+import { computeInvoiceTotals } from './money';
+
+test('invoice totals: VAT once on the subtotal, half away from zero; credit notes mirror exactly', () => {
+  const inv = computeInvoiceTotals(['20000.00', '15125.55', '0.05'], '19');
+  assert.deepEqual(inv, { subtotal: '35125.60', vatAmount: '6673.86', total: '41799.46' }); // 6 673.864
+  const credit = computeInvoiceTotals(['-20000.00', '-15125.55', '-0.05'], '19');
+  assert.deepEqual(credit, { subtotal: '-35125.60', vatAmount: '-6673.86', total: '-41799.46' });
+  assert.equal(computeInvoiceTotals(['0.50'], '9').vatAmount, '0.05'); // 0.045 → 0.05
+  assert.equal(computeInvoiceTotals(['-0.50'], '9').vatAmount, '-0.05');
+  assert.throws(() => computeInvoiceTotals(['1'], '100'));
+});

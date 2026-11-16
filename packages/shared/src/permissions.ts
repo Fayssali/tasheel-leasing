@@ -114,6 +114,16 @@ export const PERMISSIONS = [
   },
   { code: 'admin.kpi.read', description: 'View platform KPIs', allowedOrgTypes: ['PLATFORM'] },
   {
+    code: 'admin.billing.manage',
+    description: 'Configure commission rules and billing, issue invoices and credit notes',
+    allowedOrgTypes: ['PLATFORM'],
+  },
+  {
+    code: 'billing.read',
+    description: "View the organization's commissions and invoices",
+    allowedOrgTypes: ['SUPPLIER', 'FINANCIAL_INSTITUTION'],
+  },
+  {
     code: 'admin.document.review',
     description: 'Review organization verification documents',
     allowedOrgTypes: ['PLATFORM'],
@@ -157,6 +167,7 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'admin.kpi.read',
       'admin.listing.moderate',
       'admin.document.review',
+      'admin.billing.manage',
     ],
   },
   {
@@ -176,7 +187,13 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
     code: 'supplier_admin',
     organizationType: 'SUPPLIER',
     name: { fr: 'Administrateur fournisseur', ar: 'مسؤول المورد', en: 'Supplier admin' },
-    permissions: [...ORG_ADMIN_PERMS, 'listing.manage', 'quotation.respond', 'document.manage'],
+    permissions: [
+      ...ORG_ADMIN_PERMS,
+      'listing.manage',
+      'quotation.respond',
+      'document.manage',
+      'billing.read',
+    ],
   },
   {
     code: 'supplier_member',
@@ -194,6 +211,7 @@ export const SYSTEM_ROLES: readonly SystemRoleDef[] = [
       'application.review',
       'offer.issue',
       'document.manage',
+      'billing.read',
     ],
   },
   {
