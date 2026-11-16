@@ -2,14 +2,12 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import type { Locale, OrganizationStatus, OrganizationType } from '@tasheel/shared';
 import { AuditService } from '../audit/audit.service';
 import type { RequestMeta, TenantInfo } from '../common/request-context';
-import { Mailer } from '../mail/mailer';
-import { buildMail } from '../mail/templates';
+import { Notifier, type Recipient } from '../mail/notifier';
 import { PrismaService } from '../prisma/prisma.service';
 
 export type AdminAction = 'verify' | 'reject' | 'suspend' | 'reactivate';
@@ -61,12 +59,10 @@ export interface AuditQuery {
  */
 @Injectable()
 export class AdminService {
-  private readonly logger = new Logger(AdminService.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly mailer: Mailer,
+    private readonly notifier: Notifier,
   ) {}
 
   async listOrganizations(tenant: TenantInfo, query: OrganizationListQuery) {
@@ -236,8 +232,8 @@ export class AdminService {
           deletedAt: null,
           roles: { some: { role: { permissions: { some: { permissionCode: 'member.manage' } } } } },
         },
-        select: { user: { select: { email: true, firstName: true, locale: true } } },
-      })) as Array<{ user: { email: string; firstName: string; locale: Locale } }>;
+        select: { user: { select: { id: true, email: true, firstName: true, locale: true } } },
+      })) as Array<{ user: Recipient }>;
       return { org, next, recipients: admins.map((a) => a.user) };
     });
 
@@ -250,17 +246,14 @@ export class AdminService {
             ? 'email.orgSuspended'
             : null;
     if (key) {
-      for (const r of recipients) {
-        this.deliver(
-          buildMail({
-            locale: r.locale,
-            to: r.email,
-            name: r.firstName,
-            key,
-            vars: { organization: org.legalName, reason: reason?.trim() ?? '' },
-          }),
-        );
-      }
+      // Email and in-app notification for the organization's administrators.
+      void this.notifier.send(
+        id,
+        recipients,
+        key,
+        () => ({ organization: org.legalName, reason: reason?.trim() ?? '' }),
+        '/app/organization',
+      );
     }
     return { id, status: next };
   }
@@ -321,14 +314,6 @@ export class AdminService {
         newOrganizations30d,
         generatedAt: new Date().toISOString(),
       };
-    });
-  }
-
-  private deliver(mail: Parameters<Mailer['send']>[0]): void {
-    this.mailer.send(mail).catch((err: unknown) => {
-      this.logger.error(
-        `Failed to send "${mail.subject}": ${err instanceof Error ? err.message : String(err)}`,
-      );
     });
   }
 }

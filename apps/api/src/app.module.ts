@@ -13,6 +13,8 @@ import { StorageModule } from './storage/storage.module';
 import { MailModule } from './mail/mail.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { BillingModule } from './billing/billing.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReportsModule } from './reports/reports.module';
 import { DocumentsModule } from './documents/documents.module';
 import { FinancingModule } from './financing/financing.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -37,6 +39,8 @@ import { TenantGuard } from './tenancy/tenant.guard';
     DocumentsModule,
     FinancingModule,
     BillingModule,
+    NotificationsModule,
+    ReportsModule,
   ],
   // Global guards run in this order: rate limit → authentication → organization → permissions.
   providers: [

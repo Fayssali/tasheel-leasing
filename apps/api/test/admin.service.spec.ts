@@ -1,3 +1,4 @@
+import { buildMail } from '../src/mail/templates';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { AdminService, type AdminAction } from '../src/admin/admin.service';
 import type { TenantInfo } from '../src/common/request-context';
@@ -57,7 +58,20 @@ function setup(
       record: async (_: unknown, e: { action: string; organizationId: string | null }) =>
         void audit.push(e),
     } as never,
-    { send: async (m: { to: string; subject: string }) => void sent.push(m) } as never,
+    {
+      // Notifier.send: render each email as the real one would be, to check recipient and subject.
+      send: async (
+        _org: string,
+        recipients: Array<{ email: string; firstName: string; locale: 'fr' | 'ar' | 'en' }>,
+        key: Parameters<typeof buildMail>[0]['key'],
+        vars: () => Record<string, string>,
+      ) => {
+        for (const r of recipients)
+          sent.push(
+            buildMail({ locale: r.locale, to: r.email, name: r.firstName, key, vars: vars() }),
+          );
+      },
+    } as never,
   );
   const meta = { ipAddress: null, userAgent: null };
   const act = (action: AdminAction, reason?: string) =>

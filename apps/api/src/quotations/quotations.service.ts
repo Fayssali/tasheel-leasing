@@ -3,11 +3,9 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { sql, type TenantContext, type TenantTx } from '@tasheel/db';
+import { sql } from '@tasheel/db';
 import {
   computeQuotationTotals,
   formatMoney,
@@ -19,15 +17,8 @@ import { v7 as uuidv7 } from 'uuid';
 import { AuditService } from '../audit/audit.service';
 import { nextReference } from '../common/references';
 import type { RequestMeta, TenantInfo } from '../common/request-context';
-import { Mailer } from '../mail/mailer';
-import { buildMail } from '../mail/templates';
+import { Notifier } from '../mail/notifier';
 import { PrismaService } from '../prisma/prisma.service';
-
-interface Recipient {
-  email: string;
-  firstName: string;
-  locale: Locale;
-}
 
 interface QuotationRow {
   id: string;
@@ -74,13 +65,10 @@ const title = (t: { fr?: string; ar?: string }, locale: Locale) =>
  */
 @Injectable()
 export class QuotationsService {
-  private readonly logger = new Logger(QuotationsService.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly mailer: Mailer,
-    private readonly config: ConfigService,
+    private readonly notifier: Notifier,
   ) {}
 
   async request(tenant: TenantInfo, input: RequestInput, meta: RequestMeta) {
@@ -144,24 +132,18 @@ export class QuotationsService {
       };
     });
 
-    const recipients = await this.membersWith(created.supplierOrgId, 'quotation.respond');
-    for (const r of recipients) {
-      this.deliver(
-        buildMail({
-          locale: r.locale,
-          to: r.email,
-          name: r.firstName,
-          key: 'email.quoteRequested',
-          vars: {
-            reference: created.reference,
-            business: created.businessName,
-            listing: title(created.listingTitle, r.locale),
-            quantity: input.quantity,
-          },
-          actionUrl: this.link('/app/quotations'),
-        }),
-      );
-    }
+    void this.notifier.notifyOrg(
+      created.supplierOrgId,
+      'quotation.respond',
+      'email.quoteRequested',
+      (locale) => ({
+        reference: created.reference,
+        business: created.businessName,
+        listing: title(created.listingTitle, locale),
+        quantity: input.quantity,
+      }),
+      '/app/quotations',
+    );
     return { id: created.id, reference: created.reference };
   }
 
@@ -300,30 +282,25 @@ export class QuotationsService {
         id,
         reference,
         requestedById: request.requestedById,
+        businessOrgId: request.organizationId,
         listingTitle: request.listing.title,
         supplierName: supplier.legalName,
       };
     });
 
-    const requester = await this.user(issued.requestedById);
-    if (requester) {
-      this.deliver(
-        buildMail({
-          locale: requester.locale,
-          to: requester.email,
-          name: requester.firstName,
-          key: 'email.quoteIssued',
-          vars: {
-            reference: issued.reference,
-            supplier: issued.supplierName,
-            listing: title(issued.listingTitle, requester.locale),
-            total: formatMoney(totals.total, requester.locale),
-            validUntil: input.validUntil.split('-').reverse().join('/'),
-          },
-          actionUrl: this.link('/app/quotations'),
-        }),
-      );
-    }
+    void this.notifier.notifyUser(
+      issued.requestedById,
+      issued.businessOrgId,
+      'email.quoteIssued',
+      (locale) => ({
+        reference: issued.reference,
+        supplier: issued.supplierName,
+        listing: title(issued.listingTitle, locale),
+        total: formatMoney(totals.total, locale),
+        validUntil: input.validUntil.split('-').reverse().join('/'),
+      }),
+      '/app/quotations',
+    );
     return { id: issued.id, reference: issued.reference, ...totals };
   }
 
@@ -387,23 +364,17 @@ export class QuotationsService {
       return q;
     });
 
-    const issuer = await this.user(result.issuedById);
-    if (issuer) {
-      this.deliver(
-        buildMail({
-          locale: issuer.locale,
-          to: issuer.email,
-          name: issuer.firstName,
-          key: decision === 'accept' ? 'email.quoteAccepted' : 'email.quoteDeclined',
-          vars: {
-            reference: result.reference,
-            business: result.request.businessName,
-            listing: title(result.listing.title, issuer.locale),
-          },
-          actionUrl: this.link('/app/quotations'),
-        }),
-      );
-    }
+    void this.notifier.notifyUser(
+      result.issuedById,
+      result.organizationId,
+      decision === 'accept' ? 'email.quoteAccepted' : 'email.quoteDeclined',
+      (locale) => ({
+        reference: result.reference,
+        business: result.request.businessName,
+        listing: title(result.listing.title, locale),
+      }),
+      '/app/quotations',
+    );
     return { id: quotationId, status: decision === 'accept' ? 'ACCEPTED' : 'DECLINED' };
   }
 
@@ -454,48 +425,6 @@ export class QuotationsService {
         meta,
       });
       return { id: requestId, status: 'CANCELLED' };
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Active members of another organization holding a permission, for notifications only.
-   * Runs in that organization's context on the server's own authority (system context):
-   * nothing from it is returned to the caller.
-   */
-  private async membersWith(organizationId: string, permission: string): Promise<Recipient[]> {
-    const system: TenantContext = { organizationId, userId: null };
-    const rows = (await this.prisma.forTenant(system, (tx: TenantTx) =>
-      tx.organizationMember.findMany({
-        where: {
-          organizationId,
-          status: 'ACTIVE',
-          deletedAt: null,
-          roles: { some: { role: { permissions: { some: { permissionCode: permission } } } } },
-        },
-        select: { user: { select: { email: true, firstName: true, locale: true } } },
-      }),
-    )) as Array<{ user: Recipient }>;
-    return rows.map((r) => r.user);
-  }
-
-  private async user(id: string): Promise<Recipient | null> {
-    return (await this.prisma.user.findUnique({
-      where: { id },
-      select: { email: true, firstName: true, locale: true },
-    })) as Recipient | null;
-  }
-
-  private link(path: string): string {
-    return `${(this.config.get<string>('WEB_APP_URL') ?? 'http://localhost:5173').replace(/\/$/, '')}${path}`;
-  }
-
-  private deliver(mail: Parameters<Mailer['send']>[0]): void {
-    this.mailer.send(mail).catch((err: unknown) => {
-      this.logger.error(
-        `Failed to send "${mail.subject}": ${err instanceof Error ? err.message : String(err)}`,
-      );
     });
   }
 }

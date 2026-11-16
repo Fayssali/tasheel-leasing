@@ -300,7 +300,52 @@ describe('Billing (PostgreSQL + RLS)', () => {
       .expect(200);
     expect(released.body[0]).toMatchObject({ status: 'ACCRUED', invoiceId: null });
 
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 100));
     expect(outbox.some((m) => /Facture/.test(m.subject))).toBe(true);
+
+    // In-app notifications: the supplier sees the invoice; the bystander sees nothing of it.
+    const notes = await request(http)
+      .get('/api/v1/notifications')
+      .set('Authorization', supplier.headers.Authorization)
+      .expect(200);
+    expect(notes.body.items.some((n: { key: string }) => n.key === 'email.invoiceIssued')).toBe(
+      true,
+    );
+    expect(notes.body.unread).toBeGreaterThan(0);
+    const otherNotes = await request(http)
+      .get('/api/v1/notifications')
+      .set('Authorization', other.headers.Authorization)
+      .expect(200);
+    expect(
+      otherNotes.body.items.some((n: { key: string }) => n.key === 'email.invoiceIssued'),
+    ).toBe(false);
+    await request(http)
+      .post('/api/v1/notifications/read-all')
+      .set('Authorization', supplier.headers.Authorization)
+      .expect(200);
+    expect(
+      (
+        await request(http)
+          .get('/api/v1/notifications')
+          .set('Authorization', supplier.headers.Authorization)
+          .expect(200)
+      ).body.unread,
+    ).toBe(0);
+
+    // Reports: the supplier's own figures; the platform view for Tasheel staff only.
+    const report = await request(http)
+      .get('/api/v1/reports/overview')
+      .set(supplier.headers)
+      .expect(200);
+    expect(report.body).toMatchObject({
+      kind: 'SUPPLIER',
+      quotationsAccepted: 1,
+      acceptedValue: '1512555.50',
+      commissionsAccrued: '30251.11',
+    });
+    expect(report.body.requestsByMonth).toHaveLength(6);
+    await request(http).get('/api/v1/admin/reports').set(supplier.headers).expect(403);
+    const platform = await request(http).get('/api/v1/admin/reports').set(admin).expect(200);
+    expect(Number(platform.body.collected)).toBeGreaterThanOrEqual(35998.82);
   });
 });

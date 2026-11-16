@@ -2,7 +2,6 @@
  * Listing lifecycle and quotation rules against in-memory fakes. Real SQL/RLS is covered by
  * the RLS suite and test-int/marketplace.int-spec.ts.
  */
-import { ConfigService } from '@nestjs/config';
 import type { TenantInfo } from '../src/common/request-context';
 import { ListingsService } from '../src/marketplace/listings.service';
 import { QuotationsService, effectiveStatus } from '../src/quotations/quotations.service';
@@ -182,8 +181,7 @@ function quotationsSetup(
   const service = new QuotationsService(
     prisma as never,
     { record: async () => undefined } as never,
-    { send: async () => undefined } as never,
-    new ConfigService({}),
+    { notifyOrg: async () => undefined, notifyUser: async () => undefined } as never,
   );
   return { service, request, quotations, tx };
 }
