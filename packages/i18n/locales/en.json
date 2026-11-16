@@ -166,6 +166,11 @@
       "subject": "Application withdrawn — {{reference}} — Tasheel Leasing",
       "body": "{{business}} withdrew its financing application. The file and its documents are no longer accessible.",
       "cta": "View applications"
+    },
+    "invoiceIssued": {
+      "subject": "Invoice {{number}} — Tasheel Leasing",
+      "body": "Your commission invoice {{number}} is available: {{total}}, due by {{dueDate}}.",
+      "cta": "View the invoice"
     }
   },
   "auth": {

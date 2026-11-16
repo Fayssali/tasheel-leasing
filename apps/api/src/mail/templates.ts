@@ -55,7 +55,8 @@ interface TemplateInput {
     | 'email.applicationDeclined'
     | 'email.offerAccepted'
     | 'email.offerDeclined'
-    | 'email.applicationWithdrawn';
+    | 'email.applicationWithdrawn'
+    | 'email.invoiceIssued';
   vars?: Record<string, string | number>;
   /** Call-to-action link; omitted for notification-only emails. */
   actionUrl?: string;

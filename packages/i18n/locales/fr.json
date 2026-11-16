@@ -166,6 +166,11 @@
       "subject": "Demande retirée — {{reference}} — Tasheel Leasing",
       "body": "{{business}} a retiré sa demande de financement. Le dossier et ses pièces ne sont plus accessibles.",
       "cta": "Voir mes demandes"
+    },
+    "invoiceIssued": {
+      "subject": "Facture {{number}} — Tasheel Leasing",
+      "body": "Votre facture de commissions {{number}} est disponible : {{total}}, à régler au plus tard le {{dueDate}}.",
+      "cta": "Voir la facture"
     }
   },
   "auth": {

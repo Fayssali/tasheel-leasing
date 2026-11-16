@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { asJson, type TenantTx } from '@tasheel/db';
+import { asJson, sql, type TenantTx } from '@tasheel/db';
 import {
   computeInstallment,
   formatMoney,
@@ -749,6 +749,8 @@ export class ApplicationsService {
           where: { id: offer.application.id },
           data: { status: 'OFFER_ACCEPTED', decidedAt: new Date() },
         });
+        // Institution commission, computed from the applicable rule in this same transaction.
+        await tx.$executeRaw(sql`SELECT app_accrue_commission('Offer', ${offerId}::uuid)`);
       }
       await this.audit.record(tx, {
         organizationId: tenant.organizationId,

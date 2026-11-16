@@ -168,6 +168,7 @@ function store() {
       },
     },
     $queryRawUnsafe: async () => [{ n: 3n }],
+    $executeRaw: jest.fn(async () => 1),
   };
   const prisma = {
     forTenant: async (_: unknown, fn: (t: typeof tx) => Promise<unknown>) => fn(tx),
@@ -177,6 +178,7 @@ function store() {
   };
   const notifier = { notifyOrg: async () => undefined };
   return {
+    tx,
     db,
     applications: new ApplicationsService(prisma as never, audit as never, notifier as never),
     review: new ReviewService(prisma as never, audit as never, notifier as never),
@@ -343,7 +345,7 @@ describe('institution review and offers', () => {
   });
 
   it('accepting one offer declines the others and closes the remaining submissions', async () => {
-    const { review, applications, db } = submitted();
+    const { review, applications, db, tx } = submitted();
     const a = await review.issueOffer(tenant(BANK, 'FINANCIAL_INSTITUTION'), 's1', offer, meta);
     await review.issueOffer(
       tenant(BANK2, 'FINANCIAL_INSTITUTION'),
@@ -355,6 +357,8 @@ describe('institution review and offers', () => {
     expect(db.offers.map((o) => o.status)).toEqual(['ACCEPTED', 'DECLINED']);
     expect(db.submissions.map((s) => s.status)).toEqual(['OFFER_MADE', 'CLOSED']);
     expect(db.application.status).toBe('OFFER_ACCEPTED');
+    // The institution commission is accrued in the same transaction.
+    expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
   });
 
   it('presents and treats past-validity offers as expired', async () => {

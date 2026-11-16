@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TenantContext, TenantTx } from '@tasheel/db';
+import { sql, type TenantContext, type TenantTx } from '@tasheel/db';
 import {
   computeQuotationTotals,
   formatMoney,
@@ -367,11 +367,14 @@ export class QuotationsService {
           code: 'CONCURRENT_CHANGE',
           message: 'The quotation changed meanwhile. Reload.',
         });
-      if (decision === 'accept')
+      if (decision === 'accept') {
         await tx.quotationRequest.update({
           where: { id: q.requestId },
           data: { status: 'CLOSED' },
         });
+        // Supplier commission, computed from the applicable rule in this same transaction.
+        await tx.$executeRaw(sql`SELECT app_accrue_commission('Quotation', ${quotationId}::uuid)`);
+      }
       await this.audit.record(tx, {
         organizationId: tenant.organizationId,
         actorUserId: tenant.userId,

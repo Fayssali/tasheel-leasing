@@ -173,6 +173,7 @@ function quotationsSetup(
     },
     organization: { findUnique: async () => ({ legalName: 'Atlas Machines (fictif)' }) },
     $queryRawUnsafe: async () => [{ n: 7n }],
+    $executeRaw: jest.fn(async () => 1),
   };
   const prisma = {
     forTenant: async (_: unknown, fn: (t: typeof tx) => Promise<unknown>) => fn(tx),
@@ -184,7 +185,7 @@ function quotationsSetup(
     { send: async () => undefined } as never,
     new ConfigService({}),
   );
-  return { service, request, quotations };
+  return { service, request, quotations, tx };
 }
 
 const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString().slice(0, 10);
@@ -244,10 +245,16 @@ describe('quotations', () => {
 
   it('accepting closes the request; an expired quotation cannot be accepted', async () => {
     const ok = quotationsSetup({ requestStatus: 'QUOTED' });
+    const accrual = ok.tx.$executeRaw;
     await expect(
       ok.service.decide(tenant(BUSINESS, 'VERIFIED', 'BUSINESS'), 'q0', 'accept', meta),
     ).resolves.toMatchObject({ status: 'ACCEPTED' });
     expect(ok.request.status).toBe('CLOSED');
+    // The supplier commission is accrued in the same transaction as the acceptance.
+    expect(accrual).toHaveBeenCalledTimes(1);
+    expect(((accrual.mock.calls[0] as unknown[])[0] as { sql: string }).sql).toContain(
+      'app_accrue_commission',
+    );
 
     const expired = quotationsSetup({
       requestStatus: 'QUOTED',
