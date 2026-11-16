@@ -216,7 +216,7 @@ the repository, so this scope should still be checked against it.
 - [x] Screens in French and Arabic, responsive
 - [x] Production readiness files, without any deployment
 - [x] Fictional demo data
-- [ ] CI green on GitHub
+- [x] CI green on GitHub, 2026-11-16, including the container image build and production-mode smoke test ([run](https://github.com/Fayssali/tasheel-leasing/actions/runs/43861670990))
 - [ ] Demo accepted by the project owner (`docs/demo/phase-4.md`)
 
 ## Next
