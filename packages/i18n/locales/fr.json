@@ -93,15 +93,18 @@
     },
     "orgVerified": {
       "subject": "Votre organisation est vérifiée — Tasheel Leasing",
-      "body": "{{organization}} a été vérifiée par l'équipe Tasheel Leasing. Vous avez désormais accès à toutes les fonctionnalités de la plateforme."
+      "body": "{{organization}} a été vérifiée par l'équipe Tasheel Leasing. Vous avez désormais accès à toutes les fonctionnalités de la plateforme.",
+      "cta": "Accéder à mon espace"
     },
     "orgRejected": {
       "subject": "Vérification de votre organisation — Tasheel Leasing",
-      "body": "La vérification de {{organization}} n'a pas pu aboutir. Motif : {{reason}}. Vous pouvez compléter votre dossier et contacter le support."
+      "body": "La vérification de {{organization}} n'a pas pu aboutir. Motif : {{reason}}. Vous pouvez compléter votre dossier et contacter le support.",
+      "cta": "Voir mon organisation"
     },
     "orgSuspended": {
       "subject": "Votre organisation est suspendue — Tasheel Leasing",
-      "body": "L'accès de {{organization}} à Tasheel Leasing est suspendu. Motif : {{reason}}. Contactez le support pour plus d'informations."
+      "body": "L'accès de {{organization}} à Tasheel Leasing est suspendu. Motif : {{reason}}. Contactez le support pour plus d'informations.",
+      "cta": "Voir mon organisation"
     },
     "quoteRequested": {
       "subject": "Nouvelle demande de devis {{reference}} — Tasheel Leasing",

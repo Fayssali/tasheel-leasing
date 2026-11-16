@@ -51,7 +51,7 @@ export class ReportsService {
           (SELECT coalesce(sum(amount), 0) FROM commissions WHERE status = 'INVOICED')::text AS "commissionsInvoiced",
           (SELECT coalesce(sum(total), 0) FROM invoices WHERE kind = 'INVOICE' AND status = 'ISSUED')::text AS "receivables",
           (SELECT coalesce(sum(total), 0) FROM invoices WHERE kind = 'INVOICE' AND status = 'ISSUED' AND due_date < current_date)::text AS "overdue",
-          (SELECT coalesce(sum(total), 0) FROM invoices WHERE kind = 'INVOICE' AND status = 'PAID')::text AS "collected"`,
+          (SELECT coalesce(sum(total), 0) FROM invoices WHERE kind = 'INVOICE' AND paid_at IS NOT NULL)::text AS "collected"`,
       );
       return {
         ...m,

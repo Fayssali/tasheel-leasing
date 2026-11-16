@@ -93,15 +93,18 @@
     },
     "orgVerified": {
       "subject": "Your organization is verified — Tasheel Leasing",
-      "body": "{{organization}} has been verified by the Tasheel Leasing team. You now have access to all platform features."
+      "body": "{{organization}} has been verified by the Tasheel Leasing team. You now have access to all platform features.",
+      "cta": "Open my workspace"
     },
     "orgRejected": {
       "subject": "Verification of your organization — Tasheel Leasing",
-      "body": "The verification of {{organization}} could not be completed. Reason: {{reason}}. You can complete your file and contact support."
+      "body": "The verification of {{organization}} could not be completed. Reason: {{reason}}. You can complete your file and contact support.",
+      "cta": "View my organization"
     },
     "orgSuspended": {
       "subject": "Your organization is suspended — Tasheel Leasing",
-      "body": "Access for {{organization}} to Tasheel Leasing is suspended. Reason: {{reason}}. Contact support for more information."
+      "body": "Access for {{organization}} to Tasheel Leasing is suspended. Reason: {{reason}}. Contact support for more information.",
+      "cta": "View my organization"
     },
     "quoteRequested": {
       "subject": "New quotation request {{reference}} — Tasheel Leasing",

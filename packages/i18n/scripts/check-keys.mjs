@@ -19,5 +19,18 @@ for (const locale of ['ar', 'en']) {
     console.error(`${locale}: missing [${missing.join(', ')}] extra [${extra.join(', ')}]`);
   }
 }
+// Every notification email can carry a link to the platform, which needs a button label.
+// Only emails that never link anywhere are exempt.
+const NO_LINK = new Set(['passwordChanged']);
+const email = load('fr').email;
+const noCta = Object.entries(email)
+  .filter(
+    ([k, v]) => v && typeof v === 'object' && 'subject' in v && !('cta' in v) && !NO_LINK.has(k),
+  )
+  .map(([k]) => `email.${k}.cta`);
+if (noCta.length) {
+  failed = true;
+  console.error(`email templates without a button label: [${noCta.join(', ')}]`);
+}
 if (failed) process.exit(1);
 console.log(`i18n: ${reference.size} keys, all locales complete.`);
