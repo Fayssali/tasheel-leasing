@@ -42,4 +42,9 @@ describe('GET /api/v1/health', () => {
     prismaMock.$queryRaw.mockRejectedValueOnce(new Error('connection refused'));
     await request(app.getHttpServer()).get('/api/v1/health').expect(503);
   });
+  it('answers liveness without touching the database', async () => {
+    prismaMock.$queryRaw.mockClear();
+    await request(app.getHttpServer()).get('/api/v1/health/live').expect(200, { status: 'ok' });
+    expect(prismaMock.$queryRaw).not.toHaveBeenCalled();
+  });
 });

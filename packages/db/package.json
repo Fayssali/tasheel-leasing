@@ -15,18 +15,19 @@
     "test": "dotenv -e ../../.env -- tsx --test test/*.test.ts",
     "test:rls": "dotenv -e ../../.env -- bash test/rls/run.sh",
     "create-admin": "dotenv -e ../../.env -- tsx scripts/create-platform-admin.ts",
-    "seed:catalogue": "dotenv -e ../../.env -- tsx prisma/seed.ts --catalogue-only"
+    "seed:catalogue": "dotenv -e ../../.env -- tsx prisma/seed.ts --catalogue-only",
+    "migrate:prod": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
-    "@tasheel/shared": "workspace:*"
+    "@tasheel/shared": "workspace:*",
+    "prisma": "^6.19.0"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1169.0",
     "@node-rs/argon2": "^2.0.2",
     "@types/node": "^22.9.0",
     "dotenv-cli": "^8.0.0",
-    "prisma": "^6.19.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

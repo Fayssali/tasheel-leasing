@@ -1,0 +1,12 @@
+# Edge proxy: TLS certificates (automatic, Let's Encrypt) and HTTP→HTTPS redirect.
+# TASHEEL_DOMAIN must point to this host before the first start.
+{$TASHEEL_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:8080 {
+		header_up X-Request-Id {http.request.uuid}
+	}
+	log {
+		output stdout
+		format json
+	}
+}

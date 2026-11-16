@@ -61,3 +61,87 @@ jobs:
 
       - name: Formatting
         run: pnpm format:check
+
+  # Builds both production images and starts them the way infra/production does:
+  # production database initialisation, migrations from the API image, API in production
+  # mode, web (Nginx) in front. Nothing is pushed or deployed.
+  container-images:
+    runs-on: ubuntu-latest
+    env:
+      ADMIN_PW: ci-admin-0123456789abcdef
+      APP_PW: ci-app-0123456789abcdef
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          tags: tasheel/api:ci
+          load: true
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          tags: tasheel/web:ci
+          load: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      - name: Start PostgreSQL with the production initialisation
+        run: |
+          docker network create tasheel
+          docker run -d --name postgres --network tasheel \
+            -e POSTGRES_PASSWORD=ci-super -e TASHEEL_ADMIN_PASSWORD=$ADMIN_PW -e TASHEEL_APP_PASSWORD=$APP_PW \
+            -v "$PWD/infra/production/postgres-init:/docker-entrypoint-initdb.d:ro" postgres:16-alpine
+          for i in $(seq 1 30); do docker exec postgres pg_isready -U postgres -d tasheel && break; sleep 2; done
+
+      - name: Apply migrations from the API image
+        run: |
+          docker run --rm --network tasheel -w /app/packages/db \
+            -e DATABASE_URL=postgresql://tasheel_app:$APP_PW@postgres:5432/tasheel \
+            -e DATABASE_URL_ADMIN=postgresql://tasheel_admin:$ADMIN_PW@postgres:5432/tasheel \
+            tasheel/api:ci npx prisma migrate deploy
+
+      - name: Production configuration is refused when unsafe
+        run: |
+          if docker run --rm -e NODE_ENV=production -e DATABASE_URL=postgresql://x -e JWT_ACCESS_SECRET=change-me-access tasheel/api:ci 2>&1 | tee out.txt; then
+            echo "the API started with an unsafe configuration"; exit 1
+          fi
+          grep -q "Unsafe production configuration" out.txt
+
+      - name: Start API and web in production mode
+        run: |
+          docker run -d --name api --network tasheel \
+            -e NODE_ENV=production -e TRUST_PROXY=1 \
+            -e DATABASE_URL=postgresql://tasheel_app:$APP_PW@postgres:5432/tasheel \
+            -e JWT_ACCESS_SECRET=$(openssl rand -hex 32) -e MFA_ENCRYPTION_KEY=$(openssl rand -base64 32) \
+            -e WEB_APP_URL=https://app.example.test -e API_CORS_ORIGIN=https://app.example.test \
+            -e S3_ENDPOINT=http://minio:9000 -e S3_BUCKET_DOCUMENTS=tasheel-documents -e S3_ACCESS_KEY=ci -e S3_SECRET_KEY=ci-secret \
+            -e SMTP_HOST=mail -e MAIL_FROM=no-reply@example.test -e SCAN_MODE=clamav -e CLAMAV_HOST=clamav \
+            tasheel/api:ci
+          docker run -d --name web --network tasheel -p 8080:8080 tasheel/web:ci
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/api/v1/health && break; sleep 2; done
+
+      - name: Smoke test through Nginx
+        run: |
+          set -x
+          curl -fsS http://localhost:8080/api/v1/health | grep -q '"database":"up"'
+          curl -fsS http://localhost:8080/api/v1/health/live | grep -q '"status":"ok"'
+          curl -fsS http://localhost:8080/app/billing | grep -q '<div id="root">'
+          curl -sI http://localhost:8080/ | grep -qi "content-security-policy: default-src 'self'"
+          curl -sI http://localhost:8080/ | grep -qi "x-content-type-options: nosniff"
+          curl -sI http://localhost:8080/api/v1/health | grep -qi "x-request-id"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/v1/billing/invoices)" = 401
+          docker run --rm --network tasheel postgres:16-alpine sh -c \
+            "PGPASSWORD=$APP_PW psql -h postgres -U tasheel_app -d tasheel -tAc 'select rolbypassrls from pg_roles where rolname = current_user'" | grep -qx f
+
+      - name: Container logs
+        if: always()
+        run: docker logs api 2>&1 | tail -50; docker logs web 2>&1 | tail -20
