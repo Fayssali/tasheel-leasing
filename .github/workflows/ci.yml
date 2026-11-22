@@ -82,6 +82,7 @@ jobs:
         with:
           context: .
           file: apps/api/Dockerfile
+          target: runtime
           tags: tasheel/api:ci
           load: true
           cache-from: type=gha,scope=api
