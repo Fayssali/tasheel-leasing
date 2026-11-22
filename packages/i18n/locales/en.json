@@ -468,7 +468,9 @@
     "INVALID_PAYER": "This organization does not match the trigger (supplier or institution).",
     "NAME_REQUIRED": "Give the rule a name in French or Arabic.",
     "RATE_REQUIRED": "A percentage rule needs a rate.",
-    "AMOUNT_REQUIRED": "A fixed rule needs an amount."
+    "AMOUNT_REQUIRED": "A fixed rule needs an amount.",
+    "DEMO_READ_ONLY": "Read-only demo: this action is not saved.",
+    "DEMO_NOT_AVAILABLE": "This screen is not part of the demonstration."
   },
   "listingStatus": {
     "DRAFT": "Draft",
@@ -1154,6 +1156,19 @@
     }
   },
   "demo": {
-    "banner": "Demonstration — all organizations, people and amounts are fictional. Do not enter real data."
+    "banner": "Demonstration — all organizations, people and amounts are fictional. Do not enter real data.",
+    "switcher": {
+      "title": "Interactive demo",
+      "hint": "Choose a point of view: each role sees its own workspace.",
+      "readOnly": "Read-only: actions are not saved. Fictional data.",
+      "current": "current role",
+      "role": {
+        "anon": "Visitor (public marketplace)",
+        "business": "Business — Tassili Agro",
+        "supplier": "Supplier — Atlas Machines",
+        "bank": "Financial institution — Hodna Leasing",
+        "admin": "Tasheel team (administration)"
+      }
+    }
   }
 }

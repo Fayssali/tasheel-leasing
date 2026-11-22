@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createBrowserRouter, Navigate, useLocation } from 'react-router';
+import { createBrowserRouter, createHashRouter, Navigate, useLocation } from 'react-router';
 import { AppShell } from './components/AppShell';
 import { Spinner } from './components/ui';
 import { useAuth } from './lib/auth';
@@ -177,7 +177,10 @@ function AdminArea() {
   );
 }
 
-export const router = createBrowserRouter([
+// The browser-only demo is served as static files: hash URLs keep every page reachable.
+const createRouter = import.meta.env.VITE_DEMO === '1' ? createHashRouter : createBrowserRouter;
+
+export const router = createRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/marketplace', element: <MarketplacePage /> },
   { path: '/marketplace/suppliers/:id', element: <SupplierPage /> },

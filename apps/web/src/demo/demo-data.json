@@ -1,0 +1,3677 @@
+{
+  "anon": {
+    "GET /health": { "status": 200, "body": { "status": "ok", "database": "up", "demo": true } },
+    "POST /auth/refresh": {
+      "status": 401,
+      "body": { "code": "UNAUTHENTICATED", "message": "No session" }
+    },
+    "GET /invitations/preview?token=x": {
+      "status": 200,
+      "body": {
+        "organizationName": "Tassili Agro Transformation EURL (fictif)",
+        "organizationType": "BUSINESS",
+        "email": "comptable@tassili-agro.dz",
+        "role": { "code": "business_member", "name": { "fr": "Collaborateur", "ar": "متعاون" } },
+        "expiresAt": "2026-11-22T09:00:00Z",
+        "existingAccount": false
+      }
+    },
+    "GET /marketplace/categories": {
+      "status": 200,
+      "body": [
+        {
+          "id": "c1",
+          "code": "construction",
+          "name": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "parentId": null,
+          "listingCount": 7,
+          "specSchema": [
+            {
+              "key": "power_kw",
+              "label": { "fr": "Puissance", "ar": "القدرة" },
+              "type": "number",
+              "unit": "kW"
+            },
+            {
+              "key": "weight_kg",
+              "label": { "fr": "Poids", "ar": "الوزن" },
+              "type": "number",
+              "unit": "kg"
+            },
+            {
+              "key": "fuel",
+              "label": { "fr": "Énergie", "ar": "الطاقة" },
+              "type": "select",
+              "options": [
+                { "value": "diesel", "label": { "fr": "Diesel", "ar": "ديزل" } },
+                { "value": "electric", "label": { "fr": "Électrique", "ar": "كهربائي" } }
+              ]
+            },
+            {
+              "key": "hours_used",
+              "label": { "fr": "Heures d'utilisation", "ar": "ساعات الاستعمال" },
+              "type": "number",
+              "unit": "h"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "code": "agriculture",
+          "name": { "fr": "Agriculture", "ar": "الفلاحة", "en": "Agriculture" },
+          "parentId": null,
+          "listingCount": 5,
+          "specSchema": []
+        },
+        {
+          "id": "c3",
+          "code": "industrial",
+          "name": { "fr": "Machines industrielles", "ar": "الآلات الصناعية", "en": "Industrial" },
+          "parentId": null,
+          "listingCount": 4,
+          "specSchema": []
+        },
+        {
+          "id": "c4",
+          "code": "medical",
+          "name": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" },
+          "parentId": null,
+          "listingCount": 2,
+          "specSchema": []
+        },
+        {
+          "id": "c5",
+          "code": "vehicles",
+          "name": { "fr": "Véhicules utilitaires", "ar": "المركبات النفعية", "en": "Vehicles" },
+          "parentId": null,
+          "listingCount": 2,
+          "specSchema": []
+        }
+      ]
+    },
+    "GET /marketplace/listings": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "l1",
+            "reference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن"
+            },
+            "brand": "Fictive",
+            "model": "PX-100",
+            "year": 2025,
+            "condition": "NEW",
+            "price": "18500000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "construction",
+            "categoryName": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img1"
+          },
+          {
+            "id": "l2",
+            "reference": "EQ-2026-000002",
+            "title": { "fr": "Tracteur agricole 110 ch", "ar": "جرار فلاحي 110 حصان" },
+            "brand": "Fictive",
+            "model": "PX-200",
+            "year": 2021,
+            "condition": "USED",
+            "price": "7900000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "agriculture",
+            "categoryName": { "fr": "Agriculture", "ar": "الفلاحة", "en": "Agriculture" },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img2"
+          },
+          {
+            "id": "l3",
+            "reference": "EQ-2026-000003",
+            "title": { "fr": "Centre d'usinage CNC 3 axes", "ar": "مركز تشغيل CNC ثلاثي المحاور" },
+            "brand": "Fictive",
+            "model": "PX-300",
+            "year": 2025,
+            "condition": "NEW",
+            "price": null,
+            "currency": "DZD",
+            "priceOnRequest": true,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "industrial",
+            "categoryName": {
+              "fr": "Machines industrielles",
+              "ar": "الآلات الصناعية",
+              "en": "Industrial"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img3"
+          },
+          {
+            "id": "l4",
+            "reference": "EQ-2026-000004",
+            "title": { "fr": "Chargeuse sur pneus 3 m³", "ar": "جرافة على عجلات 3 م³" },
+            "brand": "Fictive",
+            "model": "PX-400",
+            "year": 2019,
+            "condition": "REFURBISHED",
+            "price": "14250000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "construction",
+            "categoryName": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img4"
+          },
+          {
+            "id": "l5",
+            "reference": "EQ-2026-000005",
+            "title": { "fr": "Échographe portable", "ar": "جهاز إيكوغرافي محمول" },
+            "brand": "Fictive",
+            "model": "PX-500",
+            "year": 2025,
+            "condition": "NEW",
+            "price": "3450000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "medical",
+            "categoryName": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img0"
+          },
+          {
+            "id": "l6",
+            "reference": "EQ-2026-000006",
+            "title": { "fr": "Camion benne 19 t", "ar": "شاحنة قلابة 19 طن" },
+            "brand": "Fictive",
+            "model": "PX-600",
+            "year": 2022,
+            "condition": "USED",
+            "price": "12600000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "vehicles",
+            "categoryName": {
+              "fr": "Véhicules utilitaires",
+              "ar": "المركبات النفعية",
+              "en": "Vehicles"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img1"
+          }
+        ],
+        "total": 20,
+        "page": 1,
+        "pageSize": 6
+      }
+    },
+    "GET /marketplace/images/img1": { "status": 200, "body": null },
+    "GET /marketplace/images/img2": { "status": 200, "body": null },
+    "GET /marketplace/images/img3": { "status": 200, "body": null },
+    "GET /marketplace/images/img4": { "status": 200, "body": null },
+    "GET /marketplace/images/img0": { "status": 200, "body": null },
+    "GET /marketplace/listings/EQ-2026-000001": {
+      "status": 200,
+      "body": {
+        "id": "l1",
+        "reference": "EQ-2026-000001",
+        "title": {
+          "fr": "Pelle hydraulique sur chenilles 22 t",
+          "ar": "حفارة هيدروليكية على جنزير 22 طن"
+        },
+        "brand": "Fictive",
+        "model": "PX-100",
+        "year": 2025,
+        "condition": "NEW",
+        "price": "18500000.00",
+        "currency": "DZD",
+        "priceOnRequest": false,
+        "priceIncludesVat": false,
+        "availability": "IN_STOCK",
+        "categoryCode": "construction",
+        "categoryName": {
+          "fr": "BTP et travaux publics",
+          "ar": "البناء والأشغال العمومية",
+          "en": "Construction"
+        },
+        "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+        "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+        "supplierWilaya": "09",
+        "coverImageId": "img1",
+        "description": {
+          "fr": "Pelle sur chenilles, moteur diesel conforme, cabine climatisée.\nLivrée avec godet standard 1,2 m³.",
+          "ar": "حفارة على جنزير بمحرك ديزل ومقصورة مكيفة."
+        },
+        "leadTimeDays": 21,
+        "deliveryWilayas": [],
+        "warrantyMonths": 12,
+        "specs": { "power_kw": 110, "weight_kg": 22000, "fuel": "diesel" },
+        "viewCount": 128,
+        "category": {
+          "code": "construction",
+          "name": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "specSchema": [
+            {
+              "key": "power_kw",
+              "label": { "fr": "Puissance", "ar": "القدرة" },
+              "type": "number",
+              "unit": "kW"
+            },
+            {
+              "key": "weight_kg",
+              "label": { "fr": "Poids", "ar": "الوزن" },
+              "type": "number",
+              "unit": "kg"
+            },
+            {
+              "key": "fuel",
+              "label": { "fr": "Énergie", "ar": "الطاقة" },
+              "type": "select",
+              "options": [
+                { "value": "diesel", "label": { "fr": "Diesel", "ar": "ديزل" } },
+                { "value": "electric", "label": { "fr": "Électrique", "ar": "كهربائي" } }
+              ]
+            },
+            {
+              "key": "hours_used",
+              "label": { "fr": "Heures d'utilisation", "ar": "ساعات الاستعمال" },
+              "type": "number",
+              "unit": "h"
+            }
+          ]
+        },
+        "organization": {
+          "id": "0193a1b2-0000-7000-8000-0000000000bb",
+          "legalName": "Atlas Machines Industrielles SARL (fictif)",
+          "tradeName": "Atlas Machines",
+          "wilayaCode": "09"
+        },
+        "images": [{ "id": "img0" }, { "id": "img1" }, { "id": "img2" }],
+        "documents": [
+          {
+            "id": "d1",
+            "kind": "SPEC_SHEET",
+            "fileName": "Fiche technique PX-100.pdf",
+            "sizeBytes": 482000
+          }
+        ]
+      }
+    },
+    "GET /marketplace/suppliers/0193a1b2-0000-7000-8000-0000000000bb": {
+      "status": 200,
+      "body": {
+        "id": "0193a1b2-0000-7000-8000-0000000000bb",
+        "legalName": "Atlas Machines Industrielles SARL (fictif)",
+        "tradeName": "Atlas Machines",
+        "wilayaCode": "09",
+        "verifiedAt": "2026-11-09T10:00:00Z"
+      }
+    },
+    "GET /marketplace/listings?supplierId=0193a1b2-0000-7000-8000-0000000000bb&page=1": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "l1",
+            "reference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن"
+            },
+            "brand": "Fictive",
+            "model": "PX-100",
+            "year": 2025,
+            "condition": "NEW",
+            "price": "18500000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "construction",
+            "categoryName": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img1"
+          },
+          {
+            "id": "l2",
+            "reference": "EQ-2026-000002",
+            "title": { "fr": "Tracteur agricole 110 ch", "ar": "جرار فلاحي 110 حصان" },
+            "brand": "Fictive",
+            "model": "PX-200",
+            "year": 2021,
+            "condition": "USED",
+            "price": "7900000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "agriculture",
+            "categoryName": { "fr": "Agriculture", "ar": "الفلاحة", "en": "Agriculture" },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img2"
+          },
+          {
+            "id": "l3",
+            "reference": "EQ-2026-000003",
+            "title": { "fr": "Centre d'usinage CNC 3 axes", "ar": "مركز تشغيل CNC ثلاثي المحاور" },
+            "brand": "Fictive",
+            "model": "PX-300",
+            "year": 2025,
+            "condition": "NEW",
+            "price": null,
+            "currency": "DZD",
+            "priceOnRequest": true,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "industrial",
+            "categoryName": {
+              "fr": "Machines industrielles",
+              "ar": "الآلات الصناعية",
+              "en": "Industrial"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img3"
+          },
+          {
+            "id": "l4",
+            "reference": "EQ-2026-000004",
+            "title": { "fr": "Chargeuse sur pneus 3 m³", "ar": "جرافة على عجلات 3 م³" },
+            "brand": "Fictive",
+            "model": "PX-400",
+            "year": 2019,
+            "condition": "REFURBISHED",
+            "price": "14250000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "construction",
+            "categoryName": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img4"
+          },
+          {
+            "id": "l5",
+            "reference": "EQ-2026-000005",
+            "title": { "fr": "Échographe portable", "ar": "جهاز إيكوغرافي محمول" },
+            "brand": "Fictive",
+            "model": "PX-500",
+            "year": 2025,
+            "condition": "NEW",
+            "price": "3450000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "medical",
+            "categoryName": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img0"
+          },
+          {
+            "id": "l6",
+            "reference": "EQ-2026-000006",
+            "title": { "fr": "Camion benne 19 t", "ar": "شاحنة قلابة 19 طن" },
+            "brand": "Fictive",
+            "model": "PX-600",
+            "year": 2022,
+            "condition": "USED",
+            "price": "12600000.00",
+            "currency": "DZD",
+            "priceOnRequest": false,
+            "priceIncludesVat": false,
+            "availability": "IN_STOCK",
+            "categoryCode": "vehicles",
+            "categoryName": {
+              "fr": "Véhicules utilitaires",
+              "ar": "المركبات النفعية",
+              "en": "Vehicles"
+            },
+            "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+            "supplierWilaya": "09",
+            "coverImageId": "img1"
+          }
+        ],
+        "total": 20,
+        "page": 1,
+        "pageSize": 6
+      }
+    },
+    "GET /auth/me": {
+      "status": 401,
+      "body": { "code": "UNAUTHENTICATED", "message": "No session" }
+    }
+  },
+  "business": {
+    "POST /auth/refresh": {
+      "status": 200,
+      "body": { "accessToken": "demo", "tokenType": "Bearer", "expiresIn": 900 }
+    },
+    "GET /auth/me": {
+      "status": 200,
+      "body": {
+        "user": {
+          "id": "u-biz",
+          "email": "yacine@tassili-agro.dz",
+          "firstName": "Yacine",
+          "lastName": "Haddad",
+          "locale": "fr",
+          "emailVerified": true,
+          "mfaEnabled": true,
+          "mfaSetupRequired": false
+        },
+        "memberships": [
+          {
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+            "legalName": "Tassili Agro Transformation EURL (fictif)",
+            "type": "BUSINESS",
+            "status": "VERIFIED",
+            "roles": [
+              {
+                "code": "business_admin",
+                "name": { "fr": "Administrateur de l'entreprise", "ar": "مسؤول المؤسسة" }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "GET /health": { "status": 200, "body": { "status": "ok", "database": "up", "demo": true } },
+    "GET /organizations/current": {
+      "status": 200,
+      "body": {
+        "id": "0193a1b2-0000-7000-8000-0000000000aa",
+        "type": "BUSINESS",
+        "status": "VERIFIED",
+        "statusReason": null,
+        "legalName": "Tassili Agro Transformation EURL (fictif)",
+        "tradeName": "Tassili Agro",
+        "rcNumber": "31/00-0123456B21",
+        "nif": "000031012345678",
+        "nis": "000031098765432",
+        "articleImposition": "31012345678",
+        "wilayaCode": "31",
+        "address": "Adresse fictive",
+        "email": "contact@exemple.dz",
+        "phone": "+213 21 00 00 00",
+        "defaultLocale": "fr",
+        "verifiedAt": "2026-11-12T10:00:00Z",
+        "createdAt": "2026-11-08T09:00:00Z",
+        "permissions": [
+          "organization.read",
+          "organization.update",
+          "member.read",
+          "member.invite",
+          "member.manage",
+          "role.manage",
+          "audit.read",
+          "quotation.request",
+          "favourite.manage",
+          "document.manage",
+          "application.manage"
+        ]
+      }
+    },
+    "GET /organizations/current/members": {
+      "status": 200,
+      "body": [
+        {
+          "id": "m1",
+          "status": "ACTIVE",
+          "createdAt": "2026-11-10T09:00:00Z",
+          "user": {
+            "id": "u-biz",
+            "email": "yacine@tassili-agro.dz",
+            "firstName": "Yacine",
+            "lastName": "Haddad",
+            "mfaEnabled": false
+          },
+          "roles": [
+            {
+              "role": {
+                "code": "business_admin",
+                "name": { "fr": "Administrateur de l'entreprise", "ar": "مسؤول المؤسسة" }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m2",
+          "status": "ACTIVE",
+          "createdAt": "2026-11-12T09:00:00Z",
+          "user": {
+            "id": "u-2",
+            "email": "amel@tassili-agro.dz",
+            "firstName": "Amel",
+            "lastName": "Kaci",
+            "mfaEnabled": true
+          },
+          "roles": [
+            {
+              "role": {
+                "code": "business_member",
+                "name": { "fr": "Collaborateur", "ar": "متعاون" }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m3",
+          "status": "DISABLED",
+          "createdAt": "2026-11-13T09:00:00Z",
+          "user": {
+            "id": "u-3",
+            "email": "karim@tassili-agro.dz",
+            "firstName": "Karim",
+            "lastName": "Ait",
+            "mfaEnabled": false
+          },
+          "roles": [
+            {
+              "role": {
+                "code": "business_member",
+                "name": { "fr": "Collaborateur", "ar": "متعاون" }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "GET /organizations/current/roles": {
+      "status": 200,
+      "body": [
+        {
+          "code": "business_admin",
+          "name": { "fr": "Administrateur de l'entreprise", "ar": "مسؤول المؤسسة" },
+          "permissions": [],
+          "assignableByYou": true
+        },
+        {
+          "code": "business_member",
+          "name": { "fr": "Collaborateur", "ar": "متعاون" },
+          "permissions": [],
+          "assignableByYou": true
+        }
+      ]
+    },
+    "GET /organizations/current/invitations": {
+      "status": 200,
+      "body": [
+        {
+          "id": "i1",
+          "email": "comptable@tassili-agro.dz",
+          "expiresAt": "2026-11-22T09:00:00Z",
+          "createdAt": "2026-11-15T09:00:00Z",
+          "role": { "code": "business_member", "name": { "fr": "Collaborateur", "ar": "متعاون" } }
+        }
+      ]
+    },
+    "GET /marketplace/listings/EQ-2026-000001": {
+      "status": 200,
+      "body": {
+        "id": "l1",
+        "reference": "EQ-2026-000001",
+        "title": {
+          "fr": "Pelle hydraulique sur chenilles 22 t",
+          "ar": "حفارة هيدروليكية على جنزير 22 طن"
+        },
+        "brand": "Fictive",
+        "model": "PX-100",
+        "year": 2025,
+        "condition": "NEW",
+        "price": "18500000.00",
+        "currency": "DZD",
+        "priceOnRequest": false,
+        "priceIncludesVat": false,
+        "availability": "IN_STOCK",
+        "categoryCode": "construction",
+        "categoryName": {
+          "fr": "BTP et travaux publics",
+          "ar": "البناء والأشغال العمومية",
+          "en": "Construction"
+        },
+        "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+        "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+        "supplierWilaya": "09",
+        "coverImageId": "img1",
+        "description": {
+          "fr": "Pelle sur chenilles, moteur diesel conforme, cabine climatisée.\nLivrée avec godet standard 1,2 m³.",
+          "ar": "حفارة على جنزير بمحرك ديزل ومقصورة مكيفة."
+        },
+        "leadTimeDays": 21,
+        "deliveryWilayas": [],
+        "warrantyMonths": 12,
+        "specs": { "power_kw": 110, "weight_kg": 22000, "fuel": "diesel" },
+        "viewCount": 128,
+        "category": {
+          "code": "construction",
+          "name": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "specSchema": [
+            {
+              "key": "power_kw",
+              "label": { "fr": "Puissance", "ar": "القدرة" },
+              "type": "number",
+              "unit": "kW"
+            },
+            {
+              "key": "weight_kg",
+              "label": { "fr": "Poids", "ar": "الوزن" },
+              "type": "number",
+              "unit": "kg"
+            },
+            {
+              "key": "fuel",
+              "label": { "fr": "Énergie", "ar": "الطاقة" },
+              "type": "select",
+              "options": [
+                { "value": "diesel", "label": { "fr": "Diesel", "ar": "ديزل" } },
+                { "value": "electric", "label": { "fr": "Électrique", "ar": "كهربائي" } }
+              ]
+            },
+            {
+              "key": "hours_used",
+              "label": { "fr": "Heures d'utilisation", "ar": "ساعات الاستعمال" },
+              "type": "number",
+              "unit": "h"
+            }
+          ]
+        },
+        "organization": {
+          "id": "0193a1b2-0000-7000-8000-0000000000bb",
+          "legalName": "Atlas Machines Industrielles SARL (fictif)",
+          "tradeName": "Atlas Machines",
+          "wilayaCode": "09"
+        },
+        "images": [{ "id": "img0" }, { "id": "img1" }, { "id": "img2" }],
+        "documents": [
+          {
+            "id": "d1",
+            "kind": "SPEC_SHEET",
+            "fileName": "Fiche technique PX-100.pdf",
+            "sizeBytes": 482000
+          }
+        ]
+      }
+    },
+    "GET /marketplace/images/img0": { "status": 200, "body": null },
+    "GET /marketplace/images/img1": { "status": 200, "body": null },
+    "GET /marketplace/images/img2": { "status": 200, "body": null },
+    "GET /favourites": { "status": 200, "body": [] },
+    "GET /quotation-requests": {
+      "status": 200,
+      "body": [
+        {
+          "id": "r1",
+          "reference": "QR-2026-000009",
+          "status": "QUOTED",
+          "quantity": 2,
+          "message": "Livraison souhaitée à Blida, chantier en cours.",
+          "deliveryWilaya": "09",
+          "businessName": "Tassili Agro Transformation EURL (fictif)",
+          "requesterName": "Yacine Haddad",
+          "createdAt": "2026-11-15T09:30:00Z",
+          "listing": {
+            "id": "l1",
+            "reference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن"
+            },
+            "price": "18500000.00",
+            "organization": {
+              "id": "0193a1b2-0000-7000-8000-0000000000bb",
+              "legalName": "Atlas Machines Industrielles SARL (fictif)"
+            }
+          },
+          "quotations": [
+            {
+              "id": "q1",
+              "reference": "QT-2026-000004",
+              "lines": [
+                {
+                  "label": "Pelle hydraulique PX-100",
+                  "quantity": 2,
+                  "unitPrice": "18500000.00",
+                  "lineTotal": "37000000.00"
+                },
+                {
+                  "label": "Transport et mise en service",
+                  "quantity": 1,
+                  "unitPrice": "350000.00",
+                  "lineTotal": "350000.00"
+                }
+              ],
+              "subtotal": "37350000.00",
+              "vatRate": "19",
+              "vatAmount": "7096500.00",
+              "total": "44446500.00",
+              "currency": "DZD",
+              "validUntil": "2026-11-30",
+              "deliveryTerms": "Livraison sur site sous 3 semaines",
+              "notes": null,
+              "status": "ISSUED",
+              "createdAt": "2026-11-15T11:00:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    "GET /documents": {
+      "status": 200,
+      "body": {
+        "types": [
+          {
+            "code": "rc_extract",
+            "name": {
+              "fr": "Extrait du registre du commerce",
+              "ar": "مستخرج السجل التجاري",
+              "en": "Commercial register extract"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": ["BUSINESS"],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          },
+          {
+            "code": "nif_certificate",
+            "name": { "fr": "Attestation NIF", "ar": "شهادة رقم التعريف الجبائي", "en": "NIF" },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": ["BUSINESS"],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          },
+          {
+            "code": "tax_clearance",
+            "name": {
+              "fr": "Extrait de rôle / situation fiscale",
+              "ar": "مستخرج الجدول / الوضعية الجبائية",
+              "en": "Tax clearance"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": true
+          },
+          {
+            "code": "cnas_clearance",
+            "name": {
+              "fr": "Attestation de mise à jour CNAS",
+              "ar": "شهادة التحيين لدى CNAS",
+              "en": "CNAS"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": true
+          },
+          {
+            "code": "financial_statements",
+            "name": {
+              "fr": "États financiers (bilan, TCR)",
+              "ar": "القوائم المالية",
+              "en": "Financial statements"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": false
+          },
+          {
+            "code": "bank_statements",
+            "name": {
+              "fr": "Relevés bancaires (6 derniers mois)",
+              "ar": "كشوف الحساب البنكي",
+              "en": "Bank statements"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          }
+        ],
+        "documents": [
+          {
+            "id": "d1",
+            "typeCode": "rc_extract",
+            "title": "Extrait RC 2026",
+            "fileName": "rc_extract.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 246000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "ACCEPTED",
+            "reviewReason": null,
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d2",
+            "typeCode": "nif_certificate",
+            "title": "Attestation NIF",
+            "fileName": "nif_certificate.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 247000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "REJECTED",
+            "reviewReason": "Document illisible, merci de déposer un scan net.",
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d3",
+            "typeCode": "tax_clearance",
+            "title": "Situation fiscale novembre 2026",
+            "fileName": "tax_clearance.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 248000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "PENDING",
+            "reviewReason": null,
+            "expiresOn": "2027-02-28",
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d4",
+            "typeCode": "financial_statements",
+            "title": "Bilans 2024 et 2025",
+            "fileName": "financial_statements.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 249000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "PENDING",
+            "reviewReason": null,
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          }
+        ],
+        "checklist": {
+          "verification": [
+            { "typeCode": "rc_extract", "state": "ACCEPTED" },
+            { "typeCode": "nif_certificate", "state": "REJECTED" }
+          ],
+          "application": [
+            { "typeCode": "tax_clearance", "state": "PENDING" },
+            { "typeCode": "cnas_clearance", "state": "MISSING" },
+            { "typeCode": "financial_statements", "state": "PENDING" }
+          ]
+        }
+      }
+    },
+    "GET /applications": {
+      "status": 200,
+      "body": [
+        {
+          "id": "a1",
+          "reference": "FA-2026-000003",
+          "quotationId": "q1",
+          "categoryCode": "construction",
+          "equipmentAmount": "44446500.00",
+          "downPayment": "6446500.00",
+          "financedAmount": "38000000.00",
+          "durationMonths": 48,
+          "preferredType": null,
+          "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+          "companyProfile": {
+            "yearsInBusiness": 9,
+            "employees": 85,
+            "annualRevenue": "420000000",
+            "sector": "Agroalimentaire"
+          },
+          "businessSnapshot": {
+            "legalName": "Tassili Agro Transformation EURL (fictif)",
+            "tradeName": "Tassili Agro",
+            "nif": "000031012345678",
+            "rcNumber": "31/00-0123456B21",
+            "nis": "000031098765432",
+            "wilayaCode": "31",
+            "address": null
+          },
+          "equipmentSnapshot": {
+            "quotationReference": "QT-2026-000004",
+            "listingReference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن",
+              "en": ""
+            },
+            "brand": "Fictiva",
+            "model": "PX-220",
+            "year": 2025,
+            "condition": "NEW",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+          },
+          "submittedAt": "2026-11-14T09:00:00Z",
+          "createdAt": "2026-11-13T09:00:00Z",
+          "status": "SUBMITTED",
+          "submissions": [{}, {}, {}],
+          "offers": [{ "status": "ISSUED" }, { "status": "ISSUED" }]
+        },
+        {
+          "id": "a2",
+          "reference": "FA-2026-000005",
+          "quotationId": "q1",
+          "categoryCode": "construction",
+          "equipmentAmount": "44446500.00",
+          "downPayment": "6446500.00",
+          "financedAmount": "38000000.00",
+          "durationMonths": 48,
+          "preferredType": null,
+          "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+          "companyProfile": {
+            "yearsInBusiness": 9,
+            "employees": 85,
+            "annualRevenue": "420000000",
+            "sector": "Agroalimentaire"
+          },
+          "businessSnapshot": {
+            "legalName": "Tassili Agro Transformation EURL (fictif)",
+            "tradeName": "Tassili Agro",
+            "nif": "000031012345678",
+            "rcNumber": "31/00-0123456B21",
+            "nis": "000031098765432",
+            "wilayaCode": "31",
+            "address": null
+          },
+          "equipmentSnapshot": {
+            "quotationReference": "QT-2026-000004",
+            "listingReference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن",
+              "en": ""
+            },
+            "brand": "Fictiva",
+            "model": "PX-220",
+            "year": 2025,
+            "condition": "NEW",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+          },
+          "submittedAt": "2026-11-14T09:00:00Z",
+          "createdAt": "2026-11-13T09:00:00Z",
+          "status": "DRAFT",
+          "submissions": [],
+          "offers": []
+        }
+      ]
+    },
+    "GET /applications/eligible-quotations": {
+      "status": 200,
+      "body": [
+        {
+          "id": "q1",
+          "reference": "QT-2026-000004",
+          "total": "44446500.00",
+          "listing": {
+            "reference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن",
+              "en": ""
+            },
+            "organization": { "legalName": "Atlas Machines Industrielles SARL (fictif)" }
+          }
+        }
+      ]
+    },
+    "GET /applications/a2": {
+      "status": 200,
+      "body": {
+        "id": "a2",
+        "reference": "FA-2026-000005",
+        "quotationId": "q1",
+        "categoryCode": "construction",
+        "equipmentAmount": "44446500.00",
+        "downPayment": "6446500.00",
+        "financedAmount": "38000000.00",
+        "durationMonths": 48,
+        "preferredType": null,
+        "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+        "companyProfile": {
+          "yearsInBusiness": 9,
+          "employees": 85,
+          "annualRevenue": "420000000",
+          "sector": "Agroalimentaire"
+        },
+        "businessSnapshot": {
+          "legalName": "Tassili Agro Transformation EURL (fictif)",
+          "tradeName": "Tassili Agro",
+          "nif": "000031012345678",
+          "rcNumber": "31/00-0123456B21",
+          "nis": "000031098765432",
+          "wilayaCode": "31",
+          "address": null
+        },
+        "equipmentSnapshot": {
+          "quotationReference": "QT-2026-000004",
+          "listingReference": "EQ-2026-000001",
+          "title": {
+            "fr": "Pelle hydraulique sur chenilles 22 t",
+            "ar": "حفارة هيدروليكية على جنزير 22 طن",
+            "en": ""
+          },
+          "brand": "Fictiva",
+          "model": "PX-220",
+          "year": 2025,
+          "condition": "NEW",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+        },
+        "submittedAt": null,
+        "createdAt": "2026-11-13T09:00:00Z",
+        "status": "DRAFT",
+        "documents": [
+          {
+            "document": {
+              "id": "d3",
+              "typeCode": "tax_clearance",
+              "title": "Situation fiscale novembre 2026",
+              "fileName": "tax_clearance.pdf",
+              "mimeType": "application/pdf",
+              "sizeBytes": 248000,
+              "scanStatus": "CLEAN",
+              "reviewStatus": "PENDING",
+              "reviewReason": null,
+              "expiresOn": "2027-02-28",
+              "createdAt": "2026-11-12T10:00:00Z"
+            }
+          }
+        ],
+        "submissions": [],
+        "offers": []
+      }
+    },
+    "GET /applications/a2/matches": {
+      "status": 200,
+      "body": [
+        {
+          "productId": "p1",
+          "institutionOrgId": "bankA",
+          "institutionName": "Hodna Leasing SPA (fictif)",
+          "name": { "fr": "Crédit-bail équipement", "ar": "الاعتماد الإيجاري للمعدات", "en": "" },
+          "productType": "LEASING",
+          "indicativeRateMin": "7.5000",
+          "indicativeRateMax": "9.0000",
+          "requiredDocumentTypes": ["bank_statements"],
+          "indicative": true,
+          "score": 100,
+          "checks": [
+            { "criterion": "amount", "met": true },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": true },
+            { "criterion": "category", "met": true },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": true }
+          ],
+          "installmentRange": { "min": "918808.21", "max": "945636.59" }
+        },
+        {
+          "productId": "p2",
+          "institutionOrgId": "bankB",
+          "institutionName": "Banque Fictive du Sahel SPA",
+          "name": { "fr": "Ijara matériel", "ar": "إجارة المعدات", "en": "" },
+          "productType": "IJARA",
+          "indicativeRateMin": "7.0000",
+          "indicativeRateMax": "8.5000",
+          "requiredDocumentTypes": [],
+          "indicative": true,
+          "score": 83,
+          "checks": [
+            { "criterion": "amount", "met": true },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": false },
+            { "criterion": "category", "met": true },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": true }
+          ],
+          "installmentRange": { "min": "909956.27", "max": "936635.53" }
+        },
+        {
+          "productId": "p3",
+          "institutionOrgId": "bankC",
+          "institutionName": "Crédit Populaire Fictif",
+          "name": { "fr": "Leasing PME", "ar": "ليزينغ المؤسسات الصغيرة", "en": "" },
+          "productType": "LEASING",
+          "indicativeRateMin": "8.0000",
+          "indicativeRateMax": "10.0000",
+          "requiredDocumentTypes": [],
+          "indicative": true,
+          "score": 50,
+          "checks": [
+            { "criterion": "amount", "met": false },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": true },
+            { "criterion": "category", "met": false },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": false }
+          ],
+          "installmentRange": { "min": "927698.19", "max": "963771.38" }
+        }
+      ]
+    },
+    "GET /applications/a1": {
+      "status": 200,
+      "body": {
+        "id": "a1",
+        "reference": "FA-2026-000003",
+        "quotationId": "q1",
+        "categoryCode": "construction",
+        "equipmentAmount": "44446500.00",
+        "downPayment": "6446500.00",
+        "financedAmount": "38000000.00",
+        "durationMonths": 48,
+        "preferredType": null,
+        "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+        "companyProfile": {
+          "yearsInBusiness": 9,
+          "employees": 85,
+          "annualRevenue": "420000000",
+          "sector": "Agroalimentaire"
+        },
+        "businessSnapshot": {
+          "legalName": "Tassili Agro Transformation EURL (fictif)",
+          "tradeName": "Tassili Agro",
+          "nif": "000031012345678",
+          "rcNumber": "31/00-0123456B21",
+          "nis": "000031098765432",
+          "wilayaCode": "31",
+          "address": null
+        },
+        "equipmentSnapshot": {
+          "quotationReference": "QT-2026-000004",
+          "listingReference": "EQ-2026-000001",
+          "title": {
+            "fr": "Pelle hydraulique sur chenilles 22 t",
+            "ar": "حفارة هيدروليكية على جنزير 22 طن",
+            "en": ""
+          },
+          "brand": "Fictiva",
+          "model": "PX-220",
+          "year": 2025,
+          "condition": "NEW",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+        },
+        "submittedAt": "2026-11-14T09:00:00Z",
+        "createdAt": "2026-11-13T09:00:00Z",
+        "status": "SUBMITTED",
+        "documents": [
+          {
+            "document": {
+              "id": "d3",
+              "typeCode": "tax_clearance",
+              "title": "Situation fiscale novembre 2026",
+              "fileName": "tax_clearance.pdf",
+              "mimeType": "application/pdf",
+              "sizeBytes": 248000,
+              "scanStatus": "CLEAN",
+              "reviewStatus": "PENDING",
+              "reviewReason": null,
+              "expiresOn": "2027-02-28",
+              "createdAt": "2026-11-12T10:00:00Z"
+            }
+          },
+          {
+            "document": {
+              "id": "d4",
+              "typeCode": "financial_statements",
+              "title": "Bilans 2024 et 2025",
+              "fileName": "financial_statements.pdf",
+              "mimeType": "application/pdf",
+              "sizeBytes": 249000,
+              "scanStatus": "CLEAN",
+              "reviewStatus": "PENDING",
+              "reviewReason": null,
+              "expiresOn": null,
+              "createdAt": "2026-11-12T10:00:00Z"
+            }
+          }
+        ],
+        "submissions": [
+          {
+            "id": "s1",
+            "institutionOrgId": "bankA",
+            "institutionName": "Hodna Leasing SPA (fictif)",
+            "status": "OFFER_MADE",
+            "matchScore": 100,
+            "declineReason": null,
+            "createdAt": "2026-11-14T09:00:00Z",
+            "product": {
+              "id": "p1",
+              "name": { "fr": "Crédit-bail équipement", "ar": "", "en": "" },
+              "productType": "LEASING"
+            },
+            "events": [
+              {
+                "id": "e1",
+                "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+                "kind": "SUBMITTED",
+                "note": null,
+                "createdAt": "2026-11-14T09:00:00Z"
+              },
+              {
+                "id": "e2",
+                "organizationId": "bankA",
+                "kind": "VIEWED",
+                "note": null,
+                "createdAt": "2026-11-14T11:00:00Z"
+              },
+              {
+                "id": "e3",
+                "organizationId": "bankA",
+                "kind": "INFO_REQUESTED",
+                "note": "Merci de préciser le planning de livraison.",
+                "createdAt": "2026-11-14T15:00:00Z"
+              },
+              {
+                "id": "e4",
+                "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+                "kind": "INFO_PROVIDED",
+                "note": "Livraison prévue en mars 2027.",
+                "createdAt": "2026-11-15T08:00:00Z"
+              },
+              {
+                "id": "e5",
+                "organizationId": "bankA",
+                "kind": "OFFER_MADE",
+                "note": null,
+                "createdAt": "2026-11-15T10:00:00Z"
+              }
+            ]
+          },
+          {
+            "id": "s2",
+            "institutionOrgId": "bankB",
+            "institutionName": "Banque Fictive du Sahel SPA",
+            "status": "OFFER_MADE",
+            "matchScore": 86,
+            "declineReason": null,
+            "createdAt": "2026-11-14T09:00:00Z",
+            "product": {
+              "id": "p2",
+              "name": { "fr": "Ijara matériel", "ar": "", "en": "" },
+              "productType": "IJARA"
+            },
+            "events": [
+              {
+                "id": "e6",
+                "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+                "kind": "SUBMITTED",
+                "note": null,
+                "createdAt": "2026-11-14T09:00:00Z"
+              },
+              {
+                "id": "e7",
+                "organizationId": "bankB",
+                "kind": "OFFER_MADE",
+                "note": null,
+                "createdAt": "2026-11-15T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "id": "s3",
+            "institutionOrgId": "bankC",
+            "institutionName": "Crédit Populaire Fictif",
+            "status": "DECLINED",
+            "matchScore": 71,
+            "declineReason": "Montant supérieur à notre plafond pour ce secteur.",
+            "createdAt": "2026-11-14T09:00:00Z",
+            "product": null,
+            "events": [
+              {
+                "id": "e8",
+                "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+                "kind": "SUBMITTED",
+                "note": null,
+                "createdAt": "2026-11-14T09:00:00Z"
+              },
+              {
+                "id": "e9",
+                "organizationId": "bankC",
+                "kind": "DECLINED",
+                "note": "Montant supérieur à notre plafond pour ce secteur.",
+                "createdAt": "2026-11-15T09:00:00Z"
+              }
+            ]
+          }
+        ],
+        "offers": [
+          {
+            "id": "o1",
+            "organizationId": "bankA",
+            "submissionId": "s1",
+            "reference": "OF-2026-000007",
+            "financedAmount": "38000000.00",
+            "downPayment": "6446500.00",
+            "durationMonths": 48,
+            "ratePct": "8.5000",
+            "residualValue": "0.00",
+            "feesAmount": "190000.00",
+            "installmentAmount": "936635.53",
+            "totalCost": "51594005.44",
+            "validUntil": "2026-12-05",
+            "conditions": "Assurance tous risques à la charge du preneur. Sous réserve de la décision du comité.",
+            "status": "ISSUED",
+            "createdAt": "2026-11-15T10:00:00Z"
+          },
+          {
+            "id": "o2",
+            "organizationId": "bankB",
+            "submissionId": "s2",
+            "reference": "OF-2026-000009",
+            "financedAmount": "38000000.00",
+            "downPayment": "6446500.00",
+            "durationMonths": 48,
+            "ratePct": "7.9000",
+            "residualValue": "1900000.00",
+            "feesAmount": "0.00",
+            "installmentAmount": "891522.40",
+            "totalCost": "51139575.20",
+            "validUntil": "2026-12-01",
+            "conditions": "Ijara muntahia bittamlik. Option d’achat en fin de contrat.",
+            "status": "ISSUED",
+            "createdAt": "2026-11-15T12:00:00Z"
+          }
+        ]
+      }
+    },
+    "GET /applications/a1/matches": {
+      "status": 200,
+      "body": [
+        {
+          "productId": "p1",
+          "institutionOrgId": "bankA",
+          "institutionName": "Hodna Leasing SPA (fictif)",
+          "name": { "fr": "Crédit-bail équipement", "ar": "الاعتماد الإيجاري للمعدات", "en": "" },
+          "productType": "LEASING",
+          "indicativeRateMin": "7.5000",
+          "indicativeRateMax": "9.0000",
+          "requiredDocumentTypes": ["bank_statements"],
+          "indicative": true,
+          "score": 100,
+          "checks": [
+            { "criterion": "amount", "met": true },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": true },
+            { "criterion": "category", "met": true },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": true }
+          ],
+          "installmentRange": { "min": "918808.21", "max": "945636.59" }
+        },
+        {
+          "productId": "p2",
+          "institutionOrgId": "bankB",
+          "institutionName": "Banque Fictive du Sahel SPA",
+          "name": { "fr": "Ijara matériel", "ar": "إجارة المعدات", "en": "" },
+          "productType": "IJARA",
+          "indicativeRateMin": "7.0000",
+          "indicativeRateMax": "8.5000",
+          "requiredDocumentTypes": [],
+          "indicative": true,
+          "score": 83,
+          "checks": [
+            { "criterion": "amount", "met": true },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": false },
+            { "criterion": "category", "met": true },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": true }
+          ],
+          "installmentRange": { "min": "909956.27", "max": "936635.53" }
+        },
+        {
+          "productId": "p3",
+          "institutionOrgId": "bankC",
+          "institutionName": "Crédit Populaire Fictif",
+          "name": { "fr": "Leasing PME", "ar": "ليزينغ المؤسسات الصغيرة", "en": "" },
+          "productType": "LEASING",
+          "indicativeRateMin": "8.0000",
+          "indicativeRateMax": "10.0000",
+          "requiredDocumentTypes": [],
+          "indicative": true,
+          "score": 50,
+          "checks": [
+            { "criterion": "amount", "met": false },
+            { "criterion": "duration", "met": true },
+            { "criterion": "downPayment", "met": true },
+            { "criterion": "category", "met": false },
+            { "criterion": "wilaya", "met": true },
+            { "criterion": "yearsInBusiness", "met": false }
+          ],
+          "installmentRange": { "min": "927698.19", "max": "963771.38" }
+        }
+      ]
+    },
+    "GET /reports/overview": {
+      "status": 200,
+      "body": {
+        "kind": "BUSINESS",
+        "requestsSent": 6,
+        "quotationsReceived": 4,
+        "quotationsAccepted": 2,
+        "applicationsSubmitted": 2,
+        "applicationsDraft": 1,
+        "offersReceived": 2,
+        "offersAccepted": 0,
+        "financedAmount": "0.00"
+      }
+    },
+    "GET /notifications": {
+      "status": 200,
+      "body": {
+        "unread": 2,
+        "items": [
+          {
+            "id": "b1",
+            "key": "email.offerReceived",
+            "vars": {
+              "reference": "FA-2026-000003",
+              "institution": "Hodna Leasing SPA (fictif)",
+              "installment": "936 635,53 DA",
+              "duration": "48"
+            },
+            "link": "/app/financing/a1",
+            "readAt": null,
+            "createdAt": "2026-11-15T11:00:00Z"
+          },
+          {
+            "id": "b2",
+            "key": "email.quoteIssued",
+            "vars": {
+              "reference": "QT-2026-000004",
+              "supplier": "Atlas Machines Industrielles SARL (fictif)",
+              "listing": "Pelle hydraulique sur chenilles 22 t",
+              "total": "44 446 500,00 DA TTC",
+              "validUntil": "30/11/2026"
+            },
+            "link": "/app/quotations",
+            "readAt": null,
+            "createdAt": "2026-11-14T09:30:00Z"
+          }
+        ]
+      }
+    }
+  },
+  "bank": {
+    "POST /auth/refresh": {
+      "status": 200,
+      "body": { "accessToken": "demo", "tokenType": "Bearer", "expiresIn": 900 }
+    },
+    "GET /auth/me": {
+      "status": 200,
+      "body": {
+        "user": {
+          "id": "u-bank",
+          "email": "samia@hodna-leasing.dz",
+          "firstName": "Samia",
+          "lastName": "Benali",
+          "locale": "fr",
+          "emailVerified": true,
+          "mfaEnabled": true,
+          "mfaSetupRequired": false
+        },
+        "memberships": [
+          {
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+            "legalName": "Hodna Leasing SPA (fictif)",
+            "type": "FINANCIAL_INSTITUTION",
+            "status": "VERIFIED",
+            "roles": [
+              {
+                "code": "institution_admin",
+                "name": { "fr": "Administrateur", "ar": "مسؤول", "en": "Admin" }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "GET /health": { "status": 200, "body": { "status": "ok", "database": "up", "demo": true } },
+    "POST /auth/mfa/setup": {
+      "status": 200,
+      "body": {
+        "secret": "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP",
+        "otpauthUri": "otpauth://totp/Tasheel%20Leasing%3Asamia%40hodna-leasing.dz?secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP&issuer=Tasheel+Leasing"
+      }
+    },
+    "GET /institution/applications": {
+      "status": 200,
+      "body": [
+        {
+          "id": "s1",
+          "status": "INFO_REQUESTED",
+          "matchScore": 100,
+          "createdAt": "2026-11-14T09:00:00Z",
+          "application": {
+            "id": "a1",
+            "reference": "FA-2026-000003",
+            "quotationId": "q1",
+            "categoryCode": "construction",
+            "equipmentAmount": "44446500.00",
+            "downPayment": "6446500.00",
+            "financedAmount": "38000000.00",
+            "durationMonths": 48,
+            "preferredType": null,
+            "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+            "companyProfile": {
+              "yearsInBusiness": 9,
+              "employees": 85,
+              "annualRevenue": "420000000",
+              "sector": "Agroalimentaire"
+            },
+            "businessSnapshot": {
+              "legalName": "Tassili Agro Transformation EURL (fictif)",
+              "tradeName": "Tassili Agro",
+              "nif": "000031012345678",
+              "rcNumber": "31/00-0123456B21",
+              "nis": "000031098765432",
+              "wilayaCode": "31",
+              "address": null
+            },
+            "equipmentSnapshot": {
+              "quotationReference": "QT-2026-000004",
+              "listingReference": "EQ-2026-000001",
+              "title": {
+                "fr": "Pelle hydraulique sur chenilles 22 t",
+                "ar": "حفارة هيدروليكية على جنزير 22 طن",
+                "en": ""
+              },
+              "brand": "Fictiva",
+              "model": "PX-220",
+              "year": 2025,
+              "condition": "NEW",
+              "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+            },
+            "submittedAt": "2026-11-14T09:00:00Z",
+            "createdAt": "2026-11-13T09:00:00Z"
+          },
+          "product": {
+            "id": "p1",
+            "name": { "fr": "Crédit-bail équipement", "ar": "", "en": "" },
+            "productType": "LEASING"
+          }
+        },
+        {
+          "id": "s4",
+          "status": "SENT",
+          "matchScore": 83,
+          "createdAt": "2026-11-15T14:00:00Z",
+          "application": {
+            "id": "a1",
+            "reference": "FA-2026-000006",
+            "quotationId": "q1",
+            "categoryCode": "construction",
+            "equipmentAmount": "44446500.00",
+            "downPayment": "6446500.00",
+            "financedAmount": "9200000.00",
+            "durationMonths": 36,
+            "preferredType": null,
+            "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+            "companyProfile": {
+              "yearsInBusiness": 9,
+              "employees": 85,
+              "annualRevenue": "420000000",
+              "sector": "Agroalimentaire"
+            },
+            "businessSnapshot": {
+              "legalName": "Clinique Les Palmiers SARL (fictif)",
+              "tradeName": "Tassili Agro",
+              "nif": "000031012345678",
+              "rcNumber": "31/00-0123456B21",
+              "nis": "000031098765432",
+              "wilayaCode": "31",
+              "address": null
+            },
+            "equipmentSnapshot": {
+              "quotationReference": "QT-2026-000004",
+              "listingReference": "EQ-2026-000001",
+              "title": { "fr": "Échographe portable", "ar": "", "en": "" },
+              "brand": "Fictiva",
+              "model": "PX-220",
+              "year": 2025,
+              "condition": "NEW",
+              "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+            },
+            "submittedAt": "2026-11-14T09:00:00Z",
+            "createdAt": "2026-11-13T09:00:00Z"
+          },
+          "product": null
+        },
+        {
+          "id": "s5",
+          "status": "OFFER_MADE",
+          "matchScore": 67,
+          "createdAt": "2026-11-13T09:00:00Z",
+          "application": {
+            "id": "a1",
+            "reference": "FA-2026-000002",
+            "quotationId": "q1",
+            "categoryCode": "construction",
+            "equipmentAmount": "44446500.00",
+            "downPayment": "6446500.00",
+            "financedAmount": "12600000.00",
+            "durationMonths": 48,
+            "preferredType": null,
+            "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+            "companyProfile": {
+              "yearsInBusiness": 9,
+              "employees": 85,
+              "annualRevenue": "420000000",
+              "sector": "Agroalimentaire"
+            },
+            "businessSnapshot": {
+              "legalName": "Djurdjura Travaux Publics SPA (fictif)",
+              "tradeName": "Tassili Agro",
+              "nif": "000031012345678",
+              "rcNumber": "31/00-0123456B21",
+              "nis": "000031098765432",
+              "wilayaCode": "31",
+              "address": null
+            },
+            "equipmentSnapshot": {
+              "quotationReference": "QT-2026-000004",
+              "listingReference": "EQ-2026-000001",
+              "title": { "fr": "Chargeuse sur pneus 3 m³", "ar": "", "en": "" },
+              "brand": "Fictiva",
+              "model": "PX-220",
+              "year": 2025,
+              "condition": "NEW",
+              "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+            },
+            "submittedAt": "2026-11-14T09:00:00Z",
+            "createdAt": "2026-11-13T09:00:00Z"
+          },
+          "product": null
+        }
+      ]
+    },
+    "GET /institution/applications/s1": {
+      "status": 200,
+      "body": {
+        "id": "s1",
+        "status": "UNDER_REVIEW",
+        "declineReason": null,
+        "application": {
+          "id": "a1",
+          "reference": "FA-2026-000003",
+          "quotationId": "q1",
+          "categoryCode": "construction",
+          "equipmentAmount": "44446500.00",
+          "downPayment": "6446500.00",
+          "financedAmount": "38000000.00",
+          "durationMonths": 48,
+          "preferredType": null,
+          "purpose": "Acquisition d’une pelle pour le chantier de la station de Mostaganem.",
+          "companyProfile": {
+            "yearsInBusiness": 9,
+            "employees": 85,
+            "annualRevenue": "420000000",
+            "sector": "Agroalimentaire"
+          },
+          "businessSnapshot": {
+            "legalName": "Tassili Agro Transformation EURL (fictif)",
+            "tradeName": "Tassili Agro",
+            "nif": "000031012345678",
+            "rcNumber": "31/00-0123456B21",
+            "nis": "000031098765432",
+            "wilayaCode": "31",
+            "address": null
+          },
+          "equipmentSnapshot": {
+            "quotationReference": "QT-2026-000004",
+            "listingReference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن",
+              "en": ""
+            },
+            "brand": "Fictiva",
+            "model": "PX-220",
+            "year": 2025,
+            "condition": "NEW",
+            "supplierName": "Atlas Machines Industrielles SARL (fictif)"
+          },
+          "submittedAt": "2026-11-14T09:00:00Z",
+          "createdAt": "2026-11-13T09:00:00Z",
+          "status": "SUBMITTED",
+          "documents": [
+            {
+              "document": {
+                "id": "d3",
+                "typeCode": "tax_clearance",
+                "title": "Situation fiscale novembre 2026",
+                "fileName": "tax_clearance.pdf",
+                "mimeType": "application/pdf",
+                "sizeBytes": 248000,
+                "scanStatus": "CLEAN",
+                "reviewStatus": "PENDING",
+                "reviewReason": null,
+                "expiresOn": "2027-02-28",
+                "createdAt": "2026-11-12T10:00:00Z"
+              }
+            },
+            {
+              "document": {
+                "id": "d4",
+                "typeCode": "financial_statements",
+                "title": "Bilans 2024 et 2025",
+                "fileName": "financial_statements.pdf",
+                "mimeType": "application/pdf",
+                "sizeBytes": 249000,
+                "scanStatus": "CLEAN",
+                "reviewStatus": "PENDING",
+                "reviewReason": null,
+                "expiresOn": null,
+                "createdAt": "2026-11-12T10:00:00Z"
+              }
+            }
+          ]
+        },
+        "product": { "id": "p1", "name": { "fr": "Crédit-bail équipement", "ar": "", "en": "" } },
+        "events": [
+          {
+            "id": "e1",
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+            "kind": "SUBMITTED",
+            "note": null,
+            "createdAt": "2026-11-14T09:00:00Z"
+          },
+          {
+            "id": "e2",
+            "organizationId": "bankA",
+            "kind": "VIEWED",
+            "note": null,
+            "createdAt": "2026-11-14T11:00:00Z"
+          },
+          {
+            "id": "e3",
+            "organizationId": "bankA",
+            "kind": "INFO_REQUESTED",
+            "note": "Merci de préciser le planning de livraison.",
+            "createdAt": "2026-11-14T15:00:00Z"
+          },
+          {
+            "id": "e4",
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+            "kind": "INFO_PROVIDED",
+            "note": "Livraison prévue en mars 2027.",
+            "createdAt": "2026-11-15T08:00:00Z"
+          }
+        ],
+        "offers": []
+      }
+    },
+    "GET /organizations/current": {
+      "status": 200,
+      "body": {
+        "id": "0193a1b2-0000-7000-8000-0000000000aa",
+        "type": "FINANCIAL_INSTITUTION",
+        "status": "VERIFIED",
+        "statusReason": null,
+        "legalName": "Hodna Leasing SPA (fictif)",
+        "tradeName": "Hodna Leasing",
+        "rcNumber": "28/00-0123456B21",
+        "nif": "000028012345678",
+        "nis": "000028098765432",
+        "articleImposition": "28012345678",
+        "wilayaCode": "28",
+        "address": "Adresse fictive",
+        "email": "contact@exemple.dz",
+        "phone": "+213 21 00 00 00",
+        "defaultLocale": "fr",
+        "verifiedAt": "2026-11-12T10:00:00Z",
+        "createdAt": "2026-11-08T09:00:00Z",
+        "permissions": [
+          "organization.read",
+          "organization.update",
+          "member.read",
+          "member.invite",
+          "member.manage",
+          "role.manage",
+          "audit.read",
+          "product.manage",
+          "application.review",
+          "offer.issue",
+          "document.manage",
+          "billing.read"
+        ]
+      }
+    },
+    "GET /institution/products": {
+      "status": 200,
+      "body": [
+        {
+          "id": "p1",
+          "name": { "fr": "Crédit-bail équipement", "ar": "الاعتماد الإيجاري للمعدات", "en": "" },
+          "description": {},
+          "productType": "LEASING",
+          "minAmount": "2000000.00",
+          "maxAmount": "150000000.00",
+          "minDurationMonths": 24,
+          "maxDurationMonths": 84,
+          "minDownPaymentPct": "10.00",
+          "categoryCodes": [],
+          "wilayaCodes": [],
+          "minYearsInBusiness": 2,
+          "indicativeRateMin": "7.5000",
+          "indicativeRateMax": "9.0000",
+          "requiredDocumentTypes": ["bank_statements"],
+          "isActive": true,
+          "_count": { "submissions": 12, "offers": 5 }
+        },
+        {
+          "id": "p4",
+          "name": { "fr": "Leasing véhicules utilitaires", "ar": "", "en": "" },
+          "description": {},
+          "productType": "LEASING",
+          "minAmount": "1000000.00",
+          "maxAmount": "20000000.00",
+          "minDurationMonths": 12,
+          "maxDurationMonths": 60,
+          "minDownPaymentPct": "20.00",
+          "categoryCodes": ["vehicles"],
+          "wilayaCodes": ["16", "09", "35"],
+          "minYearsInBusiness": 0,
+          "indicativeRateMin": "8.0000",
+          "indicativeRateMax": "10.5000",
+          "requiredDocumentTypes": [],
+          "isActive": false,
+          "_count": { "submissions": 0, "offers": 0 }
+        }
+      ]
+    },
+    "GET /marketplace/categories": {
+      "status": 200,
+      "body": [
+        {
+          "id": "c0",
+          "code": "construction",
+          "name": { "fr": "BTP", "ar": "", "en": "" },
+          "parentId": null,
+          "listingCount": 0,
+          "specSchema": []
+        },
+        {
+          "id": "c1",
+          "code": "agriculture",
+          "name": { "fr": "Agriculture", "ar": "", "en": "" },
+          "parentId": null,
+          "listingCount": 0,
+          "specSchema": []
+        },
+        {
+          "id": "c2",
+          "code": "industrial",
+          "name": { "fr": "Machines industrielles", "ar": "", "en": "" },
+          "parentId": null,
+          "listingCount": 0,
+          "specSchema": []
+        },
+        {
+          "id": "c3",
+          "code": "medical",
+          "name": { "fr": "Médical", "ar": "", "en": "" },
+          "parentId": null,
+          "listingCount": 0,
+          "specSchema": []
+        },
+        {
+          "id": "c4",
+          "code": "vehicles",
+          "name": { "fr": "Véhicules", "ar": "", "en": "" },
+          "parentId": null,
+          "listingCount": 0,
+          "specSchema": []
+        }
+      ]
+    },
+    "GET /institution/products/document-types": {
+      "status": 200,
+      "body": [
+        {
+          "code": "rc_extract",
+          "name": {
+            "fr": "Extrait du registre du commerce",
+            "ar": "مستخرج السجل التجاري",
+            "en": "Commercial register extract"
+          },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": ["BUSINESS"],
+          "requiredForApplication": false,
+          "hasExpiry": false
+        },
+        {
+          "code": "nif_certificate",
+          "name": { "fr": "Attestation NIF", "ar": "شهادة رقم التعريف الجبائي", "en": "NIF" },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": ["BUSINESS"],
+          "requiredForApplication": false,
+          "hasExpiry": false
+        },
+        {
+          "code": "tax_clearance",
+          "name": {
+            "fr": "Extrait de rôle / situation fiscale",
+            "ar": "مستخرج الجدول / الوضعية الجبائية",
+            "en": "Tax clearance"
+          },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": [],
+          "requiredForApplication": true,
+          "hasExpiry": true
+        },
+        {
+          "code": "cnas_clearance",
+          "name": {
+            "fr": "Attestation de mise à jour CNAS",
+            "ar": "شهادة التحيين لدى CNAS",
+            "en": "CNAS"
+          },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": [],
+          "requiredForApplication": true,
+          "hasExpiry": true
+        },
+        {
+          "code": "financial_statements",
+          "name": {
+            "fr": "États financiers (bilan, TCR)",
+            "ar": "القوائم المالية",
+            "en": "Financial statements"
+          },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": [],
+          "requiredForApplication": true,
+          "hasExpiry": false
+        },
+        {
+          "code": "bank_statements",
+          "name": {
+            "fr": "Relevés bancaires (6 derniers mois)",
+            "ar": "كشوف الحساب البنكي",
+            "en": "Bank statements"
+          },
+          "ownerTypes": ["BUSINESS"],
+          "requiredForVerification": [],
+          "requiredForApplication": false,
+          "hasExpiry": false
+        }
+      ]
+    },
+    "GET /notifications": {
+      "status": 200,
+      "body": {
+        "unread": 2,
+        "items": [
+          {
+            "id": "n1",
+            "key": "email.quoteAccepted",
+            "vars": { "reference": "QT-2026-000004", "business": "Tassili Agro" },
+            "link": "/app/quotations/q1",
+            "readAt": null,
+            "createdAt": "2026-11-15T10:00:00Z"
+          },
+          {
+            "id": "n2",
+            "key": "email.invoiceIssued",
+            "vars": {
+              "number": "TSL-2026-000003",
+              "total": "35 998,82 DZD",
+              "dueDate": "02/12/2026"
+            },
+            "link": "/app/billing/invoices/inv1",
+            "readAt": null,
+            "createdAt": "2026-11-02T09:00:00Z"
+          },
+          {
+            "id": "n3",
+            "key": "email.orgVerified",
+            "vars": { "organization": "Atlas Machines" },
+            "link": "/app/organization",
+            "readAt": "2026-11-09T09:00:00Z",
+            "createdAt": "2026-11-09T08:00:00Z"
+          }
+        ]
+      }
+    },
+    "GET /reports/overview": {
+      "status": 200,
+      "body": {
+        "kind": "FINANCIAL_INSTITUTION",
+        "received": 22,
+        "toReview": 4,
+        "offersIssued": 15,
+        "offersAccepted": 6,
+        "acceptanceRate": 40,
+        "avgHoursToFirstOffer": "31",
+        "financedVolume": "212000000.00",
+        "commissionsAccrued": "0.00",
+        "invoicesDue": "0.00",
+        "receivedByMonth": [
+          { "month": "2026-06", "value": "1" },
+          { "month": "2026-07", "value": "2" },
+          { "month": "2026-08", "value": "4" },
+          { "month": "2026-09", "value": "3" },
+          { "month": "2026-10", "value": "6" },
+          { "month": "2026-11", "value": "6" }
+        ]
+      }
+    }
+  },
+  "admin": {
+    "POST /auth/refresh": {
+      "status": 200,
+      "body": { "accessToken": "demo", "tokenType": "Bearer", "expiresIn": 900 }
+    },
+    "GET /auth/me": {
+      "status": 200,
+      "body": {
+        "user": {
+          "id": "u-admin",
+          "email": "admin@demo.tasheel.local",
+          "firstName": "Admin",
+          "lastName": "Tasheel",
+          "locale": "fr",
+          "emailVerified": true,
+          "mfaEnabled": true,
+          "mfaSetupRequired": false
+        },
+        "memberships": [
+          {
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000ff",
+            "legalName": "Tasheel Leasing (démo)",
+            "type": "PLATFORM",
+            "status": "VERIFIED",
+            "roles": [
+              {
+                "code": "platform_super_admin",
+                "name": { "fr": "Super administrateur", "ar": "مدير عام", "en": "Super admin" }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "GET /health": { "status": 200, "body": { "status": "ok", "database": "up", "demo": true } },
+    "GET /admin/kpis": {
+      "status": 200,
+      "body": {
+        "organizations": {
+          "BUSINESS": { "PENDING_VERIFICATION": 4, "VERIFIED": 12 },
+          "SUPPLIER": { "PENDING_VERIFICATION": 2, "VERIFIED": 7, "SUSPENDED": 1 },
+          "FINANCIAL_INSTITUTION": { "VERIFIED": 2, "PENDING_VERIFICATION": 1 }
+        },
+        "pendingVerification": 7,
+        "users": 63,
+        "newOrganizations30d": 9,
+        "generatedAt": "2026-11-15T16:00:00Z"
+      }
+    },
+    "GET /admin/organizations?status=PENDING_VERIFICATION&limit=25": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "o1",
+            "type": "SUPPLIER",
+            "status": "PENDING_VERIFICATION",
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "wilayaCode": "09",
+            "nif": "000009012345678",
+            "rcNumber": "09/00-1111111B20",
+            "createdAt": "2026-11-08T10:00:00Z",
+            "verifiedAt": null,
+            "_count": { "members": 2 }
+          },
+          {
+            "id": "o2",
+            "type": "BUSINESS",
+            "status": "PENDING_VERIFICATION",
+            "legalName": "Tassili Agro Transformation EURL (fictif)",
+            "tradeName": null,
+            "wilayaCode": "31",
+            "nif": null,
+            "rcNumber": null,
+            "createdAt": "2026-11-10T09:00:00Z",
+            "verifiedAt": null,
+            "_count": { "members": 3 }
+          },
+          {
+            "id": "o3",
+            "type": "FINANCIAL_INSTITUTION",
+            "status": "PENDING_VERIFICATION",
+            "legalName": "Banque Fictive du Sahel SPA",
+            "tradeName": "BFS",
+            "wilayaCode": "16",
+            "nif": "000016099999999",
+            "rcNumber": "16/00-2222222B19",
+            "createdAt": "2026-11-12T09:00:00Z",
+            "verifiedAt": null,
+            "_count": { "members": 1 }
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "GET /admin/organizations/o1": {
+      "status": 200,
+      "body": {
+        "id": "o1",
+        "type": "SUPPLIER",
+        "status": "PENDING_VERIFICATION",
+        "statusReason": null,
+        "legalName": "Atlas Machines Industrielles SARL (fictif)",
+        "tradeName": "Atlas Machines",
+        "rcNumber": "31/00-0123456B21",
+        "nif": "000031012345678",
+        "nis": "000009098765432",
+        "articleImposition": null,
+        "wilayaCode": "09",
+        "address": null,
+        "email": "contact@tassili-agro.dz",
+        "phone": "+213 41 00 00 00",
+        "defaultLocale": "fr",
+        "verifiedAt": null,
+        "createdAt": "2026-11-10T09:00:00Z",
+        "permissions": [
+          "audit.read",
+          "member.invite",
+          "member.manage",
+          "member.read",
+          "organization.read",
+          "organization.update",
+          "role.manage"
+        ],
+        "members": [
+          {
+            "id": "m1",
+            "status": "ACTIVE",
+            "createdAt": "2026-11-08T10:00:00Z",
+            "user": {
+              "id": "u1",
+              "email": "karim@atlas-machines.dz",
+              "firstName": "Karim",
+              "lastName": "Mansouri",
+              "emailVerifiedAt": "2026-11-08T10:05:00Z",
+              "mfaEnabled": false,
+              "lastLoginAt": "2026-11-15T08:12:00Z"
+            },
+            "roles": [
+              {
+                "role": {
+                  "code": "supplier_admin",
+                  "name": { "fr": "Administrateur fournisseur", "ar": "مسؤول المورد" }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "GET /admin/audit-logs?organizationId=o1&limit=20": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "a1",
+            "organizationId": "o1",
+            "actorUserId": "u1",
+            "action": "organization.updated",
+            "entityType": "Organization",
+            "entityId": "o1",
+            "diff": { "after": { "nis": "000009098765432" } },
+            "ipAddress": null,
+            "createdAt": "2026-11-14T15:20:00Z"
+          },
+          {
+            "id": "a2",
+            "organizationId": "o1",
+            "actorUserId": "u1",
+            "action": "auth.registered",
+            "entityType": "Organization",
+            "entityId": "o1",
+            "diff": { "organizationType": "SUPPLIER" },
+            "ipAddress": null,
+            "createdAt": "2026-11-08T10:00:00Z"
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "GET /admin/settings/marketplace": { "status": 200, "body": { "moderation": true } },
+    "GET /admin/listings?status=PENDING_REVIEW": {
+      "status": 200,
+      "body": [
+        {
+          "id": "l5",
+          "reference": "EQ-2026-000005",
+          "title": { "fr": "Échographe portable", "ar": "جهاز إيكوغرافي محمول" },
+          "brand": "Fictive",
+          "model": "PX-500",
+          "year": 2025,
+          "condition": "NEW",
+          "price": "3450000.00",
+          "currency": "DZD",
+          "priceOnRequest": false,
+          "priceIncludesVat": false,
+          "availability": "IN_STOCK",
+          "categoryCode": "medical",
+          "categoryName": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" },
+          "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+          "supplierWilaya": "09",
+          "coverImageId": "img0",
+          "status": "PENDING_REVIEW",
+          "updatedAt": "2026-11-15T12:00:00Z",
+          "category": {
+            "name": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" }
+          },
+          "organization": { "id": "o9", "legalName": "MediEquip Algérie SARL (fictif)" }
+        }
+      ]
+    },
+    "GET /admin/organizations/o1/documents": {
+      "status": 200,
+      "body": {
+        "types": [
+          {
+            "code": "rc_extract",
+            "name": {
+              "fr": "Extrait du registre du commerce",
+              "ar": "مستخرج السجل التجاري",
+              "en": "Commercial register extract"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": ["BUSINESS"],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          },
+          {
+            "code": "nif_certificate",
+            "name": { "fr": "Attestation NIF", "ar": "شهادة رقم التعريف الجبائي", "en": "NIF" },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": ["BUSINESS"],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          },
+          {
+            "code": "tax_clearance",
+            "name": {
+              "fr": "Extrait de rôle / situation fiscale",
+              "ar": "مستخرج الجدول / الوضعية الجبائية",
+              "en": "Tax clearance"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": true
+          },
+          {
+            "code": "cnas_clearance",
+            "name": {
+              "fr": "Attestation de mise à jour CNAS",
+              "ar": "شهادة التحيين لدى CNAS",
+              "en": "CNAS"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": true
+          },
+          {
+            "code": "financial_statements",
+            "name": {
+              "fr": "États financiers (bilan, TCR)",
+              "ar": "القوائم المالية",
+              "en": "Financial statements"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": true,
+            "hasExpiry": false
+          },
+          {
+            "code": "bank_statements",
+            "name": {
+              "fr": "Relevés bancaires (6 derniers mois)",
+              "ar": "كشوف الحساب البنكي",
+              "en": "Bank statements"
+            },
+            "ownerTypes": ["BUSINESS"],
+            "requiredForVerification": [],
+            "requiredForApplication": false,
+            "hasExpiry": false
+          }
+        ],
+        "documents": [
+          {
+            "id": "d1",
+            "typeCode": "rc_extract",
+            "title": "Extrait RC 2026",
+            "fileName": "rc_extract.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 246000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "ACCEPTED",
+            "reviewReason": null,
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d2",
+            "typeCode": "nif_certificate",
+            "title": "Attestation NIF",
+            "fileName": "nif_certificate.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 247000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "REJECTED",
+            "reviewReason": "Document illisible, merci de déposer un scan net.",
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d3",
+            "typeCode": "tax_clearance",
+            "title": "Situation fiscale novembre 2026",
+            "fileName": "tax_clearance.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 248000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "PENDING",
+            "reviewReason": null,
+            "expiresOn": "2027-02-28",
+            "createdAt": "2026-11-12T10:00:00Z"
+          },
+          {
+            "id": "d4",
+            "typeCode": "financial_statements",
+            "title": "Bilans 2024 et 2025",
+            "fileName": "financial_statements.pdf",
+            "mimeType": "application/pdf",
+            "sizeBytes": 249000,
+            "scanStatus": "CLEAN",
+            "reviewStatus": "PENDING",
+            "reviewReason": null,
+            "expiresOn": null,
+            "createdAt": "2026-11-12T10:00:00Z"
+          }
+        ],
+        "checklist": {
+          "verification": [
+            { "typeCode": "rc_extract", "state": "ACCEPTED" },
+            { "typeCode": "nif_certificate", "state": "REJECTED" }
+          ],
+          "application": [
+            { "typeCode": "tax_clearance", "state": "PENDING" },
+            { "typeCode": "cnas_clearance", "state": "MISSING" },
+            { "typeCode": "financial_statements", "state": "PENDING" }
+          ]
+        }
+      }
+    },
+    "GET /notifications": {
+      "status": 200,
+      "body": {
+        "unread": 2,
+        "items": [
+          {
+            "id": "n1",
+            "key": "email.quoteAccepted",
+            "vars": { "reference": "QT-2026-000004", "business": "Tassili Agro" },
+            "link": "/app/quotations/q1",
+            "readAt": null,
+            "createdAt": "2026-11-15T10:00:00Z"
+          },
+          {
+            "id": "n2",
+            "key": "email.invoiceIssued",
+            "vars": {
+              "number": "TSL-2026-000003",
+              "total": "35 998,82 DZD",
+              "dueDate": "02/12/2026"
+            },
+            "link": "/app/billing/invoices/inv1",
+            "readAt": null,
+            "createdAt": "2026-11-02T09:00:00Z"
+          },
+          {
+            "id": "n3",
+            "key": "email.orgVerified",
+            "vars": { "organization": "Atlas Machines" },
+            "link": "/app/organization",
+            "readAt": "2026-11-09T09:00:00Z",
+            "createdAt": "2026-11-09T08:00:00Z"
+          }
+        ]
+      }
+    },
+    "GET /admin/reports": {
+      "status": 200,
+      "body": {
+        "publishedListings": 58,
+        "quotationRequests": 141,
+        "acceptedQuotations": 39,
+        "acceptedQuotationValue": "412300000.00",
+        "acceptedOffers": 17,
+        "financedVolume": "598000000.00",
+        "commissionsAccrued": "1240500.00",
+        "receivables": "2310400.25",
+        "overdue": "514201.98",
+        "collected": "3802100.00",
+        "financedByMonth": [
+          { "month": "2026-06", "value": "42000000.0" },
+          { "month": "2026-07", "value": "65000000.0" },
+          { "month": "2026-08", "value": "51000000.0" },
+          { "month": "2026-09", "value": "120000000.0" },
+          { "month": "2026-10", "value": "148000000.0" },
+          { "month": "2026-11", "value": "172000000.0" }
+        ],
+        "commissionsByMonth": [
+          { "month": "2026-06", "value": "310000" },
+          { "month": "2026-07", "value": "420500" },
+          { "month": "2026-08", "value": "380000" },
+          { "month": "2026-09", "value": "760200" },
+          { "month": "2026-10", "value": "905000" },
+          { "month": "2026-11", "value": "1012000" }
+        ]
+      }
+    },
+    "GET /admin/billing/invoices": {
+      "status": 200,
+      "body": [
+        {
+          "id": "inv1",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000003",
+          "status": "ISSUED",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-12-02",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": null,
+          "paymentReference": null,
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        },
+        {
+          "id": "inv2",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000002",
+          "status": "PAID",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-12-02",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": "2026-10-20",
+          "paymentReference": "VIR-88231",
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        },
+        {
+          "id": "inv3",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000001",
+          "status": "ISSUED",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-10-15",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": null,
+          "paymentReference": null,
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        },
+        {
+          "id": "inv4",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Hodna Leasing SPA (fictif)",
+          "kind": "INVOICE",
+          "number": null,
+          "status": "DRAFT",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": null,
+          "dueDate": null,
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {},
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": null,
+          "paymentReference": null,
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        }
+      ]
+    },
+    "GET /admin/billing/commissions": {
+      "status": 200,
+      "body": [
+        {
+          "id": "c1",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "trigger": "QUOTATION_ACCEPTED",
+          "sourceType": "Quotation",
+          "sourceReference": "QT-2026-000004",
+          "baseAmount": "1512555.50",
+          "ratePct": "2.0000",
+          "amount": "30251.11",
+          "status": "INVOICED",
+          "invoiceId": "inv1",
+          "invoice": { "id": "inv1", "number": "TSL-2026-000003", "status": "ISSUED" },
+          "rule": {
+            "name": { "fr": "Commission fournisseur standard", "ar": "عمولة المورد", "en": "" },
+            "basis": "PERCENT"
+          },
+          "accruedAt": "2026-10-12T10:00:00Z"
+        },
+        {
+          "id": "c2",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Hodna Leasing SPA (fictif)",
+          "trigger": "OFFER_ACCEPTED",
+          "sourceType": "Offer",
+          "sourceReference": "OF-2026-000007",
+          "baseAmount": "38000000.00",
+          "ratePct": null,
+          "amount": "150000.00",
+          "status": "ACCRUED",
+          "invoiceId": null,
+          "invoice": null,
+          "rule": {
+            "name": { "fr": "Forfait établissement", "ar": "مبلغ جزافي", "en": "" },
+            "basis": "FIXED"
+          },
+          "accruedAt": "2026-11-15T12:00:00Z"
+        }
+      ]
+    },
+    "GET /admin/billing/rules": {
+      "status": 200,
+      "body": [
+        {
+          "id": "r1",
+          "name": {
+            "fr": "Commission fournisseur standard",
+            "ar": "عمولة المورد القياسية",
+            "en": ""
+          },
+          "trigger": "QUOTATION_ACCEPTED",
+          "payerOrgId": null,
+          "basis": "PERCENT",
+          "ratePct": "2.0000",
+          "fixedAmount": null,
+          "minAmount": "5000.00",
+          "maxAmount": "500000.00",
+          "categoryCodes": [],
+          "validFrom": "2026-10-01",
+          "validTo": null,
+          "isActive": true,
+          "_count": { "commissions": 11 }
+        },
+        {
+          "id": "r2",
+          "name": { "fr": "Forfait établissement", "ar": "مبلغ جزافي للمؤسسة", "en": "" },
+          "trigger": "OFFER_ACCEPTED",
+          "payerOrgId": null,
+          "basis": "FIXED",
+          "ratePct": null,
+          "fixedAmount": "150000.00",
+          "minAmount": null,
+          "maxAmount": null,
+          "categoryCodes": [],
+          "validFrom": "2026-11-01",
+          "validTo": null,
+          "isActive": true,
+          "_count": { "commissions": 1 }
+        }
+      ]
+    },
+    "GET /marketplace/categories": { "status": 200, "body": [] },
+    "GET /admin/organizations?type=SUPPLIER&status=VERIFIED&limit=100": {
+      "status": 200,
+      "body": { "items": [], "nextCursor": null }
+    },
+    "GET /admin/billing/settings": {
+      "status": 200,
+      "body": {
+        "issuer": {
+          "legalName": "Tasheel Leasing SPA (fictif)",
+          "address": "12 rue des Frères Fictifs, Hydra",
+          "wilayaCode": "16",
+          "rcNumber": "16/00-9999999B26",
+          "nif": "000016999999999",
+          "nis": "000016888888888",
+          "articleImposition": "16999999999",
+          "bankName": "Banque Fictive du Sahel",
+          "rib": "000 00000 0000000000 00",
+          "email": "facturation@tasheel.example",
+          "phone": "+213 21 00 00 00"
+        },
+        "vatRate": "19.00",
+        "paymentTermsDays": 30,
+        "invoicePrefix": "TSL",
+        "creditNotePrefix": "AV"
+      }
+    },
+    "GET /admin/billing/invoices/inv4": {
+      "status": 200,
+      "body": {
+        "id": "inv4",
+        "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+        "organizationName": "Hodna Leasing SPA (fictif)",
+        "kind": "INVOICE",
+        "number": null,
+        "status": "DRAFT",
+        "creditedInvoiceId": null,
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-31",
+        "issueDate": null,
+        "dueDate": null,
+        "subtotal": "30251.11",
+        "vatRate": "19.00",
+        "vatAmount": "5747.71",
+        "total": "35998.82",
+        "currency": "DZD",
+        "issuer": {},
+        "customer": {
+          "legalName": "Atlas Machines Industrielles SARL (fictif)",
+          "tradeName": "Atlas Machines",
+          "address": "Zone industrielle, Blida",
+          "wilayaCode": "09",
+          "rcNumber": "09/00-1111111B20",
+          "nif": "000009012345678",
+          "nis": "000009098765432",
+          "articleImposition": "09012345678"
+        },
+        "notes": null,
+        "paidAt": null,
+        "paymentReference": null,
+        "createdAt": "2026-11-01T09:00:00Z",
+        "lines": [
+          {
+            "id": "l1",
+            "label": "Commission sur devis accepté QT-2026-000004",
+            "amount": "30251.11",
+            "sortOrder": 0
+          }
+        ]
+      }
+    },
+    "GET /organizations/current": {
+      "status": 200,
+      "body": {
+        "id": "0193a1b2-0000-7000-8000-0000000000ff",
+        "type": "PLATFORM",
+        "status": "VERIFIED",
+        "statusReason": null,
+        "legalName": "Tasheel Leasing (démo)",
+        "tradeName": "Tasheel",
+        "rcNumber": "16/00-0123456B21",
+        "nif": "000016012345678",
+        "nis": "000016098765432",
+        "articleImposition": "16012345678",
+        "wilayaCode": "16",
+        "address": "Adresse fictive",
+        "email": "contact@exemple.dz",
+        "phone": "+213 21 00 00 00",
+        "defaultLocale": "fr",
+        "verifiedAt": "2026-11-12T10:00:00Z",
+        "createdAt": "2026-11-08T09:00:00Z",
+        "permissions": [
+          "organization.read",
+          "organization.update",
+          "member.read",
+          "member.invite",
+          "member.manage",
+          "role.manage",
+          "audit.read",
+          "admin.organization.read",
+          "admin.organization.verify",
+          "admin.settings.manage",
+          "admin.support_session",
+          "admin.audit.read",
+          "admin.kpi.read",
+          "admin.listing.moderate",
+          "admin.document.review",
+          "admin.billing.manage"
+        ]
+      }
+    }
+  },
+  "supplier": {
+    "POST /auth/refresh": {
+      "status": 200,
+      "body": { "accessToken": "demo", "tokenType": "Bearer", "expiresIn": 900 }
+    },
+    "GET /auth/me": {
+      "status": 200,
+      "body": {
+        "user": {
+          "id": "u-sup",
+          "email": "karim@atlas-machines.dz",
+          "firstName": "Karim",
+          "lastName": "Mansouri",
+          "locale": "fr",
+          "emailVerified": true,
+          "mfaEnabled": true,
+          "mfaSetupRequired": false
+        },
+        "memberships": [
+          {
+            "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "type": "SUPPLIER",
+            "status": "VERIFIED",
+            "roles": [
+              {
+                "code": "supplier_admin",
+                "name": {
+                  "fr": "Administrateur fournisseur",
+                  "ar": "مسؤول المورد",
+                  "en": "Supplier admin"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "GET /health": { "status": 200, "body": { "status": "ok", "database": "up", "demo": true } },
+    "GET /supplier/listings": {
+      "status": 200,
+      "body": [
+        {
+          "id": "l1",
+          "reference": "EQ-2026-000001",
+          "title": {
+            "fr": "Pelle hydraulique sur chenilles 22 t",
+            "ar": "حفارة هيدروليكية على جنزير 22 طن"
+          },
+          "brand": "Fictive",
+          "model": "PX-100",
+          "year": 2025,
+          "condition": "NEW",
+          "price": "18500000.00",
+          "currency": "DZD",
+          "priceOnRequest": false,
+          "priceIncludesVat": false,
+          "availability": "IN_STOCK",
+          "categoryCode": "construction",
+          "categoryName": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+          "supplierWilaya": "09",
+          "coverImageId": "img1",
+          "status": "PUBLISHED",
+          "statusReason": null,
+          "categoryId": "c1",
+          "category": {
+            "code": "construction",
+            "name": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            }
+          },
+          "viewCount": 128,
+          "updatedAt": "2026-11-14T10:00:00Z",
+          "images": [{ "id": "img0" }],
+          "_count": { "quotationRequests": 3 }
+        },
+        {
+          "id": "l4",
+          "reference": "EQ-2026-000004",
+          "title": { "fr": "Chargeuse sur pneus 3 m³", "ar": "جرافة على عجلات 3 م³" },
+          "brand": "Fictive",
+          "model": "PX-400",
+          "year": 2019,
+          "condition": "REFURBISHED",
+          "price": "14250000.00",
+          "currency": "DZD",
+          "priceOnRequest": false,
+          "priceIncludesVat": false,
+          "availability": "IN_STOCK",
+          "categoryCode": "construction",
+          "categoryName": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+          "supplierWilaya": "09",
+          "coverImageId": "img4",
+          "status": "DRAFT",
+          "statusReason": null,
+          "categoryId": "c1",
+          "category": {
+            "code": "construction",
+            "name": {
+              "fr": "BTP et travaux publics",
+              "ar": "البناء والأشغال العمومية",
+              "en": "Construction"
+            }
+          },
+          "viewCount": 0,
+          "updatedAt": "2026-11-15T09:00:00Z",
+          "images": [],
+          "_count": { "quotationRequests": 0 }
+        },
+        {
+          "id": "l3",
+          "reference": "EQ-2026-000003",
+          "title": { "fr": "Centre d'usinage CNC 3 axes", "ar": "مركز تشغيل CNC ثلاثي المحاور" },
+          "brand": "Fictive",
+          "model": "PX-300",
+          "year": 2025,
+          "condition": "NEW",
+          "price": null,
+          "currency": "DZD",
+          "priceOnRequest": true,
+          "priceIncludesVat": false,
+          "availability": "IN_STOCK",
+          "categoryCode": "industrial",
+          "categoryName": {
+            "fr": "Machines industrielles",
+            "ar": "الآلات الصناعية",
+            "en": "Industrial"
+          },
+          "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+          "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+          "supplierWilaya": "09",
+          "coverImageId": "img3",
+          "status": "REJECTED",
+          "statusReason": "Photos floues, merci de les remplacer.",
+          "categoryId": "c3",
+          "category": {
+            "code": "industrial",
+            "name": { "fr": "Machines industrielles", "ar": "الآلات الصناعية", "en": "Industrial" }
+          },
+          "viewCount": 0,
+          "updatedAt": "2026-11-13T09:00:00Z",
+          "images": [{ "id": "img2" }],
+          "_count": { "quotationRequests": 0 }
+        }
+      ]
+    },
+    "GET /supplier/listings/l1/images/img0": { "status": 200, "body": null },
+    "GET /supplier/listings/l3/images/img2": { "status": 200, "body": null },
+    "GET /marketplace/categories": {
+      "status": 200,
+      "body": [
+        {
+          "id": "c1",
+          "code": "construction",
+          "name": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "parentId": null,
+          "listingCount": 7,
+          "specSchema": [
+            {
+              "key": "power_kw",
+              "label": { "fr": "Puissance", "ar": "القدرة" },
+              "type": "number",
+              "unit": "kW"
+            },
+            {
+              "key": "weight_kg",
+              "label": { "fr": "Poids", "ar": "الوزن" },
+              "type": "number",
+              "unit": "kg"
+            },
+            {
+              "key": "fuel",
+              "label": { "fr": "Énergie", "ar": "الطاقة" },
+              "type": "select",
+              "options": [
+                { "value": "diesel", "label": { "fr": "Diesel", "ar": "ديزل" } },
+                { "value": "electric", "label": { "fr": "Électrique", "ar": "كهربائي" } }
+              ]
+            },
+            {
+              "key": "hours_used",
+              "label": { "fr": "Heures d'utilisation", "ar": "ساعات الاستعمال" },
+              "type": "number",
+              "unit": "h"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "code": "agriculture",
+          "name": { "fr": "Agriculture", "ar": "الفلاحة", "en": "Agriculture" },
+          "parentId": null,
+          "listingCount": 5,
+          "specSchema": []
+        },
+        {
+          "id": "c3",
+          "code": "industrial",
+          "name": { "fr": "Machines industrielles", "ar": "الآلات الصناعية", "en": "Industrial" },
+          "parentId": null,
+          "listingCount": 4,
+          "specSchema": []
+        },
+        {
+          "id": "c4",
+          "code": "medical",
+          "name": { "fr": "Équipement médical", "ar": "المعدات الطبية", "en": "Medical" },
+          "parentId": null,
+          "listingCount": 2,
+          "specSchema": []
+        },
+        {
+          "id": "c5",
+          "code": "vehicles",
+          "name": { "fr": "Véhicules utilitaires", "ar": "المركبات النفعية", "en": "Vehicles" },
+          "parentId": null,
+          "listingCount": 2,
+          "specSchema": []
+        }
+      ]
+    },
+    "GET /supplier/listings/l1": {
+      "status": 200,
+      "body": {
+        "id": "l1",
+        "reference": "EQ-2026-000001",
+        "title": {
+          "fr": "Pelle hydraulique sur chenilles 22 t",
+          "ar": "حفارة هيدروليكية على جنزير 22 طن"
+        },
+        "brand": "Fictive",
+        "model": "PX-100",
+        "year": 2025,
+        "condition": "NEW",
+        "price": "18500000.00",
+        "currency": "DZD",
+        "priceOnRequest": false,
+        "priceIncludesVat": false,
+        "availability": "IN_STOCK",
+        "categoryCode": "construction",
+        "categoryName": {
+          "fr": "BTP et travaux publics",
+          "ar": "البناء والأشغال العمومية",
+          "en": "Construction"
+        },
+        "supplierId": "0193a1b2-0000-7000-8000-0000000000bb",
+        "supplierName": "Atlas Machines Industrielles SARL (fictif)",
+        "supplierWilaya": "09",
+        "coverImageId": "img1",
+        "description": {
+          "fr": "Pelle sur chenilles, moteur diesel conforme, cabine climatisée.\nLivrée avec godet standard 1,2 m³.",
+          "ar": "حفارة على جنزير بمحرك ديزل ومقصورة مكيفة."
+        },
+        "leadTimeDays": 21,
+        "deliveryWilayas": [],
+        "warrantyMonths": 12,
+        "specs": { "power_kw": 110, "weight_kg": 22000, "fuel": "diesel" },
+        "viewCount": 128,
+        "category": {
+          "code": "construction",
+          "name": {
+            "fr": "BTP et travaux publics",
+            "ar": "البناء والأشغال العمومية",
+            "en": "Construction"
+          },
+          "specSchema": [
+            {
+              "key": "power_kw",
+              "label": { "fr": "Puissance", "ar": "القدرة" },
+              "type": "number",
+              "unit": "kW"
+            },
+            {
+              "key": "weight_kg",
+              "label": { "fr": "Poids", "ar": "الوزن" },
+              "type": "number",
+              "unit": "kg"
+            },
+            {
+              "key": "fuel",
+              "label": { "fr": "Énergie", "ar": "الطاقة" },
+              "type": "select",
+              "options": [
+                { "value": "diesel", "label": { "fr": "Diesel", "ar": "ديزل" } },
+                { "value": "electric", "label": { "fr": "Électrique", "ar": "كهربائي" } }
+              ]
+            },
+            {
+              "key": "hours_used",
+              "label": { "fr": "Heures d'utilisation", "ar": "ساعات الاستعمال" },
+              "type": "number",
+              "unit": "h"
+            }
+          ]
+        },
+        "organization": {
+          "id": "0193a1b2-0000-7000-8000-0000000000bb",
+          "legalName": "Atlas Machines Industrielles SARL (fictif)",
+          "tradeName": "Atlas Machines",
+          "wilayaCode": "09"
+        },
+        "images": [{ "id": "img0" }, { "id": "img1" }, { "id": "img2" }],
+        "documents": [
+          {
+            "id": "d1",
+            "kind": "SPEC_SHEET",
+            "fileName": "Fiche technique PX-100.pdf",
+            "sizeBytes": 482000
+          }
+        ],
+        "status": "PUBLISHED",
+        "statusReason": null,
+        "categoryId": "c1",
+        "updatedAt": "2026-11-14T10:00:00Z"
+      }
+    },
+    "GET /supplier/listings/l1/images/img1": { "status": 200, "body": null },
+    "GET /supplier/listings/l1/images/img2": { "status": 200, "body": null },
+    "GET /supplier/quotation-requests": {
+      "status": 200,
+      "body": [
+        {
+          "id": "r1",
+          "reference": "QR-2026-000009",
+          "status": "QUOTED",
+          "quantity": 2,
+          "message": "Livraison souhaitée à Blida, chantier en cours.",
+          "deliveryWilaya": "09",
+          "businessName": "Tassili Agro Transformation EURL (fictif)",
+          "requesterName": "Yacine Haddad",
+          "createdAt": "2026-11-15T09:30:00Z",
+          "listing": {
+            "id": "l1",
+            "reference": "EQ-2026-000001",
+            "title": {
+              "fr": "Pelle hydraulique sur chenilles 22 t",
+              "ar": "حفارة هيدروليكية على جنزير 22 طن"
+            },
+            "price": "18500000.00",
+            "organization": {
+              "id": "0193a1b2-0000-7000-8000-0000000000bb",
+              "legalName": "Atlas Machines Industrielles SARL (fictif)"
+            }
+          },
+          "quotations": [
+            {
+              "id": "q1",
+              "reference": "QT-2026-000004",
+              "lines": [
+                {
+                  "label": "Pelle hydraulique PX-100",
+                  "quantity": 2,
+                  "unitPrice": "18500000.00",
+                  "lineTotal": "37000000.00"
+                },
+                {
+                  "label": "Transport et mise en service",
+                  "quantity": 1,
+                  "unitPrice": "350000.00",
+                  "lineTotal": "350000.00"
+                }
+              ],
+              "subtotal": "37350000.00",
+              "vatRate": "19",
+              "vatAmount": "7096500.00",
+              "total": "44446500.00",
+              "currency": "DZD",
+              "validUntil": "2026-11-30",
+              "deliveryTerms": "Livraison sur site sous 3 semaines",
+              "notes": null,
+              "status": "ISSUED",
+              "createdAt": "2026-11-15T11:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "r2",
+          "reference": "QR-2026-000011",
+          "status": "OPEN",
+          "quantity": 1,
+          "message": null,
+          "deliveryWilaya": null,
+          "businessName": "Oasis Froid Industriel SARL (fictif)",
+          "requesterName": "Nadia Belkacem",
+          "createdAt": "2026-11-15T14:10:00Z",
+          "listing": {
+            "id": "l4",
+            "reference": "EQ-2026-000004",
+            "title": { "fr": "Chargeuse sur pneus 3 m³", "ar": "جرافة على عجلات 3 م³" },
+            "price": "14250000.00",
+            "organization": {
+              "id": "0193a1b2-0000-7000-8000-0000000000bb",
+              "legalName": "Atlas Machines Industrielles SARL (fictif)"
+            }
+          },
+          "quotations": []
+        }
+      ]
+    },
+    "GET /notifications": {
+      "status": 200,
+      "body": {
+        "unread": 2,
+        "items": [
+          {
+            "id": "n1",
+            "key": "email.quoteAccepted",
+            "vars": { "reference": "QT-2026-000004", "business": "Tassili Agro" },
+            "link": "/app/quotations/q1",
+            "readAt": null,
+            "createdAt": "2026-11-15T10:00:00Z"
+          },
+          {
+            "id": "n2",
+            "key": "email.invoiceIssued",
+            "vars": {
+              "number": "TSL-2026-000003",
+              "total": "35 998,82 DZD",
+              "dueDate": "02/12/2026"
+            },
+            "link": "/app/billing/invoices/inv1",
+            "readAt": null,
+            "createdAt": "2026-11-02T09:00:00Z"
+          },
+          {
+            "id": "n3",
+            "key": "email.orgVerified",
+            "vars": { "organization": "Atlas Machines" },
+            "link": "/app/organization",
+            "readAt": "2026-11-09T09:00:00Z",
+            "createdAt": "2026-11-09T08:00:00Z"
+          }
+        ]
+      }
+    },
+    "GET /reports/overview": {
+      "status": 200,
+      "body": {
+        "kind": "SUPPLIER",
+        "publishedListings": 14,
+        "views": 1286,
+        "requestsReceived": 37,
+        "requestsAwaiting": 3,
+        "quotationsIssued": 29,
+        "quotationsAccepted": 11,
+        "acceptanceRate": 37.9,
+        "acceptedValue": "86420500.00",
+        "commissionsAccrued": "432102.50",
+        "invoicesDue": "514201.98",
+        "requestsByMonth": [
+          { "month": "2026-06", "value": "3" },
+          { "month": "2026-07", "value": "5" },
+          { "month": "2026-08", "value": "4" },
+          { "month": "2026-09", "value": "8" },
+          { "month": "2026-10", "value": "9" },
+          { "month": "2026-11", "value": "8" }
+        ]
+      }
+    },
+    "GET /organizations/current": {
+      "status": 200,
+      "body": {
+        "id": "0193a1b2-0000-7000-8000-0000000000aa",
+        "type": "SUPPLIER",
+        "status": "VERIFIED",
+        "statusReason": null,
+        "legalName": "Atlas Machines Industrielles SARL (fictif)",
+        "tradeName": "Atlas Machines",
+        "rcNumber": "09/00-0123456B21",
+        "nif": "000009012345678",
+        "nis": "000009098765432",
+        "articleImposition": "09012345678",
+        "wilayaCode": "09",
+        "address": "Adresse fictive",
+        "email": "contact@exemple.dz",
+        "phone": "+213 21 00 00 00",
+        "defaultLocale": "fr",
+        "verifiedAt": "2026-11-12T10:00:00Z",
+        "createdAt": "2026-11-08T09:00:00Z",
+        "permissions": [
+          "organization.read",
+          "organization.update",
+          "member.read",
+          "member.invite",
+          "member.manage",
+          "role.manage",
+          "audit.read",
+          "listing.manage",
+          "quotation.respond",
+          "document.manage",
+          "billing.read"
+        ]
+      }
+    },
+    "GET /billing/invoices": {
+      "status": 200,
+      "body": [
+        {
+          "id": "inv1",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000003",
+          "status": "ISSUED",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-12-02",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": null,
+          "paymentReference": null,
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        },
+        {
+          "id": "inv2",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000002",
+          "status": "PAID",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-12-02",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": "2026-10-20",
+          "paymentReference": "VIR-88231",
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        },
+        {
+          "id": "inv3",
+          "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+          "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+          "kind": "INVOICE",
+          "number": "TSL-2026-000001",
+          "status": "ISSUED",
+          "creditedInvoiceId": null,
+          "periodStart": "2026-10-01",
+          "periodEnd": "2026-10-31",
+          "issueDate": "2026-11-02",
+          "dueDate": "2026-10-15",
+          "subtotal": "30251.11",
+          "vatRate": "19.00",
+          "vatAmount": "5747.71",
+          "total": "35998.82",
+          "currency": "DZD",
+          "issuer": {
+            "legalName": "Tasheel Leasing SPA (fictif)",
+            "address": "12 rue des Frères Fictifs, Hydra",
+            "wilayaCode": "16",
+            "rcNumber": "16/00-9999999B26",
+            "nif": "000016999999999",
+            "nis": "000016888888888",
+            "articleImposition": "16999999999",
+            "bankName": "Banque Fictive du Sahel",
+            "rib": "000 00000 0000000000 00",
+            "email": "facturation@tasheel.example",
+            "phone": "+213 21 00 00 00"
+          },
+          "customer": {
+            "legalName": "Atlas Machines Industrielles SARL (fictif)",
+            "tradeName": "Atlas Machines",
+            "address": "Zone industrielle, Blida",
+            "wilayaCode": "09",
+            "rcNumber": "09/00-1111111B20",
+            "nif": "000009012345678",
+            "nis": "000009098765432",
+            "articleImposition": "09012345678"
+          },
+          "notes": null,
+          "paidAt": null,
+          "paymentReference": null,
+          "createdAt": "2026-11-01T09:00:00Z",
+          "lines": [
+            {
+              "id": "l1",
+              "label": "Commission sur devis accepté QT-2026-000004",
+              "amount": "30251.11",
+              "sortOrder": 0
+            }
+          ]
+        }
+      ]
+    },
+    "GET /billing/invoices/inv1": {
+      "status": 200,
+      "body": {
+        "id": "inv1",
+        "organizationId": "0193a1b2-0000-7000-8000-0000000000aa",
+        "organizationName": "Atlas Machines Industrielles SARL (fictif)",
+        "kind": "INVOICE",
+        "number": "TSL-2026-000003",
+        "status": "ISSUED",
+        "creditedInvoiceId": null,
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-31",
+        "issueDate": "2026-11-02",
+        "dueDate": "2026-12-02",
+        "subtotal": "30251.11",
+        "vatRate": "19.00",
+        "vatAmount": "5747.71",
+        "total": "35998.82",
+        "currency": "DZD",
+        "issuer": {
+          "legalName": "Tasheel Leasing SPA (fictif)",
+          "address": "12 rue des Frères Fictifs, Hydra",
+          "wilayaCode": "16",
+          "rcNumber": "16/00-9999999B26",
+          "nif": "000016999999999",
+          "nis": "000016888888888",
+          "articleImposition": "16999999999",
+          "bankName": "Banque Fictive du Sahel",
+          "rib": "000 00000 0000000000 00",
+          "email": "facturation@tasheel.example",
+          "phone": "+213 21 00 00 00"
+        },
+        "customer": {
+          "legalName": "Atlas Machines Industrielles SARL (fictif)",
+          "tradeName": "Atlas Machines",
+          "address": "Zone industrielle, Blida",
+          "wilayaCode": "09",
+          "rcNumber": "09/00-1111111B20",
+          "nif": "000009012345678",
+          "nis": "000009098765432",
+          "articleImposition": "09012345678"
+        },
+        "notes": null,
+        "paidAt": null,
+        "paymentReference": null,
+        "createdAt": "2026-11-01T09:00:00Z",
+        "lines": [
+          {
+            "id": "l1",
+            "label": "Commission sur devis accepté QT-2026-000004",
+            "amount": "30251.11",
+            "sortOrder": 0
+          }
+        ]
+      }
+    }
+  }
+}

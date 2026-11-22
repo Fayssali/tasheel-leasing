@@ -6,10 +6,12 @@ import { getActiveOrg } from '../lib/api';
 import { useLocalizedName } from '../lib/format';
 import type { ListingCard as Card, LocalizedText } from '../lib/types';
 import { Badge } from './ui';
+import { demoImageUrl } from '../demo/image';
 
 const API = import.meta.env.VITE_API_URL ?? '/api/v1';
 
-export const publicImageUrl = (id: string) => `${API}/marketplace/images/${id}`;
+export const publicImageUrl = (id: string) =>
+  import.meta.env.VITE_DEMO === '1' ? demoImageUrl(id) : `${API}/marketplace/images/${id}`;
 
 /** Localized listing title, falling back to the other language. */
 export function useListingTitle() {

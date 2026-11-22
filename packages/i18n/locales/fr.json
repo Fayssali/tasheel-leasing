@@ -468,7 +468,9 @@
     "INVALID_PAYER": "Cette organisation ne correspond pas au fait générateur (fournisseur ou établissement).",
     "NAME_REQUIRED": "Donnez un nom à la règle, en français ou en arabe.",
     "RATE_REQUIRED": "Une règle en pourcentage a besoin d’un taux.",
-    "AMOUNT_REQUIRED": "Une règle forfaitaire a besoin d’un montant."
+    "AMOUNT_REQUIRED": "Une règle forfaitaire a besoin d’un montant.",
+    "DEMO_READ_ONLY": "Démo en lecture seule : cette action n’est pas enregistrée.",
+    "DEMO_NOT_AVAILABLE": "Cet écran n’est pas inclus dans la démonstration."
   },
   "listingStatus": {
     "DRAFT": "Brouillon",
@@ -1154,6 +1156,19 @@
     }
   },
   "demo": {
-    "banner": "Démonstration — toutes les organisations, personnes et montants sont fictifs. Ne saisissez aucune donnée réelle."
+    "banner": "Démonstration — toutes les organisations, personnes et montants sont fictifs. Ne saisissez aucune donnée réelle.",
+    "switcher": {
+      "title": "Démo interactive",
+      "hint": "Choisissez le point de vue : chaque rôle voit son propre espace.",
+      "readOnly": "Lecture seule : les actions ne sont pas enregistrées. Données fictives.",
+      "current": "rôle actuel",
+      "role": {
+        "anon": "Visiteur (place de marché publique)",
+        "business": "Entreprise — Tassili Agro",
+        "supplier": "Fournisseur — Atlas Machines",
+        "bank": "Établissement financier — Hodna Leasing",
+        "admin": "Équipe Tasheel (administration)"
+      }
+    }
   }
 }
