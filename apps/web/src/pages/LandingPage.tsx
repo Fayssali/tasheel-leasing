@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { ApiStatus } from '../components/ApiStatus';
+import { ApiStatus, DemoBanner } from '../components/ApiStatus';
 import { LanguageSwitch } from '../components/LanguageSwitch';
 import { useAuth } from '../lib/auth';
 import { homePathFor } from '../routes';
@@ -13,6 +13,7 @@ export function LandingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white text-gray-900">
+      <DemoBanner />
       <header className="bg-primary-900 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
           <div>

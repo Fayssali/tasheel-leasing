@@ -41,3 +41,12 @@ EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.API_PORT||3000)+'/api/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 CMD ["node", "dist/main.js"]
+
+# ---- tools: one-off administration commands (reference data, demo data, first admin) ----
+# Not a server image: it keeps the development dependencies the seed scripts need.
+#   docker run --rm --env-file … tasheel-tools                      → reference data only
+#   docker run --rm --env-file … tasheel-tools npx tsx prisma/seed.ts   → full demo data
+#   docker run --rm -it --env-file … tasheel-tools npx tsx scripts/create-platform-admin.ts
+FROM build AS tools
+WORKDIR /app/packages/db
+CMD ["npx", "tsx", "prisma/seed.ts", "--catalogue-only"]

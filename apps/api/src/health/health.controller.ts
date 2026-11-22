@@ -16,13 +16,19 @@ export class HealthController {
   /** Readiness: the API can serve requests (database reachable). Also used by the web footer. */
   @Get()
   @HttpCode(200)
-  async check(): Promise<{ status: 'ok'; database: 'up'; time: string }> {
+  async check(): Promise<{ status: 'ok'; database: 'up'; time: string; demo: boolean }> {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
     } catch {
       throw new ServiceUnavailableException({ status: 'error', database: 'down' });
     }
-    return { status: 'ok', database: 'up', time: new Date().toISOString() };
+    // demo: the web app shows a "fictional data" banner on a public demonstration server.
+    return {
+      status: 'ok',
+      database: 'up',
+      time: new Date().toISOString(),
+      demo: process.env.DEMO_MODE === 'true',
+    };
   }
 
   /** Liveness: the process answers. Touches nothing else. */

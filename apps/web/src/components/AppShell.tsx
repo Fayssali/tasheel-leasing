@@ -5,7 +5,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { homePathFor } from '../routes';
-import { ApiStatus } from './ApiStatus';
+import { ApiStatus, DemoBanner } from './ApiStatus';
 import { LanguageSwitch } from './LanguageSwitch';
 import { NotificationsNavItem } from '../pages/app/NotificationsPage';
 import { OrgStatusBadge } from './StatusBadge';
@@ -165,39 +165,42 @@ export function AppShell({ nav, area }: { nav: NavItem[]; area: 'app' | 'admin' 
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 lg:flex print:bg-white">
-      <aside className="hidden w-64 shrink-0 lg:block print:hidden">{sidebar}</aside>
-      <div className="flex items-center justify-between bg-primary-900 px-4 py-3 text-white lg:hidden print:hidden">
-        <span className="font-semibold">{t('app.name')}</span>
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="rounded border border-white/30 px-2 py-1 text-sm"
-          aria-expanded={open}
-        >
-          {t('shell.menu')}
-        </button>
+    <>
+      <DemoBanner />
+      <div className="min-h-screen bg-gray-50 lg:flex print:bg-white">
+        <aside className="hidden w-64 shrink-0 lg:block print:hidden">{sidebar}</aside>
+        <div className="flex items-center justify-between bg-primary-900 px-4 py-3 text-white lg:hidden print:hidden">
+          <span className="font-semibold">{t('app.name')}</span>
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            className="rounded border border-white/30 px-2 py-1 text-sm"
+            aria-expanded={open}
+          >
+            {t('shell.menu')}
+          </button>
+        </div>
+        {open && <div className="lg:hidden">{sidebar}</div>}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 print:max-w-none print:p-0">
+            <div className="print:hidden">
+              <Banners />
+            </div>
+            {me && me.memberships.length === 0 ? (
+              <Alert tone="action" title={t('shell.noMembershipTitle')}>
+                {t('shell.noMembershipBody')}
+              </Alert>
+            ) : (
+              <Outlet />
+            )}
+          </main>
+          <footer className="flex flex-col gap-2 border-t print:hidden border-gray-200 px-8 py-4 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-3xl text-start">{t('disclaimer.intermediary')}</p>
+            <ApiStatus />
+          </footer>
+        </div>
       </div>
-      {open && <div className="lg:hidden">{sidebar}</div>}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 print:max-w-none print:p-0">
-          <div className="print:hidden">
-            <Banners />
-          </div>
-          {me && me.memberships.length === 0 ? (
-            <Alert tone="action" title={t('shell.noMembershipTitle')}>
-              {t('shell.noMembershipBody')}
-            </Alert>
-          ) : (
-            <Outlet />
-          )}
-        </main>
-        <footer className="flex flex-col gap-2 border-t print:hidden border-gray-200 px-8 py-4 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-3xl text-start">{t('disclaimer.intermediary')}</p>
-          <ApiStatus />
-        </footer>
-      </div>
-    </div>
+    </>
   );
 }
 

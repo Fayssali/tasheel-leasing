@@ -47,4 +47,12 @@ describe('GET /api/v1/health', () => {
     await request(app.getHttpServer()).get('/api/v1/health/live').expect(200, { status: 'ok' });
     expect(prismaMock.$queryRaw).not.toHaveBeenCalled();
   });
+  it('tells the web app when the server is a public demonstration', async () => {
+    process.env.DEMO_MODE = 'true';
+    const res = await request(app.getHttpServer()).get('/api/v1/health').expect(200);
+    delete process.env.DEMO_MODE;
+    expect(res.body.demo).toBe(true);
+    const normal = await request(app.getHttpServer()).get('/api/v1/health').expect(200);
+    expect(normal.body.demo).toBe(false);
+  });
 });

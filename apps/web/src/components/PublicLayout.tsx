@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router';
 import { useAuth } from '../lib/auth';
 import { homePathFor } from '../routes';
-import { ApiStatus } from './ApiStatus';
+import { ApiStatus, DemoBanner } from './ApiStatus';
 import { LanguageSwitch } from './LanguageSwitch';
 
 /** Header and footer of the public site (home, marketplace, equipment and supplier pages). */
@@ -12,6 +12,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
   const { status, me } = useAuth();
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
+      <DemoBanner />
       <header className="bg-primary-900 text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-8">

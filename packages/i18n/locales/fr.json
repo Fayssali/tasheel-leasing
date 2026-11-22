@@ -1152,5 +1152,8 @@
       "email": "E-mail de facturation",
       "phone": "Téléphone"
     }
+  },
+  "demo": {
+    "banner": "Démonstration — toutes les organisations, personnes et montants sont fictifs. Ne saisissez aucune donnée réelle."
   }
 }

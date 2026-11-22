@@ -67,6 +67,9 @@ jobs:
   # mode, web (Nginx) in front. Nothing is pushed or deployed.
   container-images:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     env:
       ADMIN_PW: ci-admin-0123456789abcdef
       APP_PW: ci-app-0123456789abcdef
@@ -146,3 +149,38 @@ jobs:
       - name: Container logs
         if: always()
         run: docker logs api 2>&1 | tail -50; docker logs web 2>&1 | tail -20
+
+      # Only after the smoke test passed, and only from main: publish the tested images to
+      # the private GitHub registry, tagged with the commit and "main". Nothing is deployed.
+      - name: Log in to the GitHub registry
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish images
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "OWNER=$OWNER" >> "$GITHUB_ENV"
+          for name in api web; do
+            for tag in ${{ github.sha }} main; do
+              docker tag tasheel/$name:ci ghcr.io/$OWNER/tasheel-$name:$tag
+              docker push ghcr.io/$OWNER/tasheel-$name:$tag
+            done
+          done
+
+      - name: Build and publish the tools image
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          target: tools
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER }}/tasheel-tools:${{ github.sha }}
+            ghcr.io/${{ env.OWNER }}/tasheel-tools:main
+          cache-from: type=gha,scope=api

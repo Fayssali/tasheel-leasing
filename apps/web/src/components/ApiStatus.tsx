@@ -3,18 +3,37 @@ import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api/v1';
 
-export function ApiStatus() {
-  const { t } = useTranslation();
-  const { isSuccess } = useQuery({
+function useHealth() {
+  return useQuery({
     queryKey: ['health'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/health`);
       if (!res.ok) throw new Error('down');
-      return res.json() as Promise<{ status: string }>;
+      return res.json() as Promise<{ status: string; demo?: boolean }>;
     },
     refetchInterval: 30_000,
     retry: false,
   });
+}
+
+/** Shown on every page when the server runs as a public demonstration (DEMO_MODE=true). */
+export function DemoBanner() {
+  const { t } = useTranslation();
+  const { data } = useHealth();
+  if (!data?.demo) return null;
+  return (
+    <div
+      role="note"
+      className="bg-[#fdf1dc] px-4 py-2 text-center text-sm font-medium text-[#5c3d0a] print:hidden"
+    >
+      {t('demo.banner')}
+    </div>
+  );
+}
+
+export function ApiStatus() {
+  const { t } = useTranslation();
+  const { isSuccess } = useHealth();
 
   return (
     <p className="flex items-center gap-2 whitespace-nowrap">

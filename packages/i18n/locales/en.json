@@ -1152,5 +1152,8 @@
       "email": "Billing email",
       "phone": "Phone"
     }
+  },
+  "demo": {
+    "banner": "Demonstration — all organizations, people and amounts are fictional. Do not enter real data."
   }
 }
